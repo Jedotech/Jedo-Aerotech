@@ -4,7 +4,7 @@ import { schema } from './src/sanity/schemaTypes'
 
 export default defineConfig({
 name: 'default',
-title: 'Jedo Aerotech Admin',
+title: 'Jedo Admin',
 projectId: 'm2pa474h',
 dataset: 'production',
 basePath: '/studio',
