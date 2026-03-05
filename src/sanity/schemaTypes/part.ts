@@ -1,4 +1,4 @@
-export const part = { (0 spaces)
+export const part = {
 
   name: 'part',
 
