@@ -4,9 +4,9 @@ import { NextStudio } from 'next-sanity/studio'
 import config from '../../../sanity.config'
 
 export default function StudioPage() {
-return <NextStudio config={config} />
+  return <NextStudio config={config} />
 }
 
 export const generateStaticParams = () => {
-return [{ index: [] }]
+  return [{ index: [] }]
 }
