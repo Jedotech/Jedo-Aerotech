@@ -18,6 +18,26 @@ export const part = {
 
     },
 
+    {
+
+      name: 'description',
+
+      type: 'text',
+
+      title: 'Description',
+
+    },
+
+    {
+
+      name: 'price',
+
+      type: 'number',
+
+      title: 'Price (USD)',
+
+    },
+
   ],
 
 }
