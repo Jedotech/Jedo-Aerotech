@@ -22,8 +22,9 @@ export default function HomePage() {
           <div style={{ fontWeight: 'bold', fontSize: '1.5rem', letterSpacing: '1px' }}>JEDO <span style={{ color: '#ffb400' }}>TECH</span></div>
         </div>
         <div style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
-          <a href="#rfq" style={{ color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' }}>GET QUOTE</a>
-          <Link href="/studio" style={{ color: 'white', textDecoration: 'none', opacity: '0.8', fontSize: '0.9rem' }}>INVENTORY</Link>
+          {/* UPDATED: Points to your public inventory list */}
+          <Link href="/inventory" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.9rem' }}>INVENTORY</Link>
+          <a href="#rfq" style={{ backgroundColor: '#ffb400', color: '#002d5b', padding: '10px 20px', borderRadius: '5px', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.85rem' }}>GET QUOTE</a>
         </div>
       </nav>
 
@@ -39,7 +40,7 @@ export default function HomePage() {
           Chennai's Premier Sourcing Partner for Cessna, Piper, and Training Fleets. 
           Bridging the gap between global OEMs and Indian operators.
         </p>
-        <a href="#rfq" style={{ backgroundColor: '#ffb400', color: '#002d5b', padding: '18px 45px', borderRadius: '50px', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 6px 25px rgba(255,180,0,0.4)', transition: '0.3s' }}>
+        <a href="#rfq" style={{ backgroundColor: '#ffb400', color: '#002d5b', padding: '18px 45px', borderRadius: '50px', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 6px 25px rgba(255,180,0,0.4)' }}>
           REQUEST AOG QUOTE
         </a>
       </section>
@@ -95,7 +96,7 @@ export default function HomePage() {
             <textarea name="message" placeholder="Condition (NE/OH), AOG Status, or Certification needs..." style={{ ...inputField, height: '120px' }}></textarea>
           </div>
           
-          <button type="submit" style={{ backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '10px', border: 'none', fontWeight: 'bold', cursor: 'pointer', fontSize: '1.2rem', transition: '0.3s' }}>
+          <button type="submit" style={{ backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '10px', border: 'none', fontWeight: 'bold', cursor: 'pointer', fontSize: '1.2rem' }}>
             SUBMIT SOURCING REQUEST
           </button>
         </form>
@@ -106,7 +107,7 @@ export default function HomePage() {
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '50px' }}>
           <div>
             <h3 style={{ color: '#ffb400', marginBottom: '15px' }}>JEDO TECHNOLOGIES</h3>
-            <p style={{ opacity: '0.7', lineHeight: '1.6' }}>The premier sourcing and procurement agency for the global aviation industry, specializing in general aviation components.</p>
+            <p style={{ opacity: '0.7', lineHeight: '1.6' }}>The premier sourcing agency for the global aviation industry, specializing in general aviation and training fleet components.</p>
           </div>
           <div>
             <h4 style={{ borderBottom: '2px solid #ffb400', paddingBottom: '10px', marginBottom: '20px' }}>Contact Details</h4>
@@ -118,12 +119,14 @@ export default function HomePage() {
           </div>
           <div>
             <h4 style={{ borderBottom: '2px solid #ffb400', paddingBottom: '10px', marginBottom: '20px' }}>Quick Access</h4>
-            <Link href="/studio" style={{ color: 'white', display: 'block', marginBottom: '10px', textDecoration: 'none' }}>→ Inventory Dashboard</Link>
+            {/* UPDATED: Points to Public Inventory page */}
+            <Link href="/inventory" style={{ color: 'white', display: 'block', marginBottom: '10px', textDecoration: 'none' }}>→ Inventory Catalog</Link>
             <a href="#rfq" style={{ color: 'white', display: 'block', textDecoration: 'none' }}>→ Request a Quote</a>
+            {/* Private Link moved to bottom small print */}
           </div>
         </div>
         <div style={{ textAlign: 'center', marginTop: '80px', paddingTop: '30px', borderTop: '1px solid rgba(255,255,255,0.1)', opacity: '0.5', fontSize: '0.85rem' }}>
-          © 2026 Jedo Technologies Pvt. Ltd. | All Rights Reserved.
+          © 2026 Jedo Technologies Pvt. Ltd. | <Link href="/studio" style={{ color: 'inherit', textDecoration: 'none' }}>Admin Login</Link>
         </div>
       </footer>
     </div>
@@ -147,6 +150,5 @@ const whatsappButtonStyle = {
   alignItems: 'center',
   gap: '12px',
   boxShadow: '0 10px 25px rgba(37, 211, 102, 0.3)',
-  zIndex: 1000,
-  transition: '0.3s'
+  zIndex: 1000
 };
