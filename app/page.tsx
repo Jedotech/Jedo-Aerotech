@@ -35,7 +35,7 @@ export default async function HomePage() {
       <style>{`
         @media (max-width: 768px) {
           .nav-container { padding: 15px 20px !important; }
-          .hero-title { font-size: 2.8rem !important; }
+          .hero-title { font-size: 2.5rem !important; }
           .desktop-nav { display: none !important; }
         }
       `}</style>
@@ -53,10 +53,10 @@ export default async function HomePage() {
         </div>
       </nav>
 
-      {/* HERO SECTION - EDGE TO EDGE */}
+      {/* HERO SECTION - PINNED TO BOTTOM TO SHOW TYRES & GROUND */}
       <section style={heroSectionStyle}>
-        <div style={{ maxWidth: '1100px', padding: '0 20px', zIndex: 2 }}>
-          <h1 className="hero-title" style={{ fontSize: '5rem', fontWeight: '900', marginBottom: '10px', lineHeight: '1.1', textShadow: '2px 2px 10px rgba(0,0,0,0.3)' }}>
+        <div style={{ maxWidth: '1100px', padding: '0 20px', zIndex: 2, marginBottom: '20vh' }}>
+          <h1 className="hero-title" style={{ fontSize: '5rem', fontWeight: '900', marginBottom: '10px', lineHeight: '1.1', textShadow: '2px 2px 10px rgba(0,0,0,0.4)' }}>
             GLOBAL PARTS. <br />
             <span style={{ color: '#ffb400' }}>LOCAL SUPPORT.</span>
           </h1>
@@ -122,9 +122,6 @@ export default async function HomePage() {
       </section>
 
       <footer style={{ backgroundColor: '#001a35', color: 'white', padding: '80px 20px', textAlign: 'center' }}>
-        <div style={{ marginBottom: '20px' }}>
-          <img src="/jedo-logo.png" alt="Jedo Tech" style={{ height: '40px', opacity: 0.8, filter: 'brightness(0) invert(1)' }} />
-        </div>
         <p style={{ opacity: 0.6, fontSize: '0.95rem' }}>
           © 2026 Jedo Technologies Pvt. Ltd. | Aviation Supply Chain Specialists
         </p>
@@ -140,14 +137,14 @@ const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding
 
 const heroSectionStyle = { 
   width: '100%',
-  minHeight: '85vh', 
+  minHeight: '100vh', 
   display: 'flex', 
   alignItems: 'center', 
   justifyContent: 'center', 
-  backgroundImage: 'linear-gradient(rgba(0,45,91,0.45), rgba(0,45,91,0.45)), url("/hero-aircraft.png")', 
-  backgroundSize: 'cover', // Eliminates left/right gaps
+  backgroundImage: 'linear-gradient(rgba(0,45,91,0.35), rgba(0,45,91,0.35)), url("/hero-aircraft.png")', 
+  backgroundSize: 'cover', 
   backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'center 30%', // Adjusted to keep the cockpit/wings visible
+  backgroundPosition: 'center bottom', // Ensures tyres, ground, and boxes stay visible
   backgroundColor: '#002d5b', 
   color: 'white', 
   textAlign: 'center' as const,
@@ -158,4 +155,4 @@ const thStyle = { padding: '20px', fontSize: '0.9rem', textTransform: 'uppercase
 const tdStyle = { padding: '20px', color: '#002d5b', fontSize: '1rem' };
 const badgeStyle = { backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold' as const, color: '#002d5b' };
 const inputStyle = { padding: '18px', borderRadius: '10px', border: '2px solid #cbd5e1', width: '100%', fontSize: '1rem', outline: 'none' };
-const submitButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '10px', border: 'none', fontWeight: 'bold' as const, cursor: 'pointer', fontSize: '1.1rem', transition: '0.3s' };
+const submitButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '10px', border: 'none', fontWeight: 'bold' as const, cursor: 'pointer', fontSize: '1.1rem' };
