@@ -18,14 +18,13 @@ export default function HomePage() {
       {/* 2. NAVIGATION BAR */}
       <nav style={navStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          {/* LOGO FIX: Relative path and removed inversion filter */}
           <img 
             src="./jedo-logo.png" 
-            alt="Jedo Tech Logo" 
+            alt="Jedo Technologies Logo" 
             style={{ height: '45px', width: 'auto', display: 'block' }} 
           />
           <div style={{ fontWeight: 'bold', fontSize: '1.5rem', letterSpacing: '1px' }}>
-            JEDO <span style={{ color: '#ffb400' }}>TECH</span>
+            JEDO <span style={{ color: '#ffb400' }}>TECHNOLOGIES</span>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
@@ -34,16 +33,43 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* 3. HERO SECTION */}
-      <section style={heroSectionStyle}>
-        <h1 style={{ fontSize: '3.5rem', marginBottom: '15px', fontWeight: '800' }}>Global Parts. <span style={{ color: '#ffb400' }}>Local Support.</span></h1>
-        <p style={{ fontSize: '1.3rem', maxWidth: '750px', margin: '0 auto 40px', opacity: '0.9', lineHeight: '1.5' }}>
-          Chennai's Premier Sourcing Partner for Cessna, Piper, and Training Fleets. 
-          Bridging the gap between global OEMs and Indian operators.
-        </p>
-        <a href="#rfq" style={heroButtonStyle}>
-          REQUEST AOG QUOTE
-        </a>
+      {/* 3. HERO SECTION WITH TECH/VECTOR GRAPHIC (NO PHOTO) */}
+      <section style={{ 
+        padding: '100px 40px', 
+        background: 'linear-gradient(135deg, #002d5b 0%, #001a35 100%)', // Clean corporate gradient
+        color: 'white', 
+        display: 'grid',
+        gridTemplateColumns: '1.2fr 1fr', // Splits text and graphic
+        alignItems: 'center',
+        gap: '60px',
+        overflow: 'hidden'
+      }}>
+        {/* TEXT SIDE */}
+        <div style={{ textAlign: 'left' as const }}>
+          <h1 style={{ fontSize: '3.8rem', marginBottom: '20px', fontWeight: '800', lineHeight: '1.1' }}>
+            Global Parts. <span style={{ color: '#ffb400' }}>Local Support.</span>
+          </h1>
+          <p style={{ fontSize: '1.4rem', maxWidth: '750px', marginBottom: '45px', opacity: '0.95', lineHeight: '1.6', fontWeight: '400' }}>
+            Chennai's Premier Sourcing Partner for Cessna, Piper, and Training Fleets. <br/>
+            Direct access to global OEM inventory with guaranteed Indian customs compliance.
+          </p>
+          <a href="#rfq" style={heroButtonStyle}>
+            REQUEST AOG QUOTE
+          </a>
+        </div>
+
+        {/* GRAPHIC SIDE (PURE CODE VISUALIZATION) */}
+        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          {/* GLOBAL ORBITAL LINES */}
+          <div style={{ position: 'absolute', width: '300px', height: '300px', border: '2px solid rgba(255,255,255,0.1)', borderRadius: '50%' }}></div>
+          <div style={{ position: 'absolute', width: '450px', height: '450px', border: '2px solid rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
+          
+          {/* STYLIZED FLIGHT PATH ARC */}
+          <div style={{ position: 'absolute', width: '400px', height: '200px', borderTop: '4px dashed #ffb400', borderRadius: '50% 50% 0 0', transform: 'rotate(-15deg)', opacity: '0.8' }}></div>
+          
+          {/* THE "SOURCING" POINT (ICON) */}
+          <div style={{ fontSize: '100px', color: 'white', position: 'relative', zIndex: 2, textShadow: '0 0 30px rgba(255,255,255,0.6)' }}>🛰️</div>
+        </div>
       </section>
 
       {/* 4. KEY SERVICES */}
@@ -74,8 +100,6 @@ export default function HomePage() {
         <p style={{ textAlign: 'center', color: '#666', marginBottom: '40px' }}>Submit details below for immediate pricing and lead-time analysis.</p>
         
         <form action="https://formspree.io/f/mdalbdqq" method="POST" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <input type="hidden" name="_next" value="https://jedotech.com/success" />
-          
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px' }}>
             <div>
               <label style={labelStyle}>Part Number *</label>
@@ -120,7 +144,7 @@ export default function HomePage() {
           </div>
         </div>
         <div style={footerBottomStyle}>
-          © 2026 Jedo Technologies Pvt. Ltd. | <Link href="/studio" style={{ color: 'inherit', textDecoration: 'none' }}>Admin Login</Link>
+          © 2026 Jedo Technologies Pvt. Ltd.
         </div>
       </footer>
     </div>
@@ -131,15 +155,14 @@ export default function HomePage() {
 const navStyle = { backgroundColor: '#002d5b', padding: '15px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'white', position: 'sticky' as const, top: 0, zIndex: 100, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' };
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.9rem' };
 const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '10px 20px', borderRadius: '5px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem' };
-const heroSectionStyle = { padding: '120px 20px', background: 'linear-gradient(135deg, #002d5b 0%, #0056b3 100%)', color: 'white', textAlign: 'center' as const };
-const heroButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '18px 45px', borderRadius: '50px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.2rem', boxShadow: '0 6px 25px rgba(255,180,0,0.4)' };
+const heroButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '18px 45px', borderRadius: '50px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.2rem', boxShadow: '0 6px 25px rgba(255,180,0,0.4)', display: 'inline-block' };
 const featureBox = { padding: '40px', borderRadius: '20px', backgroundColor: '#fff', boxShadow: '0 10px 30px rgba(0,0,0,0.04)', textAlign: 'center' as const };
 const featureTitleStyle = { fontSize: '1.2rem', margin: '10px 0', color: '#002d5b' };
 const featureTextStyle = { fontSize: '0.95rem', color: '#555' };
 const formSectionStyle = { maxWidth: '850px', margin: '100px auto', padding: '50px', backgroundColor: '#fff', borderRadius: '20px', boxShadow: '0 15px 50px rgba(0,0,0,0.08)', borderTop: '8px solid #ffb400' };
 const inputField = { padding: '15px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem', width: '100%', outline: 'none' };
 const labelStyle = { display: 'block', fontWeight: 'bold' as const, fontSize: '0.9rem', marginBottom: '8px', color: '#002d5b' };
-const submitButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '10px', border: 'none', fontWeight: 'bold' as const, cursor: 'pointer', fontSize: '1.2rem' };
+const submitButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '10px', border: 'none', fontWeight: 'bold' as const, cursor: 'pointer', fontSize: '1.2rem', marginTop: '10px' };
 const footerStyle = { padding: '80px 20px', color: 'white', backgroundColor: '#001a35' };
 const footerGridStyle = { maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '50px' };
 const footerHeadingStyle = { borderBottom: '2px solid #ffb400', paddingBottom: '10px', marginBottom: '20px' };
