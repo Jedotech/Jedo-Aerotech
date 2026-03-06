@@ -6,10 +6,10 @@ import { createClient } from 'next-sanity'
 
 // 1. SANITY CLIENT CONFIGURATION
 const client = createClient({
-  projectId: 'm2pa474h', // Your verified Project ID
+  projectId: 'm2pa474h', 
   dataset: 'production',
   apiVersion: '2023-05-03',
-  useCdn: false, // Ensures immediate updates after Sanity imports
+  useCdn: false, 
 })
 
 export default function InventoryPage() {
@@ -17,17 +17,18 @@ export default function InventoryPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
 
-  // 2. FETCH DATA FROM SANITY
+  // 2. FETCH DATA FROM SANITY (Including new Stock & Warehouse fields)
   useEffect(() => {
     const fetchParts = async () => {
       try {
-        // Querying your custom 'part' schema
         const query = `*[_type == "part"] | order(_createdAt desc) {
           _id,
           partNumber,
           aircraftType,
           condition,
-          description
+          description,
+          quantity,
+          warehouse
         }`
         const data = await client.fetch(query)
         setParts(data)
@@ -80,7 +81,7 @@ export default function InventoryPage() {
             Live Inventory
           </h1>
           <p style={{ color: '#64748b', fontSize: '1.1rem', marginTop: '10px' }}>
-            Search our real-time database of Cessna and Piper training fleet components.
+            Genuine Cessna components available at our Chennai hub and global partners.
           </p>
         </div>
 
@@ -88,7 +89,7 @@ export default function InventoryPage() {
         <div style={{ marginBottom: '30px' }}>
           <input 
             type="text" 
-            placeholder="Search by Part Number, Aircraft Type, or Keyword..." 
+            placeholder="Search by Part Number, Aircraft (e.g. Cessna 172), or Keyword..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={searchBarStyle}
@@ -102,8 +103,8 @@ export default function InventoryPage() {
               <tr style={{ backgroundColor: '#002d5b', color: '#ffb400', textAlign: 'left' }}>
                 <th style={thStyle}>Part Number</th>
                 <th style={thStyle}>Compatibility</th>
-                <th style={thStyle}>Condition</th>
-                <th className="hide-mobile" style={thStyle}>Description</th>
+                <th style={thStyle}>Stock / Hub</th>
+                <th className="hide-mobile" style={thStyle}>Condition</th>
                 <th style={thStyle}>Action</th>
               </tr>
             </thead>
@@ -111,7 +112,7 @@ export default function InventoryPage() {
               {loading ? (
                 <tr>
                   <td colSpan={5} style={{ padding: '80px', textAlign: 'center', color: '#002d5b', fontWeight: 'bold' }}>
-                    Connecting to Sourcing Hub...
+                    Fetching Live Fleet Data...
                   </td>
                 </tr>
               ) : filteredParts.length > 0 ? (
@@ -119,8 +120,15 @@ export default function InventoryPage() {
                   <tr key={part._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                     <td style={tdStyle}><strong>{part.partNumber}</strong></td>
                     <td style={tdStyle}>{part.aircraftType || 'Cessna 172'}</td>
-                    <td style={tdStyle}><span style={badgeStyle}>{part.condition}</span></td>
-                    <td className="hide-mobile" style={tdStyle}>{part.description}</td>
+                    <td style={tdStyle}>
+                      <div style={{ fontWeight: 'bold', color: part.quantity > 0 ? '#16a34a' : '#64748b' }}>
+                        {part.quantity > 0 ? `${part.quantity} In Stock` : 'Lead Time: 7 Days'}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', opacity: 0.7 }}>
+                        Hub: {part.warehouse || 'Global'}
+                      </div>
+                    </td>
+                    <td className="hide-mobile" style={tdStyle}><span style={badgeStyle}>{part.condition}</span></td>
                     <td style={tdStyle}>
                       <Link 
                         href={`/#rfq?part=${encodeURIComponent(part.partNumber)}`} 
@@ -135,7 +143,7 @@ export default function InventoryPage() {
                 <tr>
                   <td colSpan={5} style={{ padding: '80px', textAlign: 'center' }}>
                     <div style={{ color: '#002d5b', fontWeight: 'bold', fontSize: '1.2rem' }}>No Matching Parts Found</div>
-                    <p style={{ color: '#64748b' }}>Try a different part number or contact us for custom sourcing.</p>
+                    <p style={{ color: '#64748b' }}>Contact our Chennai office for specialized sourcing.</p>
                   </td>
                 </tr>
               )}
@@ -146,7 +154,7 @@ export default function InventoryPage() {
 
       <footer style={{ backgroundColor: '#001a35', color: 'white', padding: '60px 20px', textAlign: 'center', marginTop: '80px' }}>
         <p style={{ opacity: '0.6', fontSize: '0.9rem' }}>
-          © 2026 Jedo Technologies Pvt. Ltd. | Aviation Excellence in India
+          © 2026 Jedo Technologies Pvt. Ltd. | Aviation Supply Chain Experts
         </p>
       </footer>
     </div>
@@ -159,7 +167,7 @@ const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold
 const navLinkStyleActive = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.9rem' };
 const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '10px 25px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem' };
 const searchBarStyle = { width: '100%', padding: '18px', borderRadius: '10px', border: '2.5px solid #002d5b', fontSize: '1.1rem', outline: 'none', fontWeight: '600' as const, color: '#002d5b', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' };
-const thStyle = { padding: '20px', fontSize: '0.9rem', textTransform: 'uppercase' as const, letterSpacing: '1px' };
-const tdStyle = { padding: '20px', color: '#002d5b', fontSize: '1rem' };
-const badgeStyle = { backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '800' as const, color: '#002d5b' };
-const tableButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 'bold' as const };
+const thStyle = { padding: '20px', fontSize: '0.85rem', textTransform: 'uppercase' as const, letterSpacing: '1px' };
+const tdStyle = { padding: '20px', color: '#002d5b', fontSize: '0.95rem' };
+const badgeStyle = { backgroundColor: '#e2e8f0', padding: '6px 12px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '800' as const, color: '#002d5b' };
+const tableButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold' as const };
