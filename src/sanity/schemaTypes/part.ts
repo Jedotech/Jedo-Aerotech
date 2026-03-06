@@ -1,111 +1,47 @@
-export const part = { 
+import { defineType, defineField } from 'sanity'
 
-  name: 'part',
-
-  type: 'document',
-
+export const parts = defineType({
+  name: 'part', // IMPORTANT: Keep this as 'part' so the website finds it
   title: 'Aircraft Part',
-
+  type: 'document',
   fields: [
-
-    {
-
+    defineField({
       name: 'partNumber',
-
-      type: 'string',
-
       title: 'Part Number',
-
-    },
-
-    {
-
+      type: 'string',
+    }),
+    defineField({
       name: 'aircraftType',
-
-      type: 'string',
-
       title: 'Aircraft Compatibility',
-
-      description: 'e.g. Cessna 152, 172, Piper Seneca, etc.',
-
-    },
-
-    {
-
-      name: 'partImage',
-
-      type: 'image',
-
-      title: 'Part Photo / Tag Image',
-
-      options: { hotspot: true },
-
-    },
-
-    {
-
-      name: 'condition',
-
       type: 'string',
-
-      title: 'Condition',
-
-    },
-
-    {
-
-      name: 'location',
-
-      type: 'string',
-
-      title: 'Physical Location',
-
-    },
-
-    {
-
-      name: 'price',
-
+    }),
+    defineField({
+      name: 'quantity',
+      title: 'Stock Level (Qty)',
       type: 'number',
-
-      title: 'Price (USD)',
-
-    },
-
-    {
-
-      name: 'internalNotes',
-
-      type: 'text',
-
-      title: 'Internal Broker Notes',
-
-    },
-
-    {
-
+      initialValue: 0,
+    }),
+    defineField({
+      name: 'warehouse',
+      title: 'Warehouse Hub',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Chennai, India', value: 'Chennai' },
+          { title: 'Singapore Hub', value: 'Singapore' },
+          { title: 'USA Warehouse', value: 'USA' },
+        ],
+      },
+    }),
+    defineField({
+      name: 'condition',
+      title: 'Condition',
+      type: 'string',
+    }),
+    defineField({
       name: 'description',
-
+      title: 'Description',
       type: 'text',
-
-      title: 'Public Description',
-
-    },
-
+    }),
   ],
-
-  preview: {
-
-    select: {
-
-      title: 'partNumber',
-
-      subtitle: 'aircraftType',
-
-      media: 'partImage',
-
-    },
-
-  },
-
-}
+})
