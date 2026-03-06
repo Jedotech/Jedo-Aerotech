@@ -1,125 +1,96 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { createClient } from 'next-sanity';
-
-// 1. Configure the Sanity Client
-const client = createClient({
-  projectId: "m2pa474h",
-  dataset: "production",
-  apiVersion: "2024-03-05",
-  useCdn: false,
-});
+import Link from 'next/link'
 
 export default function InventoryPage() {
-  const [parts, setParts] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  // 2. Fetch data when the page loads
-  useEffect(() => {
-    const fetchParts = async () => {
-      const query = `*[_type == "part"] | order(_createdAt desc) {
-        _id,
-        partNumber,
-        aircraftType,
-        condition,
-        location
-      }`;
-      const data = await client.fetch(query);
-      setParts(data);
-      setLoading(false);
-    };
-    fetchParts();
-  }, []);
-
-  // 3. Filter logic
-  const filteredParts = parts.filter((part) =>
-    part.partNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (part.aircraftType && part.aircraftType.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'sans-serif' }}>
+    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       
-      {/* NAVIGATION */}
+      {/* NAVIGATION BAR - FIXED FOR INVENTORY PAGE */}
       <nav style={navStyle}>
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: 'white' }}>
-          <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>JEDO <span style={{ color: '#ffb400' }}>TECH</span></div>
-        </Link>
-        <Link href="/#rfq" style={quoteButtonStyle}>REQUEST QUOTE</Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <Link href="/">
+            {/* The "/" at the start of the src is the secret to making it visible here */}
+            <img 
+              src="/jedo-logo.png" 
+              alt="Jedo Technologies" 
+              style={{ height: '40px', width: 'auto', cursor: 'pointer' }} 
+            />
+          </Link>
+        </div>
+        <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
+          <Link href="/" style={navLinkStyle}>HOME</Link>
+          <Link href="/inventory" style={navLinkStyle}>INVENTORY</Link>
+          <a href="/#rfq" style={quoteButtonStyle}>GET QUOTE</a>
+        </div>
       </nav>
 
-      {/* HEADER & SEARCH BAR */}
-      <header style={{ padding: '60px 20px', textAlign: 'center', backgroundColor: '#fff', borderBottom: '1px solid #eee' }}>
-        <h1 style={{ color: '#002d5b', fontSize: '2.5rem', marginBottom: '20px' }}>Current Inventory</h1>
-        
-        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <input 
-            type="text" 
-            placeholder="🔍 Search by Part Number or Aircraft (e.g. Cessna)..." 
-            style={searchBarStyle}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </header>
+      <main style={{ padding: '60px 20px', maxWidth: '1200px', margin: '0 auto' }}>
+        <h1 style={{ color: '#002d5b', fontSize: '2.5rem', fontWeight: '800', marginBottom: '10px' }}>
+          Current Inventory
+        </h1>
+        <p style={{ color: '#64748b', marginBottom: '40px' }}>
+          Certified aircraft parts ready for immediate dispatch from Chennai.
+        </p>
 
-      {/* TABLE SECTION */}
-      <main style={{ maxWidth: '1100px', margin: '40px auto', padding: '0 20px' }}>
-        <div style={tableContainerStyle}>
-          {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center' }}>Loading Fleet Inventory...</div>
-          ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#002d5b', color: 'white' }}>
-                  <th style={tableHeader}>Part Number</th>
-                  <th style={tableHeader}>Compatibility</th>
-                  <th style={tableHeader}>Condition</th>
-                  <th style={tableHeader}>Location</th>
-                  <th style={tableHeader}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredParts.map((part) => (
-                  <tr key={part._id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                    <td style={tableCell}><strong>{part.partNumber}</strong></td>
-                    <td style={tableCell}>{part.aircraftType || "General Aviation"}</td>
-                    <td style={tableCell}>
-                      <span style={{ 
-                        backgroundColor: part.condition === 'NE' ? '#dcfce7' : '#fef9c3', 
-                        color: part.condition === 'NE' ? '#166534' : '#854d0e', 
-                        padding: '4px 10px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' 
-                      }}>
-                        {part.condition}
-                      </span>
-                    </td>
-                    <td style={tableCell}>{part.location}</td>
-                    <td style={tableCell}>
-                      <Link href="/#rfq" style={rfqLinkStyle}>RFQ →</Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          {!loading && filteredParts.length === 0 && (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
-              No parts found matching "{searchTerm}". Try a different part number.
-            </div>
-          )}
+        {/* INVENTORY TABLE */}
+        <div style={{ overflowX: 'auto' }}>
+          <table style={tableStyle}>
+            <thead>
+              <tr style={{ backgroundColor: '#002d5b', color: '#ffb400' }}>
+                <th style={thStyle}>Part Number</th>
+                <th style={thStyle}>Description</th>
+                <th style={thStyle}>Condition</th>
+                <th style={thStyle}>Availability</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={tdStyle}>066-5000-05</td>
+                <td style={tdStyle}>KI-209 VOR/LOC/GS Indicator</td>
+                <td style={tdStyle}>Overhauled</td>
+                <td style={tdStyle}>In Stock</td>
+              </tr>
+              <tr style={{ backgroundColor: '#f8fafc' }}>
+                <td style={tdStyle}>12701-001</td>
+                <td style={tdStyle}>Cessna 172 Seat Rail</td>
+                <td style={tdStyle}>New (OEM)</td>
+                <td style={tdStyle}>2 Units</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </main>
+
+      <footer style={{ backgroundColor: '#001a35', color: 'white', padding: '40px', textAlign: 'center', marginTop: '60px' }}>
+        <p>© 2026 Jedo Technologies | Aviation Sourcing Excellence</p>
+      </footer>
     </div>
-  );
+  )
 }
 
-// STYLING
-const navStyle = { backgroundColor: '#002d5b', padding: '15px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'white' };
-const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '8px 18px', borderRadius: '5px', textDecoration: 'none', fontWeight: 'bold' as const };
-const searchBarStyle = { width: '100%', padding: '15px 25px', borderRadius: '30px', border: '2px solid #002d5b', fontSize: '1rem', outline: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' };
-const tableContainerStyle = { backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden' as const };
-const tableHeader = { padding: '20px', fontSize: '0.85rem', fontWeight: 'bold' as const, textTransform: 'uppercase' as const };
-const tableCell = { padding: '18px 20px', fontSize: '0.95rem' };
-const rfqLinkStyle = { backgroundColor: '#002d5b', color: 'white', padding: '6px 12px', borderRadius: '4px', textDecoration: 'none', fontSize: '0.8rem' };
+// STYLES
+const navStyle = { 
+  display: 'flex', 
+  justifyContent: 'space-between', 
+  alignItems: 'center', 
+  padding: '20px 60px', 
+  backgroundColor: '#002d5b', 
+  position: 'sticky' as const, 
+  top: 0, 
+  zIndex: 100 
+};
+
+const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.9rem' };
+
+const quoteButtonStyle = { 
+  backgroundColor: '#ffb400', 
+  color: '#002d5b', 
+  padding: '10px 25px', 
+  borderRadius: '4px', 
+  textDecoration: 'none', 
+  fontWeight: 'bold' as const 
+};
+
+// TABLE STYLES
+const tableStyle = { width: '100%', borderCollapse: 'collapse' as const, marginTop: '20px', border: '2px solid #002d5b' };
+const thStyle = { padding: '15px', textAlign: 'left' as const, borderBottom: '2px solid #002d5b' };
+const tdStyle = { padding: '15px', borderBottom: '1px solid #e2e8f0', color: '#002d5b', fontWeight: '500' };
