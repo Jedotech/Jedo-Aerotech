@@ -17,12 +17,13 @@ export default function HomePage() {
 
       {/* 2. NAVIGATION BAR */}
       <nav style={navStyle}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <Link href="/">
+            {/* FIX: Leading slash ensures the logo loads on all sub-pages */}
             <img 
-              src="./jedo-logo.png" 
-              alt="Jedo Technologies" 
-              style={{ height: '45px', width: 'auto', cursor: 'pointer' }} 
+              src="/jedo-logo.png" 
+              alt="Jedo Technologies Logo" 
+              style={{ height: '50px', width: 'auto', cursor: 'pointer', display: 'block' }} 
             />
           </Link>
         </div>
@@ -33,13 +34,13 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* 3. HERO SECTION: FULL WIDTH OVERLAY */}
+      {/* 3. HERO SECTION */}
       <section style={heroSectionStyle}>
         <div style={{ maxWidth: '900px', padding: '0 20px' }}>
           <h1 style={{ fontSize: '4rem', fontWeight: '900', marginBottom: '20px', letterSpacing: '-1px' }}>
             GLOBAL PARTS. <span style={{ color: '#ffb400' }}>LOCAL SUPPORT.</span>
           </h1>
-          <p style={{ fontSize: '1.4rem', lineHeight: '1.6', marginBottom: '40px', opacity: '0.9', fontWeight: '400' }}>
+          <p style={{ fontSize: '1.4rem', lineHeight: '1.6', marginBottom: '40px', opacity: '0.9' }}>
             Chennai's premier sourcing agency for Cessna, Piper, and training fleets. <br/>
             Certified airworthiness with seamless Indian customs clearance.
           </p>
@@ -47,7 +48,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. TRUST STRIP (CERTIFICATIONS) */}
+      {/* 4. TRUST STRIP */}
       <div style={trustStripStyle}>
         <span style={{ color: '#64748b', fontWeight: 'bold', letterSpacing: '2px', fontSize: '0.8rem' }}>
           CERTIFIED TRACEABILITY: FAA 8130-3 | EASA FORM 1 | DGCA COMPLIANT
@@ -62,7 +63,6 @@ export default function HomePage() {
           </h2>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
-            {/* STEP 1 */}
             <div style={trustBoxStyle}>
               <div style={stepNumberStyle}>01</div>
               <h3 style={trustTitleStyle}>Global Sourcing</h3>
@@ -71,7 +71,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* STEP 2 */}
             <div style={trustBoxStyle}>
               <div style={stepNumberStyle}>02</div>
               <h3 style={trustTitleStyle}>Quality Inspection</h3>
@@ -80,7 +79,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* STEP 3 */}
             <div style={trustBoxStyle}>
               <div style={stepNumberStyle}>03</div>
               <h3 style={trustTitleStyle}>Local Logistics</h3>
@@ -92,7 +90,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. RFQ SECTION WITH BOLD FORMS */}
+      {/* 6. RFQ SECTION WITH HIGH-VISIBILITY BOLD FORMS */}
       <section id="rfq" style={{ padding: '120px 20px', backgroundColor: '#ffffff' }}>
         <div style={{ maxWidth: '650px', margin: '0 auto' }}>
           <h2 style={{ color: '#002d5b', fontSize: '2.8rem', fontWeight: '800', textAlign: 'center', marginBottom: '10px' }}>Ready to Source?</h2>
@@ -110,7 +108,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. PROFESSIONAL FOOTER */}
+      {/* 7. FOOTER */}
       <footer style={footerStyle}>
         <div style={footerGridStyle}>
           <div>
@@ -134,59 +132,38 @@ export default function HomePage() {
             </p>
           </div>
         </div>
-        <div style={{ textAlign: 'center' as const, marginTop: '60px', opacity: '0.4', fontSize: '0.8rem' }}>
-          © 2026 Jedo Technologies Pvt. Ltd. | Aviation Excellence
-        </div>
       </footer>
     </div>
   )
 }
 
 // STYLING OBJECTS
-const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 100, boxShadow: '0 4px 10px rgba(0,0,0,0.1)' };
-const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.9rem', letterSpacing: '0.5px' };
-const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '10px 25px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem' };
-
-const heroSectionStyle = { 
-  height: '85vh', 
-  display: 'flex', 
-  alignItems: 'center', 
-  justifyContent: 'center', 
-  backgroundImage: 'linear-gradient(rgba(0, 45, 91, 0.75), rgba(0, 45, 91, 0.75)), url("./hero-aircraft.png")', 
-  backgroundSize: 'cover', 
-  backgroundPosition: 'center', 
-  color: 'white', 
-  textAlign: 'center' as const 
-};
-
-const heroButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '20px 50px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem', boxShadow: '0 10px 20px rgba(0,0,0,0.2)' };
+const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 100 };
+const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.9rem' };
+const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '10px 25px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const };
+const heroSectionStyle = { height: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'linear-gradient(rgba(0, 45, 91, 0.75), rgba(0, 45, 91, 0.75)), url("./hero-aircraft.png")', backgroundSize: 'cover', backgroundPosition: 'center', color: 'white', textAlign: 'center' as const };
+const heroButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '20px 50px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem' };
 const trustStripStyle = { backgroundColor: '#f1f5f9', padding: '25px', borderBottom: '1px solid #e2e8f0', textAlign: 'center' as const };
-
-// TRUST SECTION STYLES
 const trustBoxStyle = { backgroundColor: 'white', padding: '45px', borderRadius: '15px', boxShadow: '0 15px 35px rgba(0,0,0,0.05)', borderTop: '5px solid #ffb400', position: 'relative' as const };
 const stepNumberStyle = { fontSize: '4rem', fontWeight: '900', color: 'rgba(0, 45, 91, 0.05)', position: 'absolute' as const, top: '5px', right: '25px' };
 const trustTitleStyle = { color: '#002d5b', fontSize: '1.4rem', marginBottom: '15px', fontWeight: '800' as const };
 const trustTextStyle = { color: '#64748b', lineHeight: '1.7', fontSize: '1rem' };
 
-// BOLD FORM STYLES
+// BOLD FORM STYLE (FIXED FOR VISIBILITY)
 const boldInputStyle = { 
   padding: '18px', 
   borderRadius: '8px', 
-  border: '2px solid #002d5b', 
+  border: '2.5px solid #002d5b', // Significantly bolder border
   width: '100%', 
   fontSize: '1rem', 
   outline: 'none', 
   backgroundColor: '#ffffff',
-  boxShadow: '0 4px 6px rgba(0,0,0,0.02)',
   color: '#002d5b',
-  fontWeight: '500'
+  fontWeight: '600' // Bolder text inside
 };
 
-const submitButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '8px', border: 'none', fontWeight: 'bold' as const, cursor: 'pointer', fontSize: '1.2rem', marginTop: '10px', boxShadow: '0 10px 20px rgba(0,45,91,0.2)' };
-
-// FOOTER STYLES
-const footerStyle = { backgroundColor: '#001a35', color: 'white', padding: '100px 40px' };
+const submitButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '8px', border: 'none', fontWeight: 'bold' as const, cursor: 'pointer', fontSize: '1.2rem', marginTop: '10px' };
+const footerStyle = { backgroundColor: '#001a35', color: 'white', padding: '80px 40px' };
 const footerGridStyle = { maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '60px' };
 const footerHeadingStyle = { marginBottom: '25px', fontSize: '1.1rem', fontWeight: '800', borderBottom: '2px solid #ffb400', paddingBottom: '10px', display: 'inline-block' };
-
-const whatsappButtonStyle = { position: 'fixed' as const, bottom: '40px', right: '40px', backgroundColor: '#25D366', color: 'white', padding: '15px 30px', borderRadius: '50px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 15px 30px rgba(37, 211, 102, 0.4)', zIndex: 1000 };
+const whatsappButtonStyle = { position: 'fixed' as const, bottom: '40px', right: '40px', backgroundColor: '#25D366', color: 'white', padding: '15px 30px', borderRadius: '50px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1000 };
