@@ -24,10 +24,11 @@ export default function InventoryPage() {
   useEffect(() => {
     const fetchParts = async () => {
       try {
-        const query = `*[_type == "part"] | order(_createdAt desc) {
+        const query = `*[_type == "part"] | order(aircraftType asc) {
           _id,
-          partNumber,
           aircraftType,
+          gearPosition,
+          partNumber,
           plyRating,
           condition,
           priceUSD, 
@@ -47,9 +48,9 @@ export default function InventoryPage() {
 
   // 3. SEARCH FILTER LOGIC
   const filteredParts = parts.filter((part) => 
-    part.partNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     part.aircraftType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    part.plyRating?.toLowerCase().includes(searchTerm.toLowerCase())
+    part.partNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    part.gearPosition?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   // 4. PRICE FORMATTING LOGIC
@@ -77,64 +78,83 @@ export default function InventoryPage() {
         </div>
       </nav>
 
-      <main style={{ padding: '60px 20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <main style={{ padding: '60px 20px', maxWidth: '1350px', margin: '0 auto' }}>
         <h1 style={{ color: '#002d5b', fontSize: '3rem', fontWeight: '900', margin: 0 }}>Tyre Marketplace</h1>
-        <p style={{ color: '#64748b', marginBottom: '30px' }}>Global sourcing intelligence for training aircraft fleets.</p>
+        <p style={{ color: '#64748b', marginBottom: '30px' }}>Global sourcing intelligence for Cessna, Piper, and training fleets.</p>
         
         <div style={{ marginBottom: '30px', display: 'flex', gap: '15px' }}>
           <input 
             type="text" 
-            placeholder="Search size, ply, or aircraft model..." 
+            placeholder="Search by aircraft model, gear position, or tyre size..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={searchBarStyle}
           />
         </div>
 
-        {/* UPDATED TABLE WITH PLY RATING COLUMN */}
+        {/* MARKETPLACE TABLE WITH ALL REQUESTED COLUMNS */}
         <div style={tableWrapper}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ backgroundColor: '#002d5b', color: '#ffb400', textAlign: 'left' }}>
-                <th style={thStyle}>Part / Size</th>
-                <th style={thStyle}>Ply Rating</th>
-                <th style={thStyle}>Fleet</th>
-                <th style={thStyle}>Est. Price ({currency})</th>
-                <th style={thStyle}>Status</th>
+                <th style={thStyle}>Aircraft Model</th>
+                <th style={thStyle}>Gear Position</th>
+                <th style={thStyle}>Tyre Size / P/N</th>
+                <th style={thStyle}>Ply</th>
+                <th style={thStyle}>Est. Cost ({currency})</th>
+                <th style={thStyle}>Sourcing Status</th>
                 <th style={thStyle}>Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center' }}>Loading Global Data...</td></tr>
-              ) : filteredParts.map((part) => (
-                <tr key={part._id} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={tdStyle}><strong>{part.partNumber}</strong></td>
-                  <td style={tdStyle}>
-                    <span style={plyBadgeStyle}>
-                      {part.plyRating || 'N/A'}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>{part.aircraftType}</td>
-                  <td style={tdStyle}>
-                    <span style={{ fontWeight: 'bold', color: '#002d5b' }}>
-                      {formatPrice(part.priceUSD)}
-                    </span>
-                    <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>*Excl. Customs/GST</div>
-                  </td>
-                  <td style={tdStyle}>
-                    <div style={{ color: part.quantity > 0 ? '#16a34a' : '#64748b', fontWeight: 'bold' }}>
-                      {part.quantity > 0 ? 'Ready Hub' : 'Sourcing Required'}
-                    </div>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>
-                      {part.warehouse || 'Global'}
-                    </div>
-                  </td>
-                  <td style={tdStyle}>
-                    <Link href={`/#rfq?part=${part.partNumber}`} style={tableButtonStyle}>GET QUOTE</Link>
+                <tr><td colSpan={7} style={{ padding: '40px', textAlign: 'center' }}>Syncing Global Inventory Hubs...</td></tr>
+              ) : filteredParts.length > 0 ? (
+                filteredParts.map((part) => (
+                  <tr key={part._id} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={tdStyle}><strong>{part.aircraftType}</strong></td>
+                    <td style={tdStyle}><span style={gearBadgeStyle}>{part.gearPosition || 'Main'}</span></td>
+                    <td style={tdStyle}>
+                      <div style={{ fontWeight: 'bold' }}>{part.partNumber}</div>
+                      <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>Ref: {part.condition}</div>
+                    </td>
+                    <td style={tdStyle}>
+                      <span style={plyBadgeStyle}>{part.plyRating || 'N/A'}</span>
+                    </td>
+                    <td style={tdStyle}>
+                      <span style={{ fontWeight: '900', color: '#002d5b', fontSize: '1.1rem' }}>
+                        {formatPrice(part.priceUSD)}
+                      </span>
+                      <div style={{ fontSize: '0.65rem', opacity: 0.6, marginTop: '4px' }}>
+                        *Excl. Customs/GST
+                      </div>
+                    </td>
+                    <td style={tdStyle}>
+                      <div style={{ color: part.quantity > 0 ? '#16a34a' : '#64748b', fontWeight: 'bold' }}>
+                        {part.quantity > 0 ? 'Ready to Ship' : 'Available to Source'}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>
+                        {part.warehouse || 'Global Hub'}
+                      </div>
+                    </td>
+                    <td style={tdStyle}>
+                      <Link 
+                        href={`/#rfq?part=${encodeURIComponent(part.partNumber)}`} 
+                        style={tableButtonStyle}
+                      >
+                        GET QUOTE
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} style={{ padding: '80px', textAlign: 'center' }}>
+                    <div style={{ color: '#002d5b', fontWeight: 'bold' }}>No matching parts found.</div>
+                    <p>Contact Jedo Technologies for custom sourcing.</p>
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -143,14 +163,15 @@ export default function InventoryPage() {
   )
 }
 
-// STYLES
+// STYLING OBJECTS
+const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const toggleContainer = { display: 'flex', backgroundColor: '#001a35', borderRadius: '20px', padding: '4px' };
 const activeToggle = { backgroundColor: '#ffb400', color: '#002d5b', border: 'none', padding: '5px 15px', borderRadius: '15px', cursor: 'pointer', fontWeight: 'bold' as const };
 const inactiveToggle = { backgroundColor: 'transparent', color: 'white', border: 'none', padding: '5px 15px', cursor: 'pointer', opacity: 0.6 };
-const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
-const searchBarStyle = { flex: 1, padding: '15px', borderRadius: '8px', border: '2px solid #002d5b', fontSize: '1rem', fontWeight: 'bold' as const };
+const searchBarStyle = { width: '100%', padding: '15px', borderRadius: '8px', border: '2px solid #002d5b', fontSize: '1rem', fontWeight: 'bold' as const };
 const tableWrapper = { borderRadius: '12px', border: '2px solid #002d5b', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' };
-const thStyle = { padding: '15px', fontSize: '0.8rem', textTransform: 'uppercase' as const };
-const tdStyle = { padding: '15px', fontSize: '0.9rem' };
-const tableButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '8px 15px', borderRadius: '5px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold' as const };
-const plyBadgeStyle = { backgroundColor: '#e2e8f0', color: '#002d5b', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' as const, fontSize: '0.8rem' };
+const thStyle = { padding: '15px', fontSize: '0.8rem', textTransform: 'uppercase' as const, letterSpacing: '0.5px' };
+const tdStyle = { padding: '15px', fontSize: '0.9rem', verticalAlign: 'middle' as const };
+const tableButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '10px 18px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold' as const };
+const plyBadgeStyle = { backgroundColor: '#f1f5f9', color: '#475569', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' as const, fontSize: '0.75rem' };
+const gearBadgeStyle = { backgroundColor: '#e2e8f0', color: '#002d5b', padding: '4px 10px', borderRadius: '4px', fontWeight: 'bold' as const, fontSize: '0.75rem', textTransform: 'uppercase' as const };

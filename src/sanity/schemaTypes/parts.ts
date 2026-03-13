@@ -6,10 +6,32 @@ export const parts = defineType({
   type: 'document',
   fields: [
     defineField({
-      name: 'partNumber',
-      title: 'Part Number / Tyre Size',
+      name: 'aircraftType',
+      title: 'Aircraft Model',
       type: 'string',
-      description: 'e.g., 6.00-6 or 5.00-5',
+      description: 'e.g., Cessna 172, Piper Archer.',
+      initialValue: 'Cessna 172',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'gearPosition',
+      title: 'Gear Position',
+      type: 'string',
+      description: 'Is this for the Nose or Main gear?',
+      options: {
+        list: [
+          { title: 'Nose Gear', value: 'Nose' },
+          { title: 'Main Gear', value: 'Main' },
+          { title: 'All Positions', value: 'All' },
+        ],
+      },
+      initialValue: 'Main',
+    }),
+    defineField({
+      name: 'partNumber',
+      title: 'Tyre Size / Part Number',
+      type: 'string',
+      description: 'e.g., 6.00-6 or 5.00-5.',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -34,17 +56,10 @@ export const parts = defineType({
       description: 'Global sourcing price. Automatically converted to INR on the site.',
     }),
     defineField({
-      name: 'aircraftType',
-      title: 'Aircraft Compatibility',
-      type: 'string',
-      description: 'Primary aircraft model, e.g., Cessna 172.',
-      initialValue: 'Cessna 172',
-    }),
-    defineField({
       name: 'quantity',
       title: 'Availability Status',
       type: 'number',
-      description: 'Set to 0 for "Available to Source" or 1+ for "Ready Hub".',
+      description: 'Set to 0 for "Available to Source" or 1+ for "Ready to Ship".',
       initialValue: 0,
     }),
     defineField({
