@@ -17,9 +17,9 @@ export default function InventoryPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [loading, setLoading] = useState(true)
   
-  // 2. CURRENCY STATE (Default to INR for Chennai clients)
+  // 2. CURRENCY STATE (Default to INR)
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
-  const exchangeRate = 83.5; 
+  const exchangeRate = 83.5; // Update periodically based on market
 
   useEffect(() => {
     const fetchParts = async () => {
@@ -30,7 +30,6 @@ export default function InventoryPage() {
           gearPosition,
           partNumber,
           plyRating,
-          condition,
           priceUSD, 
           quantity,
           warehouse
@@ -53,14 +52,18 @@ export default function InventoryPage() {
     part.gearPosition?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // 4. PRICE FORMATTING LOGIC
+  // 4. PRICE FORMATTING WITH "EST." AND FALLBACK
   const formatPrice = (usdAmount: number) => {
-    if (!usdAmount) return "Contact for Quote";
-    if (currency === 'INR') {
-      const inrValue = usdAmount * exchangeRate;
-      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(inrValue);
-    }
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(usdAmount);
+    if (!usdAmount || usdAmount === 0) return "Contact for Quote";
+
+    const isINR = currency === 'INR';
+    const finalValue = isINR ? usdAmount * exchangeRate : usdAmount;
+
+    return `Est. ${new Intl.NumberFormat(isINR ? 'en-IN' : 'en-US', { 
+      style: 'currency', 
+      currency: currency, 
+      maximumFractionDigits: 0 
+    }).format(finalValue)}`;
   }
 
   return (
@@ -78,21 +81,20 @@ export default function InventoryPage() {
         </div>
       </nav>
 
-      <main style={{ padding: '60px 20px', maxWidth: '1350px', margin: '0 auto' }}>
+      <main style={{ padding: '60px 20px', maxWidth: '1400px', margin: '0 auto' }}>
         <h1 style={{ color: '#002d5b', fontSize: '3rem', fontWeight: '900', margin: 0 }}>Tyre Marketplace</h1>
-        <p style={{ color: '#64748b', marginBottom: '30px' }}>Global sourcing intelligence for Cessna, Piper, and training fleets.</p>
+        <p style={{ color: '#64748b', marginBottom: '30px' }}>Global sourcing intelligence for training aircraft fleets.</p>
         
-        <div style={{ marginBottom: '30px', display: 'flex', gap: '15px' }}>
+        <div style={{ marginBottom: '30px' }}>
           <input 
             type="text" 
-            placeholder="Search by aircraft model, gear position, or tyre size..." 
+            placeholder="Search by aircraft model, gear position, or size..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={searchBarStyle}
           />
         </div>
 
-        {/* MARKETPLACE TABLE WITH ALL REQUESTED COLUMNS */}
         <div style={tableWrapper}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -108,7 +110,7 @@ export default function InventoryPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7} style={{ padding: '40px', textAlign: 'center' }}>Syncing Global Inventory Hubs...</td></tr>
+                <tr><td colSpan={7} style={{ padding: '40px', textAlign: 'center' }}>Syncing Global Markets...</td></tr>
               ) : filteredParts.length > 0 ? (
                 filteredParts.map((part) => (
                   <tr key={part._id} style={{ borderBottom: '1px solid #eee' }}>
@@ -116,7 +118,6 @@ export default function InventoryPage() {
                     <td style={tdStyle}><span style={gearBadgeStyle}>{part.gearPosition || 'Main'}</span></td>
                     <td style={tdStyle}>
                       <div style={{ fontWeight: 'bold' }}>{part.partNumber}</div>
-                      <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>Ref: {part.condition}</div>
                     </td>
                     <td style={tdStyle}>
                       <span style={plyBadgeStyle}>{part.plyRating || 'N/A'}</span>
@@ -134,7 +135,7 @@ export default function InventoryPage() {
                         {part.quantity > 0 ? 'Ready to Ship' : 'Available to Source'}
                       </div>
                       <div style={{ fontSize: '0.75rem', opacity: 0.7 }}>
-                        {part.warehouse || 'Global Hub'}
+                        Hub: {part.warehouse || 'Global'}
                       </div>
                     </td>
                     <td style={tdStyle}>
@@ -148,12 +149,7 @@ export default function InventoryPage() {
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={7} style={{ padding: '80px', textAlign: 'center' }}>
-                    <div style={{ color: '#002d5b', fontWeight: 'bold' }}>No matching parts found.</div>
-                    <p>Contact Jedo Technologies for custom sourcing.</p>
-                  </td>
-                </tr>
+                <tr><td colSpan={7} style={{ padding: '80px', textAlign: 'center' }}>No matching tyres found.</td></tr>
               )}
             </tbody>
           </table>
@@ -163,7 +159,7 @@ export default function InventoryPage() {
   )
 }
 
-// STYLING OBJECTS
+// STYLING
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const toggleContainer = { display: 'flex', backgroundColor: '#001a35', borderRadius: '20px', padding: '4px' };
 const activeToggle = { backgroundColor: '#ffb400', color: '#002d5b', border: 'none', padding: '5px 15px', borderRadius: '15px', cursor: 'pointer', fontWeight: 'bold' as const };
