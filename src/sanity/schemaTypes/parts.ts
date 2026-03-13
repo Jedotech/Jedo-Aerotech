@@ -13,23 +13,38 @@ export const parts = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'plyRating',
+      title: 'Ply Rating',
+      type: 'string',
+      description: 'The load-carrying capacity of the tyre.',
+      options: {
+        list: [
+          { title: '4-Ply', value: '4-Ply' },
+          { title: '6-Ply', value: '6-Ply' },
+          { title: '8-Ply', value: '8-Ply' },
+          { title: '10-Ply', value: '10-Ply' },
+          { title: '12-Ply', value: '12-Ply' },
+        ],
+      },
+    }),
+    defineField({
       name: 'priceUSD',
       title: 'Base Price (USD)',
       type: 'number',
-      description: 'The global sourcing price in USD. This will be automatically converted to INR on the website.',
+      description: 'Global sourcing price. Automatically converted to INR on the site.',
     }),
     defineField({
       name: 'aircraftType',
       title: 'Aircraft Compatibility',
       type: 'string',
-      description: 'e.g., Cessna 172, Piper Archer, etc.',
+      description: 'Primary aircraft model, e.g., Cessna 172.',
       initialValue: 'Cessna 172',
     }),
     defineField({
       name: 'quantity',
       title: 'Availability Status',
       type: 'number',
-      description: 'Set to 0 to show "Available to Source" or 1+ to show "Ready Hub".',
+      description: 'Set to 0 for "Available to Source" or 1+ for "Ready Hub".',
       initialValue: 0,
     }),
     defineField({
@@ -56,19 +71,20 @@ export const parts = defineType({
           { title: 'Serviceable (SV)', value: 'Serviceable' },
         ],
       },
+      initialValue: 'New',
     }),
     defineField({
       name: 'description',
-      title: 'Detailed Specifications',
+      title: 'Technical Notes',
       type: 'text',
-      description: 'Mention Ply Rating, Brand (Goodyear/Michelin), and Tube requirements.',
+      description: 'Mention specific brand (Goodyear/Michelin) or tube requirements.',
     }),
     defineField({
       name: 'partImage',
       title: 'Certification Photo / Tag',
       type: 'image',
       options: { hotspot: true },
-      description: 'Upload the 8130-3 or EASA Form 1 image for trust.'
+      description: 'Upload the 8130-3 or EASA Form 1 image for client trust.'
     }),
   ],
 })
