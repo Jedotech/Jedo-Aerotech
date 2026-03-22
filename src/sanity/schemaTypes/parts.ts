@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity'
-import { RocketIcon, UserIcon, CogIcon } from '@sanity/icons'
+import { RocketIcon, TrolleyIcon, ClockIcon } from '@sanity/icons'
 
 export default defineType({
   name: 'part',
@@ -9,6 +9,7 @@ export default defineType({
   groups: [
     { name: 'technical', title: 'Technical Specs' },
     { name: 'management', title: 'Customer & Status' },
+    { name: 'inventory', title: 'Warehouse & Sourcing' },
     { name: 'history', title: 'Maintenance Log' },
   ],
   fields: [
@@ -35,6 +36,16 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'plyRating',
+      title: 'Ply Rating',
+      type: 'number',
+      group: 'technical',
+      options: {
+        list: [4, 6, 8, 10, 12],
+      },
+      initialValue: 6,
+    }),
+    defineField({
       name: 'maxDesignLife',
       title: 'Max Design Life (Landings)',
       type: 'number',
@@ -43,13 +54,13 @@ export default defineType({
       initialValue: 350,
     }),
 
-    // --- MANAGEMENT GROUP ---
+    // --- MANAGEMENT GROUP (For Fleet Intel) ---
     defineField({
       name: 'ownerEmail',
       title: 'Customer / Owner Email',
       type: 'string',
       group: 'management',
-      description: 'The primary identifier for dashboard access (e.g., tajesudoss@gmail.com).',
+      description: 'Primary identifier for dashboard access (e.g., tajesudoss@gmail.com).',
       validation: (Rule) => Rule.required().email(),
     }),
     defineField({
@@ -63,7 +74,7 @@ export default defineType({
           { title: 'Critical / AOG', value: 'critical' },
           { title: 'Retired / Scrapped', value: 'retired' },
         ],
-        layout: 'radio' // Makes it easier to select quickly
+        layout: 'radio'
       },
       initialValue: 'active',
     }),
@@ -74,11 +85,30 @@ export default defineType({
       group: 'management',
       initialValue: 0,
     }),
+
+    // --- INVENTORY GROUP (For Homepage Marketplace) ---
+    defineField({
+      name: 'quantity',
+      title: 'In-Stock Quantity',
+      type: 'number',
+      group: 'inventory',
+      initialValue: 1,
+    }),
+    defineField({
+      name: 'warehouse',
+      title: 'Warehouse Location',
+      type: 'string',
+      group: 'inventory',
+      options: {
+        list: ['Chennai', 'Singapore', 'USA (Hub)'],
+      },
+      initialValue: 'Chennai',
+    }),
     defineField({
       name: 'priceUSD',
       title: 'Unit Price (USD)',
       type: 'number',
-      group: 'management',
+      group: 'inventory',
     }),
 
     // --- HISTORY GROUP ---
@@ -96,12 +126,13 @@ export default defineType({
       type: 'aircraftType',
       landings: 'totalLandings',
       status: 'status',
+      warehouse: 'warehouse'
     },
-    prepare({ sn, type, landings, status }) {
+    prepare({ sn, type, landings, status, warehouse }) {
       const statusEmoji = status === 'active' ? '✅' : status === 'critical' ? '⚠️' : '❌';
       return {
         title: `${sn} [${type}]`,
-        subtitle: `${statusEmoji} Landings: ${landings || 0}`,
+        subtitle: `${statusEmoji} LNDG: ${landings || 0} | Loc: ${warehouse || 'Unknown'}`,
       }
     },
   },
