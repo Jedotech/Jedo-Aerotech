@@ -16,6 +16,16 @@ export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
   const [loading, setLoading] = useState(true)
+  
+  // FORM STATE
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    aircraft: '',
+    quantity: '',
+    message: ''
+  })
+
   const rfqSectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -39,46 +49,41 @@ export default function MarketplacePage() {
     `${p.aircraftType || ''} ${p.tyreSize || ''} ${p.partNumber || ''} ${p.gearPosition || ''}`.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // 1. IMPROVED EMAIL HANDLER
-  const handleQuoteRequest = (part: any) => {
-    const subject = encodeURIComponent(`RFQ: ${part.aircraftType} Tyre - P/N ${part.partNumber}`);
-    const body = encodeURIComponent(`Dear Jedo Sourcing Team,\n\nI am interested in the following inventory item:\n\nAircraft: ${part.aircraftType}\nPart Number: ${part.partNumber}\nSize: ${part.tyreSize}\nLocation: ${part.warehouse}\n\nPlease provide a formal quote including shipping to [Insert Location] and estimated lead time.\n\nRegards,`);
-    window.location.href = `mailto:tajesudoss@gmail.com?subject=${subject}&body=${body}`;
-  };
-
-  const scrollToRFQ = () => {
+  // HANDLER: CLICKING GET QUOTE
+  const triggerQuoteForm = (part: any) => {
+    setFormData({
+      ...formData,
+      aircraft: part.aircraftType || '',
+      message: `Requesting quote for:\nPart Number: ${part.partNumber}\nSize: ${part.tyreSize}\nPosition: ${part.gearPosition}\nHub: ${part.warehouse}`
+    })
+    // Smooth scroll to form
     rfqSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       
-      {/* PROFESSIONAL NAVIGATION */}
+      {/* NAVIGATION */}
       <nav style={navStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
-        
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <div style={switcherContainer}>
             <button onClick={() => setCurrency('INR')} style={{...switchBtn, backgroundColor: currency === 'INR' ? '#ffb400' : 'transparent', color: currency === 'INR' ? '#002d5b' : 'white'}}>INR</button>
             <button onClick={() => setCurrency('USD')} style={{...switchBtn, backgroundColor: currency === 'USD' ? '#ffb400' : 'transparent', color: currency === 'USD' ? '#002d5b' : 'white'}}>USD</button>
           </div>
-          {/* HOME BUTTON ON THE RIGHT */}
           <Link href="/" style={homeTabStyle}>HOME</Link>
         </div>
       </nav>
 
       <section style={{ padding: '80px 20px', maxWidth: '1400px', margin: '0 auto' }}>
-        <header style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <div>
-                <h1 style={{ color: '#002d5b', fontSize: '3rem', fontWeight: '900', marginBottom: '10px' }}>Tyre Marketplace</h1>
-                <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Global inventory intelligence for flight schools.</p>
-            </div>
-            <button onClick={scrollToRFQ} style={bulkQuoteBtn}>REQUEST BULK QUOTE</button>
+        <header style={{ marginBottom: '40px' }}>
+            <h1 style={{ color: '#002d5b', fontSize: '3rem', fontWeight: '900', marginBottom: '10px' }}>Tyre Marketplace</h1>
+            <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Global inventory intelligence for Cessna & Piper training fleets.</p>
         </header>
 
         <input 
           type="text" 
-          placeholder="Search by Model, Size, or P/N..." 
+          placeholder="Search inventory by Model, Size, or P/N..." 
           onChange={(e) => setSearchTerm(e.target.value)}
           style={searchStyle}
         />
@@ -99,7 +104,7 @@ export default function MarketplacePage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>Loading Hub...</td></tr>
+                <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>Syncing Inventory...</td></tr>
               ) : filteredParts.map((part) => (
                 <tr key={part._id} style={{ borderBottom: '1.5px solid #cbd5e1' }}>
                   <td style={tdStyle}><strong>{part.aircraftType}</strong></td>
@@ -115,12 +120,12 @@ export default function MarketplacePage() {
                   <td style={tdStyle}>
                     <div style={{ color: '#16a34a', fontWeight: '900', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ height: '8px', width: '8px', backgroundColor: '#16a34a', borderRadius: '50%' }}></span>
-                      Available
+                      In Stock
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Hub: {part.warehouse}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{part.warehouse} Hub</div>
                   </td>
                   <td style={tdStyle}>
-                    <button onClick={() => handleQuoteRequest(part)} style={actionBtnStyle}>GET QUOTE</button>
+                    <button onClick={() => triggerQuoteForm(part)} style={actionBtnStyle}>GET QUOTE</button>
                   </td>
                 </tr>
               ))}
@@ -129,24 +134,45 @@ export default function MarketplacePage() {
         </div>
       </section>
 
-      {/* 2. NEW REQUEST FOR QUOTE SECTION */}
+      {/* SOURCING REQUEST FORM */}
       <section ref={rfqSectionRef} id="rfq" style={{ backgroundColor: '#002d5b', padding: '100px 20px', color: 'white' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '20px' }}>Custom Sourcing Request</h2>
-          <p style={{ opacity: 0.8, marginBottom: '40px' }}>Can't find a specific tyre? Our global procurement team can source it for you from our Singapore or US hubs within 48 hours.</p>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '10px', textAlign: 'center' }}>Sourcing Request</h2>
+          <p style={{ opacity: 0.8, marginBottom: '40px', textAlign: 'center' }}>Submit your details and we will get back to you with a formal quote and shipping timeline.</p>
           
           <form style={formStyle} onSubmit={(e) => e.preventDefault()}>
             <div style={formGrid}>
-                <input type="text" placeholder="Full Name" style={inputStyle} />
-                <input type="email" placeholder="Work Email" style={inputStyle} />
-                <input type="text" placeholder="Aircraft Model" style={inputStyle} />
-                <input type="text" placeholder="Quantity Required" style={inputStyle} />
+                <input 
+                    type="text" placeholder="Your Name" style={inputStyle} 
+                    value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})}
+                />
+                <input 
+                    type="email" placeholder="Email Address" style={inputStyle} 
+                    value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})}
+                />
+                <input 
+                    type="text" placeholder="Aircraft Model" style={inputStyle} 
+                    value={formData.aircraft} onChange={(e) => setFormData({...formData, aircraft: e.target.value})}
+                />
+                <input 
+                    type="text" placeholder="Quantity" style={inputStyle} 
+                    value={formData.quantity} onChange={(e) => setFormData({...formData, quantity: e.target.value})}
+                />
             </div>
-            <textarea placeholder="Tell us about your requirement..." style={{...inputStyle, height: '120px', gridColumn: 'span 2'}}></textarea>
-            <button style={submitBtn}>SEND SOURCING REQUEST</button>
+            <textarea 
+                placeholder="Details of your requirement..." 
+                style={{...inputStyle, height: '150px', gridColumn: 'span 2'}}
+                value={formData.message}
+                onChange={(e) => setFormData({...formData, message: e.target.value})}
+            ></textarea>
+            <button style={submitBtn}>SUBMIT QUOTE REQUEST</button>
           </form>
         </div>
       </section>
+
+      <footer style={{ backgroundColor: '#001a35', color: 'rgba(255,255,255,0.5)', padding: '40px', textAlign: 'center', fontSize: '0.8rem' }}>
+        © 2026 Jedo Technologies Pvt. Ltd. | Sourcing Excellence
+      </footer>
     </div>
   )
 }
@@ -154,7 +180,6 @@ export default function MarketplacePage() {
 // STYLES
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const homeTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem', border: '2px solid #ffb400', padding: '8px 25px', borderRadius: '6px', letterSpacing: '1px' };
-const bulkQuoteBtn = { backgroundColor: 'transparent', color: '#002d5b', border: '2px solid #002d5b', padding: '10px 20px', borderRadius: '6px', fontWeight: 'bold' as const, cursor: 'pointer' };
 const searchStyle = { width: '100%', padding: '20px 25px', borderRadius: '10px', border: '2px solid #002d5b', marginBottom: '40px', outline: 'none', fontSize: '1rem' };
 const thStyle = { padding: '20px', fontSize: '0.75rem', letterSpacing: '1px' };
 const tdStyle = { padding: '25px', color: '#002d5b' };
@@ -166,5 +191,5 @@ const actionBtnStyle = { backgroundColor: '#ffb400', color: '#002d5b', border: '
 // FORM STYLES
 const formStyle = { display: 'flex', flexDirection: 'column' as const, gap: '15px' };
 const formGrid = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' };
-const inputStyle = { padding: '15px', borderRadius: '6px', border: 'none', outline: 'none', fontSize: '1rem', backgroundColor: 'rgba(255,255,255,0.1)', color: 'white' };
-const submitBtn = { backgroundColor: '#ffb400', color: '#002d5b', border: 'none', padding: '20px', borderRadius: '6px', fontWeight: '900' as const, cursor: 'pointer', marginTop: '10px', fontSize: '1rem' };
+const inputStyle = { padding: '18px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)', outline: 'none', fontSize: '1rem', backgroundColor: 'rgba(255,255,255,0.05)', color: 'white' };
+const submitBtn = { backgroundColor: '#ffb400', color: '#002d5b', border: 'none', padding: '20px', borderRadius: '8px', fontWeight: '900' as const, cursor: 'pointer', marginTop: '10px', fontSize: '1rem', letterSpacing: '1px' };
