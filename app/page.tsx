@@ -102,8 +102,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* SOURCING PREVIEW - UPDATED TABLE */}
-      <section style={{ padding: '80px 20px', maxWidth: '1300px', margin: '0 auto' }}>
+      {/* SOURCING PREVIEW - SEPARATED COLUMNS */}
+      <section style={{ padding: '80px 20px', maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', marginBottom: '40px' }}>
           <div>
             <h2 style={{ color: '#002d5b', fontWeight: '800', fontSize: '2.5rem', margin: 0 }}>Global Availability</h2>
@@ -114,45 +114,65 @@ export default async function HomePage() {
           </Link>
         </div>
         
-        <div style={{ overflowX: 'auto', borderRadius: '20px', border: '1px solid #e2e8f0', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
+        <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 15px 35px rgba(0,0,0,0.05)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
             <thead>
-              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
-                <th style={thStyle}>Aircraft Model</th>
-                <th style={thStyle}>Gear Position</th>
-                <th style={thStyle}>Tyre Size</th>
-                <th style={thStyle}>Ply</th>
-                <th style={thStyle}>Part Number (P/N)</th>
-                <th style={thStyle}>Est. Cost (INR)</th>
-                <th style={thStyle}>Sourcing Status</th>
+              <tr style={{ backgroundColor: '#002d5b', color: '#ffb400', textAlign: 'left' }}>
+                <th style={thStyle}>AIRCRAFT MODEL</th>
+                <th style={thStyle}>GEAR POSITION</th>
+                <th style={thStyle}>TYRE SIZE</th>
+                <th style={thStyle}>PART NUMBER</th>
+                <th style={thStyle}>PLY</th>
+                <th style={thStyle}>EST. COST (INR)</th>
+                <th style={thStyle}>SOURCING STATUS</th>
+                <th style={thStyle}>ACTION</th>
               </tr>
             </thead>
             <tbody>
               {parts.length > 0 ? parts.map((part: any) => {
-                // Currency conversion (Approx 1 USD = 83.5 INR)
                 const costINR = part.priceUSD ? Math.round(part.priceUSD * 83.5).toLocaleString('en-IN') : 'Quote Req';
                 
                 return (
                   <tr key={part._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={tdStyle}>{part.aircraftType}</td>
-                    <td style={tdStyle}>{part.gearPosition || 'Main / Nose'}</td>
-                    <td style={tdStyle}><strong>{part.tyreSize || '5.00-5'}</strong></td>
-                    <td style={tdStyle}>{part.plyRating}-Ply</td>
-                    <td style={tdStyle}><code style={{fontSize: '0.8rem', color: '#64748b'}}>{part.partNumber}</code></td>
-                    <td style={tdStyle}><strong>₹{costINR}</strong></td>
+                    <td style={tdStyle}><strong>{part.aircraftType}</strong></td>
                     <td style={tdStyle}>
-                        <span style={{
-                            ...badgeStyle, 
-                            backgroundColor: part.quantity > 0 ? '#dcfce7' : '#f1f5f9',
-                            color: part.quantity > 0 ? '#166534' : '#475569'
-                        }}>
-                            {part.quantity > 0 ? `In Stock (${part.warehouse})` : 'Source on Request'}
-                        </span>
+                      <span style={{ backgroundColor: '#e2e8f0', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '900', color: '#475569' }}>
+                        {(part.gearPosition || 'ALL').toUpperCase()}
+                      </span>
+                    </td>
+                    <td style={tdStyle}><strong>{part.tyreSize || '5.00-5'}</strong></td>
+                    <td style={tdStyle}><code style={{fontSize: '0.85rem', color: '#64748b'}}>{part.partNumber}</code></td>
+                    <td style={tdStyle}>
+                      <span style={{ border: '1px solid #e2e8f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', color: '#64748b' }}>
+                        {part.plyRating}-Ply
+                      </span>
+                    </td>
+                    <td style={tdStyle}>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#002d5b' }}>Est. ₹{costINR}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 'bold' }}>*Excl. Customs/GST</div>
+                    </td>
+                    <td style={tdStyle}>
+                      <div style={{ color: '#16a34a', fontWeight: '900', fontSize: '0.9rem' }}>Ready to Ship</div>
+                      <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Hub: {part.warehouse || 'Chennai'}</div>
+                    </td>
+                    <td style={tdStyle}>
+                      <a href="#rfq" style={{ 
+                        backgroundColor: '#002d5b', 
+                        color: 'white', 
+                        padding: '12px 20px', 
+                        borderRadius: '6px', 
+                        textDecoration: 'none', 
+                        fontSize: '0.8rem', 
+                        fontWeight: '900',
+                        display: 'inline-block'
+                      }}>
+                        GET QUOTE
+                      </a>
                     </td>
                   </tr>
                 )
               }) : (
-                <tr><td colSpan={7} style={{ padding: '60px', textAlign: 'center', color: '#64748b' }}>Syncing Global Inventory Hubs...</td></tr>
+                <tr><td colSpan={8} style={{ padding: '60px', textAlign: 'center', color: '#64748b' }}>Initializing Global Inventory Hubs...</td></tr>
               )}
             </tbody>
           </table>
@@ -210,8 +230,7 @@ const statValueStyle = { fontSize: '2rem', fontWeight: '900', color: 'white' };
 
 const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '15px 35px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem' };
 const secondaryButtonStyle = { backgroundColor: 'transparent', color: 'white', padding: '15px 35px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem', border: '2px solid white' };
-const thStyle = { padding: '25px', fontSize: '0.75rem', textTransform: 'uppercase' as const, letterSpacing: '1px', color: '#64748b' };
+const thStyle = { padding: '20px', fontSize: '0.75rem', textTransform: 'uppercase' as const, letterSpacing: '1px' };
 const tdStyle = { padding: '25px', color: '#002d5b', fontSize: '1rem' };
-const badgeStyle = { padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold' as const };
 const inputStyle = { padding: '18px', borderRadius: '10px', border: '2px solid #cbd5e1', width: '100%', fontSize: '1rem', outline: 'none' };
 const submitButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '10px', border: 'none', fontWeight: 'bold' as const, cursor: 'pointer', fontSize: '1.1rem' };
