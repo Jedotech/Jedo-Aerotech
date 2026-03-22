@@ -12,13 +12,18 @@ const client = createClient({
 // 2. DYNAMIC DATA FETCHING
 async function getHomepageData() {
   const query = `{
-    "parts": *[_type == "part"] | order(_createdAt desc) [0...5] {
-      serialNumber,
+    "parts": *[_type == "part"] | order(_createdAt desc) [0...8] {
+      _id,
+      partNumber,
+      tyreSize,
       aircraftType,
-      status,
-      totalLandings,
-      maxDesignLife,
-      ownerEmail
+      gearPosition,
+      plyRating,
+      priceUSD,
+      quantity,
+      warehouse,
+      "totalLandings": coalesce(totalLandings, 0),
+      "maxLife": coalesce(maxDesignLife, 350)
     },
     "totalCount": count(*[_type == "part"]),
     "criticalCount": count(*[_type == "part" && totalLandings >= maxDesignLife * 0.85])
@@ -69,7 +74,7 @@ export default async function HomePage() {
             <span style={{ color: '#ffb400' }}>TRAINING FLEETS.</span>
           </h1>
           <p style={{ fontSize: '1.5rem', fontWeight: '600', maxWidth: '850px', margin: '0 auto 30px', opacity: 0.95 }}>
-            Intelligence-driven brokerage for Cessna & Piper. We monitor, verify, and deliver certified tyres to your hangar.
+            Specialized brokerage for Cessna & Piper. We source, verify, and deliver certified aviation tyres to your hangar.
           </p>
           
           <div className="hero-btn-container" style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
@@ -79,33 +84,33 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* LIVE ASSET PULSE - DYNAMIC STATS */}
+      {/* LIVE ASSET PULSE */}
       <section style={{ backgroundColor: '#002d5b', padding: '40px 20px', marginTop: '-50px', position: 'relative', zIndex: 10 }}>
         <div className="stats-grid" style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
           <div style={statCardStyle}>
-            <span style={statLabelStyle}>LIVE INVENTORY</span>
+            <span style={statLabelStyle}>TOTAL TRACKED ASSETS</span>
             <span style={statValueStyle}>{totalCount} Units</span>
           </div>
           <div style={statCardStyle}>
-            <span style={statLabelStyle}>FLEET HEALTH</span>
+            <span style={statLabelStyle}>FLEET HEALTH RATING</span>
             <span style={statValueStyle}>{fleetHealth}%</span>
           </div>
           <div style={{...statCardStyle, backgroundColor: '#ffb400', border: 'none'}}>
-            <span style={{...statLabelStyle, color: '#002d5b'}}>AOG STATUS</span>
-            <span style={{...statValueStyle, color: '#002d5b'}}>READY</span>
+            <span style={{...statLabelStyle, color: '#002d5b'}}>SOURCING HUB STATUS</span>
+            <span style={{...statValueStyle, color: '#002d5b'}}>CHENNAI LIVE</span>
           </div>
         </div>
       </section>
 
-      {/* SOURCING PREVIEW - DYNAMIC TABLE */}
-      <section style={{ padding: '80px 20px', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* SOURCING PREVIEW - UPDATED TABLE */}
+      <section style={{ padding: '80px 20px', maxWidth: '1300px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', marginBottom: '40px' }}>
           <div>
             <h2 style={{ color: '#002d5b', fontWeight: '800', fontSize: '2.5rem', margin: 0 }}>Global Availability</h2>
-            <p style={{ color: '#64748b', fontWeight: 'bold' }}>Real-time status of tracked assets in Chennai & Singapore</p>
+            <p style={{ color: '#64748b', fontWeight: 'bold' }}>Live inventory pulse from Chennai & Singapore hubs</p>
           </div>
           <Link href="/inventory" style={{ color: '#002d5b', fontWeight: 'bold', textDecoration: 'none', borderBottom: '3px solid #ffb400', paddingBottom: '5px' }}>
-            View Full Marketplace →
+            Full Marketplace →
           </Link>
         </div>
         
@@ -113,37 +118,41 @@ export default async function HomePage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
             <thead>
               <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0', textAlign: 'left' }}>
-                <th style={thStyle}>Asset Serial</th>
-                <th style={thStyle}>Compatible Fleet</th>
-                <th style={thStyle}>Lifecycle Status</th>
-                <th style={thStyle}>Operational Health</th>
+                <th style={thStyle}>Aircraft Model</th>
+                <th style={thStyle}>Gear Position</th>
+                <th style={thStyle}>Tyre Size</th>
+                <th style={thStyle}>Ply</th>
+                <th style={thStyle}>Part Number (P/N)</th>
+                <th style={thStyle}>Est. Cost (INR)</th>
+                <th style={thStyle}>Sourcing Status</th>
               </tr>
             </thead>
             <tbody>
               {parts.length > 0 ? parts.map((part: any) => {
-                const wear = Math.round((part.landings / part.maxDesignLife) * 100);
+                // Currency conversion (Approx 1 USD = 83.5 INR)
+                const costINR = part.priceUSD ? Math.round(part.priceUSD * 83.5).toLocaleString('en-IN') : 'Quote Req';
+                
                 return (
-                  <tr key={part.serialNumber} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={tdStyle}><strong>{part.serialNumber}</strong></td>
-                    <td style={tdStyle}>{part.aircraftType || 'Cessna 172'}</td>
-                    <td style={tdStyle}>
-                      <div style={{ fontWeight: 'bold', color: wear > 85 ? '#ef4444' : '#16a34a' }}>
-                        {wear}% Life Used
-                      </div>
-                    </td>
+                  <tr key={part._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={tdStyle}>{part.aircraftType}</td>
+                    <td style={tdStyle}>{part.gearPosition || 'Main / Nose'}</td>
+                    <td style={tdStyle}><strong>{part.tyreSize || '5.00-5'}</strong></td>
+                    <td style={tdStyle}>{part.plyRating}-Ply</td>
+                    <td style={tdStyle}><code style={{fontSize: '0.8rem', color: '#64748b'}}>{part.partNumber}</code></td>
+                    <td style={tdStyle}><strong>₹{costINR}</strong></td>
                     <td style={tdStyle}>
                         <span style={{
                             ...badgeStyle, 
-                            backgroundColor: wear > 85 ? '#fee2e2' : '#dcfce7',
-                            color: wear > 85 ? '#991b1b' : '#166534'
+                            backgroundColor: part.quantity > 0 ? '#dcfce7' : '#f1f5f9',
+                            color: part.quantity > 0 ? '#166534' : '#475569'
                         }}>
-                            {wear > 85 ? 'Critical Risk' : 'Healthy'}
+                            {part.quantity > 0 ? `In Stock (${part.warehouse})` : 'Source on Request'}
                         </span>
                     </td>
                   </tr>
                 )
               }) : (
-                <tr><td colSpan={4} style={{ padding: '60px', textAlign: 'center', color: '#64748b' }}>Initializing Global Inventory Hubs...</td></tr>
+                <tr><td colSpan={7} style={{ padding: '60px', textAlign: 'center', color: '#64748b' }}>Syncing Global Inventory Hubs...</td></tr>
               )}
             </tbody>
           </table>
@@ -201,7 +210,7 @@ const statValueStyle = { fontSize: '2rem', fontWeight: '900', color: 'white' };
 
 const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '15px 35px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem' };
 const secondaryButtonStyle = { backgroundColor: 'transparent', color: 'white', padding: '15px 35px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem', border: '2px solid white' };
-const thStyle = { padding: '25px', fontSize: '0.8rem', textTransform: 'uppercase' as const, letterSpacing: '1px', color: '#64748b' };
+const thStyle = { padding: '25px', fontSize: '0.75rem', textTransform: 'uppercase' as const, letterSpacing: '1px', color: '#64748b' };
 const tdStyle = { padding: '25px', color: '#002d5b', fontSize: '1rem' };
 const badgeStyle = { padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold' as const };
 const inputStyle = { padding: '18px', borderRadius: '10px', border: '2px solid #cbd5e1', width: '100%', fontSize: '1rem', outline: 'none' };

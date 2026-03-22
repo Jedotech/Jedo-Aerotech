@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity'
-import { RocketIcon, TrolleyIcon, ClockIcon } from '@sanity/icons'
+import { RocketIcon } from '@sanity/icons'
 
 export default defineType({
   name: 'part',
@@ -10,21 +10,12 @@ export default defineType({
     { name: 'technical', title: 'Technical Specs' },
     { name: 'management', title: 'Customer & Status' },
     { name: 'inventory', title: 'Warehouse & Sourcing' },
-    { name: 'history', title: 'Maintenance Log' },
   ],
   fields: [
     // --- TECHNICAL GROUP ---
     defineField({
-      name: 'serialNumber',
-      title: 'Serial Number',
-      type: 'string',
-      group: 'technical',
-      validation: (Rule) => Rule.required(),
-      description: 'The unique manufacturer serial number (e.g., SN-10245)',
-    }),
-    defineField({
       name: 'aircraftType',
-      title: 'Aircraft Type',
+      title: 'Aircraft Model',
       type: 'string',
       group: 'technical',
       options: {
@@ -36,73 +27,45 @@ export default defineType({
       },
     }),
     defineField({
+      name: 'gearPosition',
+      title: 'Gear Position',
+      type: 'string',
+      group: 'technical',
+      options: {
+        list: ['Nose Gear', 'Main Gear', 'Tail Wheel'],
+      },
+    }),
+    defineField({
+      name: 'tyreSize',
+      title: 'Tyre Size',
+      type: 'string',
+      group: 'technical',
+      description: 'e.g., 5.00-5 or 6.00-6',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'partNumber',
+      title: 'Part Number (P/N)',
+      type: 'string',
+      group: 'technical',
+      description: 'The specific manufacturer part number',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'plyRating',
       title: 'Ply Rating',
       type: 'number',
       group: 'technical',
-      options: {
-        list: [4, 6, 8, 10, 12],
-      },
+      options: { list: [4, 6, 8, 10] },
       initialValue: 6,
     }),
-    defineField({
-      name: 'maxDesignLife',
-      title: 'Max Design Life (Landings)',
-      type: 'number',
-      group: 'technical',
-      description: 'Standard retirement limit (e.g., 350 for Cessna 172 mains).',
-      initialValue: 350,
-    }),
 
-    // --- MANAGEMENT GROUP (For Fleet Intel) ---
+    // --- MANAGEMENT & INVENTORY ---
     defineField({
       name: 'ownerEmail',
-      title: 'Customer / Owner Email',
+      title: 'Owner Email (for Intel Dashboard)',
       type: 'string',
       group: 'management',
-      description: 'Primary identifier for dashboard access (e.g., tajesudoss@gmail.com).',
-      validation: (Rule) => Rule.required().email(),
-    }),
-    defineField({
-      name: 'status',
-      title: 'Operational Status',
-      type: 'string',
-      group: 'management',
-      options: {
-        list: [
-          { title: 'In-Service', value: 'active' },
-          { title: 'Critical / AOG', value: 'critical' },
-          { title: 'Retired / Scrapped', value: 'retired' },
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'active',
-    }),
-    defineField({
-      name: 'totalLandings',
-      title: 'Current Landings',
-      type: 'number',
-      group: 'management',
-      initialValue: 0,
-    }),
-
-    // --- INVENTORY GROUP (For Homepage Marketplace) ---
-    defineField({
-      name: 'quantity',
-      title: 'In-Stock Quantity',
-      type: 'number',
-      group: 'inventory',
-      initialValue: 1,
-    }),
-    defineField({
-      name: 'warehouse',
-      title: 'Warehouse Location',
-      type: 'string',
-      group: 'inventory',
-      options: {
-        list: ['Chennai', 'Singapore', 'USA (Hub)'],
-      },
-      initialValue: 'Chennai',
     }),
     defineField({
       name: 'priceUSD',
@@ -110,30 +73,24 @@ export default defineType({
       type: 'number',
       group: 'inventory',
     }),
-
-    // --- HISTORY GROUP ---
     defineField({
-      name: 'maintenanceNotes',
-      title: 'Maintenance Log Notes',
-      type: 'text',
-      group: 'history',
-      description: 'Details on why this tyre was replaced or current condition.',
+      name: 'quantity',
+      title: 'In-Stock Quantity',
+      type: 'number',
+      group: 'inventory',
+    }),
+    defineField({
+      name: 'warehouse',
+      title: 'Warehouse Location',
+      type: 'string',
+      group: 'inventory',
+      options: { list: ['Chennai', 'Singapore', 'USA (Hub)'] },
     }),
   ],
   preview: {
     select: {
-      sn: 'serialNumber',
-      type: 'aircraftType',
-      landings: 'totalLandings',
-      status: 'status',
-      warehouse: 'warehouse'
-    },
-    prepare({ sn, type, landings, status, warehouse }) {
-      const statusEmoji = status === 'active' ? '✅' : status === 'critical' ? '⚠️' : '❌';
-      return {
-        title: `${sn} [${type}]`,
-        subtitle: `${statusEmoji} LNDG: ${landings || 0} | Loc: ${warehouse || 'Unknown'}`,
-      }
+      title: 'tyreSize',
+      subtitle: 'partNumber',
     },
   },
 })
