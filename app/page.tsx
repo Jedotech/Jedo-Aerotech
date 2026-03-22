@@ -21,6 +21,8 @@ export default function HomePage() {
   // 2. FETCH DATA FROM SANITY
   useEffect(() => {
     async function fetchData() {
+      // We explicitly fetch the separate fields. 
+      // Ensure these field names match your schema in parts.ts exactly.
       const query = `*[_type == "part"] | order(_createdAt desc) {
         _id,
         aircraftType,
@@ -46,9 +48,9 @@ export default function HomePage() {
 
   const exchangeRate = 83.5;
 
-  // 3. SEARCH LOGIC
+  // 3. SEARCH LOGIC (Checks Model, Size, P/N, and Gear Position)
   const filteredParts = parts.filter((part) => {
-    const searchStr = `${part.aircraftType} ${part.tyreSize} ${part.partNumber} ${part.gearPosition}`.toLowerCase();
+    const searchStr = `${part.aircraftType || ''} ${part.tyreSize || ''} ${part.partNumber || ''} ${part.gearPosition || ''}`.toLowerCase();
     return searchStr.includes(searchTerm.toLowerCase());
   });
 
@@ -57,9 +59,11 @@ export default function HomePage() {
       
       {/* NAVIGATION BAR */}
       <nav style={navStyle}>
-        <Link href="/">
-          <img src="/jedo-logo.png" alt="Jedo Technologies" style={{ height: '40px', width: 'auto' }} />
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Link href="/">
+            <img src="/jedo-logo.png" alt="Jedo Technologies" style={{ height: '40px', width: 'auto' }} />
+          </Link>
+        </div>
         
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           {/* CURRENCY TOGGLE */}
@@ -117,26 +121,26 @@ export default function HomePage() {
               {loading ? (
                 <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center', color: '#64748b' }}>Syncing with Global Hubs...</td></tr>
               ) : filteredParts.length > 0 ? filteredParts.map((part: any) => {
-                const cost = currency === 'INR' 
+                const costLabel = currency === 'INR' 
                   ? `₹${Math.round(part.priceUSD * exchangeRate).toLocaleString('en-IN')}`
                   : `$${part.priceUSD?.toLocaleString()}`;
 
                 return (
                   <tr key={part._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={tdStyle}><strong>{part.aircraftType}</strong></td>
+                    <td style={tdStyle}><strong>{part.aircraftType || 'N/A'}</strong></td>
                     <td style={tdStyle}>
                       <span style={badgeStyle}>{(part.gearPosition || 'MAIN').toUpperCase()}</span>
                     </td>
                     <td style={tdStyle}><strong>{part.tyreSize || 'N/A'}</strong></td>
-                    <td style={tdStyle}><code style={{ color: '#64748b' }}>{part.partNumber || 'Entry Required'}</code></td>
+                    <td style={tdStyle}><code style={{ color: '#64748b' }}>{part.partNumber || 'Entry Req.'}</code></td>
                     <td style={tdStyle}>
                       <span style={{ border: '1px solid #e2e8f0', padding: '3px 8px', borderRadius: '4px', fontSize: '0.8rem', color: '#64748b' }}>
-                        {part.plyRating}-Ply
+                        {part.plyRating ? `${part.plyRating}-Ply` : 'N/A'}
                       </span>
                     </td>
                     <td style={tdStyle}>
                       <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#002d5b' }}>
-                        {part.priceUSD ? cost : 'Contact for Quote'}
+                        {part.priceUSD ? costLabel : 'Contact for Quote'}
                       </div>
                       <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 'bold' }}>*Excl. Customs/GST</div>
                     </td>
@@ -164,7 +168,7 @@ export default function HomePage() {
   )
 }
 
-// STYLES
+// --- CSS-IN-JS STYLES ---
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const switcherContainer = { display: 'flex', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '20px', padding: '2px', backgroundColor: 'rgba(0,0,0,0.2)' };
 const switchBtn = { border: 'none', padding: '6px 15px', borderRadius: '18px', fontSize: '0.75rem', fontWeight: 'bold' as const, cursor: 'pointer', transition: '0.2s' };
