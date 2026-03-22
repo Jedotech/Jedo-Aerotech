@@ -1,0 +1,54 @@
+[
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            "Cessna 172",
+            "Cessna 152",
+            "Piper Archer"
+          ]
+        },
+        "name": "aircraftType",
+        "type": "string",
+        "title": "Aircraft Model"
+      },
+      {
+        "options": {
+          "list": [
+            "Nose Gear",
+            "Main Gear",
+            "All Positions"
+          ]
+        },
+        "name": "gearPosition",
+        "type": "string"
+      },
+      {
+        "description": "e.g., 6.00-6 or 5.00-5",
+        "name": "tyreSize",
+        "type": "string"
+      },
+      {
+        "description": "The specific manufacturer P/N (e.g., 505C61-8)",
+        "name": "partNumber",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            "4-Ply",
+            "6-Ply",
+            "8-Ply",
+            "10-Ply"
+          ]
+        },
+        "name": "plyRating",
+        "type": "string"
+      }
+    ],
+    "name": "part",
+    "type": "document",
+    "title": "Tyre Inventory"
+  }
+]

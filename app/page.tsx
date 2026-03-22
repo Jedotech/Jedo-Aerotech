@@ -1,7 +1,9 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. SANITY CLIENT CONFIGURATION
 const client = createClient({
   projectId: 'm2pa474h', 
   dataset: 'production',
@@ -9,228 +11,130 @@ const client = createClient({
   useCdn: false, 
 })
 
-// 2. DYNAMIC DATA FETCHING
-async function getHomepageData() {
-  const query = `{
-    "parts": *[_type == "part"] | order(_createdAt desc) [0...8] {
-      _id,
-      partNumber,
-      tyreSize,
-      aircraftType,
-      gearPosition,
-      plyRating,
-      priceUSD,
-      quantity,
-      warehouse,
-      "totalLandings": coalesce(totalLandings, 0),
-      "maxLife": coalesce(maxDesignLife, 350)
-    },
-    "totalCount": count(*[_type == "part"]),
-    "criticalCount": count(*[_type == "part" && totalLandings >= maxDesignLife * 0.85])
-  }`
-  try {
-    return await client.fetch(query)
-  } catch (e) {
-    console.error("Fetch error:", e)
-    return { parts: [], totalCount: 0, criticalCount: 0 }
-  }
-}
+export default function HomePage() {
+  const [parts, setParts] = useState<any[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
+  const [loading, setLoading] = useState(true)
 
-export default async function HomePage() {
-  const { parts, totalCount, criticalCount } = await getHomepageData();
-  const fleetHealth = totalCount > 0 ? Math.round(((totalCount - criticalCount) / totalCount) * 100) : 100;
+  useEffect(() => {
+    async function fetchData() {
+      const query = `*[_type == "part"] | order(_createdAt desc)`
+      const data = await client.fetch(query)
+      setParts(data)
+      setLoading(false)
+    }
+    fetchData()
+  }, [])
+
+  const exchangeRate = 83.5;
+
+  // --- SEARCH LOGIC ---
+  const filteredParts = parts.filter((part) => {
+    const searchStr = `${part.aircraftType} ${part.tyreSize} ${part.partNumber} ${part.gearPosition}`.toLowerCase();
+    return searchStr.includes(searchTerm.toLowerCase());
+  });
 
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'sans-serif', margin: 0, padding: 0 }}>
+    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       
-      <style>{`
-        @media (max-width: 768px) {
-          .nav-container { padding: 15px 20px !important; }
-          .hero-title { font-size: 2.8rem !important; }
-          .desktop-nav { display: none !important; }
-          .hero-btn-container { flex-direction: column; gap: 10px; }
-          .stats-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-
-      {/* NAVIGATION BAR */}
-      <nav className="nav-container" style={navStyle}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Link href="/">
-            <img src="/jedo-logo.png" alt="Jedo Technologies" style={{ height: '45px', width: 'auto' }} />
-          </Link>
-        </div>
-        <div className="desktop-nav" style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
-          <Link href="/inventory" style={navLinkStyle}>MARKETPLACE</Link>
+      {/* NAVIGATION with Switcher */}
+      <nav style={navStyle}>
+        <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <div style={switcherContainer}>
+            <button 
+              onClick={() => setCurrency('INR')}
+              style={{...switchBtn, backgroundColor: currency === 'INR' ? '#ffb400' : 'transparent', color: currency === 'INR' ? '#002d5b' : 'white'}}
+            >INR</button>
+            <button 
+              onClick={() => setCurrency('USD')}
+              style={{...switchBtn, backgroundColor: currency === 'USD' ? '#ffb400' : 'transparent', color: currency === 'USD' ? '#002d5b' : 'white'}}
+            >USD</button>
+          </div>
           <a href="#rfq" style={quoteButtonStyle}>REQUEST SOURCING</a>
         </div>
       </nav>
 
-      {/* HERO SECTION */}
-      <section style={heroSectionStyle}>
-        <div style={{ maxWidth: '1100px', padding: '0 20px', zIndex: 2 }}>
-          <h1 className="hero-title" style={{ fontSize: '5rem', fontWeight: '900', marginBottom: '15px', lineHeight: '1.1', textShadow: '2px 2px 10px rgba(0,0,0,0.5)' }}>
-            THE TYRE HUB FOR <br />
-            <span style={{ color: '#ffb400' }}>TRAINING FLEETS.</span>
-          </h1>
-          <p style={{ fontSize: '1.5rem', fontWeight: '600', maxWidth: '850px', margin: '0 auto 30px', opacity: 0.95 }}>
-            Specialized brokerage for Cessna & Piper. We source, verify, and deliver certified aviation tyres to your hangar.
-          </p>
-          
-          <div className="hero-btn-container" style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
-            <Link href="/inventory" style={primaryButtonStyle}>Browse Marketplace</Link>
-            <Link href="https://jedo-fleet-intel.vercel.app" style={secondaryButtonStyle}>Fleet Intel Login</Link>
+      {/* SEARCH BAR SECTION */}
+      <section style={{ backgroundColor: '#f8fafc', padding: '40px 20px', borderBottom: '1px solid #e2e8f0' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <div style={{ flex: 1, position: 'relative' }}>
+            <input 
+              type="text" 
+              placeholder="Search by Model, Size (e.g. 5.00-5), or Part Number..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={searchFieldStyle}
+            />
+            <span style={{ position: 'absolute', right: '20px', top: '15px', color: '#94a3b8' }}>🔍</span>
+          </div>
+          <div style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 'bold' }}>
+            {filteredParts.length} Results Found
           </div>
         </div>
       </section>
 
-      {/* LIVE ASSET PULSE */}
-      <section style={{ backgroundColor: '#002d5b', padding: '40px 20px', marginTop: '-50px', position: 'relative', zIndex: 10 }}>
-        <div className="stats-grid" style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-          <div style={statCardStyle}>
-            <span style={statLabelStyle}>TOTAL TRACKED ASSETS</span>
-            <span style={statValueStyle}>{totalCount} Units</span>
-          </div>
-          <div style={statCardStyle}>
-            <span style={statLabelStyle}>FLEET HEALTH RATING</span>
-            <span style={statValueStyle}>{fleetHealth}%</span>
-          </div>
-          <div style={{...statCardStyle, backgroundColor: '#ffb400', border: 'none'}}>
-            <span style={{...statLabelStyle, color: '#002d5b'}}>SOURCING HUB STATUS</span>
-            <span style={{...statValueStyle, color: '#002d5b'}}>CHENNAI LIVE</span>
-          </div>
-        </div>
-      </section>
-
-      {/* SOURCING PREVIEW - SEPARATED COLUMNS */}
-      <section style={{ padding: '80px 20px', maxWidth: '1400px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', marginBottom: '40px' }}>
-          <div>
-            <h2 style={{ color: '#002d5b', fontWeight: '800', fontSize: '2.5rem', margin: 0 }}>Global Availability</h2>
-            <p style={{ color: '#64748b', fontWeight: 'bold' }}>Live inventory pulse from Chennai & Singapore hubs</p>
-          </div>
-          <Link href="/inventory" style={{ color: '#002d5b', fontWeight: 'bold', textDecoration: 'none', borderBottom: '3px solid #ffb400', paddingBottom: '5px' }}>
-            Full Marketplace →
-          </Link>
-        </div>
-        
-        <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 15px 35px rgba(0,0,0,0.05)' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
+      {/* MARKETPLACE TABLE */}
+      <section style={{ padding: '40px 20px', maxWidth: '1400px', margin: '0 auto' }}>
+        <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ backgroundColor: '#002d5b', color: '#ffb400', textAlign: 'left' }}>
                 <th style={thStyle}>AIRCRAFT MODEL</th>
-                <th style={thStyle}>GEAR POSITION</th>
+                <th style={thStyle}>GEAR</th>
                 <th style={thStyle}>TYRE SIZE</th>
                 <th style={thStyle}>PART NUMBER</th>
                 <th style={thStyle}>PLY</th>
-                <th style={thStyle}>EST. COST (INR)</th>
-                <th style={thStyle}>SOURCING STATUS</th>
+                <th style={thStyle}>EST. COST ({currency})</th>
+                <th style={thStyle}>STATUS</th>
                 <th style={thStyle}>ACTION</th>
               </tr>
             </thead>
             <tbody>
-              {parts.length > 0 ? parts.map((part: any) => {
-                const costINR = part.priceUSD ? Math.round(part.priceUSD * 83.5).toLocaleString('en-IN') : 'Quote Req';
-                
+              {loading ? (
+                <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center', color: '#64748b' }}>Initializing Inventory...</td></tr>
+              ) : filteredParts.length > 0 ? filteredParts.map((part) => {
+                const cost = currency === 'INR' 
+                  ? `₹${Math.round(part.priceUSD * exchangeRate).toLocaleString('en-IN')}`
+                  : `$${part.priceUSD.toLocaleString()}`;
+
                 return (
                   <tr key={part._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                     <td style={tdStyle}><strong>{part.aircraftType}</strong></td>
+                    <td style={tdStyle}><span style={badgeStyle}>{(part.gearPosition || 'All').toUpperCase()}</span></td>
+                    <td style={tdStyle}><strong>{part.tyreSize}</strong></td>
+                    <td style={tdStyle}><code style={{ color: '#64748b' }}>{part.partNumber}</code></td>
+                    <td style={tdStyle}>{part.plyRating}-Ply</td>
                     <td style={tdStyle}>
-                      <span style={{ backgroundColor: '#e2e8f0', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '900', color: '#475569' }}>
-                        {(part.gearPosition || 'ALL').toUpperCase()}
-                      </span>
-                    </td>
-                    <td style={tdStyle}><strong>{part.tyreSize || '5.00-5'}</strong></td>
-                    <td style={tdStyle}><code style={{fontSize: '0.85rem', color: '#64748b'}}>{part.partNumber}</code></td>
-                    <td style={tdStyle}>
-                      <span style={{ border: '1px solid #e2e8f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', color: '#64748b' }}>
-                        {part.plyRating}-Ply
-                      </span>
-                    </td>
-                    <td style={tdStyle}>
-                      <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#002d5b' }}>Est. ₹{costINR}</div>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#002d5b' }}>{cost}</div>
                       <div style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: 'bold' }}>*Excl. Customs/GST</div>
                     </td>
                     <td style={tdStyle}>
                       <div style={{ color: '#16a34a', fontWeight: '900', fontSize: '0.9rem' }}>Ready to Ship</div>
-                      <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Hub: {part.warehouse || 'Chennai'}</div>
+                      <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Hub: {part.warehouse}</div>
                     </td>
-                    <td style={tdStyle}>
-                      <a href="#rfq" style={{ 
-                        backgroundColor: '#002d5b', 
-                        color: 'white', 
-                        padding: '12px 20px', 
-                        borderRadius: '6px', 
-                        textDecoration: 'none', 
-                        fontSize: '0.8rem', 
-                        fontWeight: '900',
-                        display: 'inline-block'
-                      }}>
-                        GET QUOTE
-                      </a>
-                    </td>
+                    <td style={tdStyle}><a href="#rfq" style={tableBtnStyle}>GET QUOTE</a></td>
                   </tr>
                 )
               }) : (
-                <tr><td colSpan={8} style={{ padding: '60px', textAlign: 'center', color: '#64748b' }}>Initializing Global Inventory Hubs...</td></tr>
+                <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center', color: '#64748b' }}>No matching tyres found in the hub.</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </section>
-
-      {/* RFQ SOURCING FORM */}
-      <section id="rfq" style={{ padding: '100px 20px', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
-        <div style={{ maxWidth: '650px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-            <h2 style={{ color: '#002d5b', fontSize: '2.8rem', fontWeight: '800' }}>Global Sourcing Request</h2>
-            <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Our brokerage network spans USA, Singapore, and India. Tell us your requirement.</p>
-          </div>
-          <form action="https://formspree.io/f/mdalbdqq" method="POST" style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-            <input type="text" name="part" placeholder="Tyre Size or Part Number *" required style={inputStyle} />
-            <input type="email" name="email" placeholder="Contact Email *" required style={inputStyle} />
-            <textarea name="message" placeholder="Aircraft Model & Quantity needed..." rows={5} style={inputStyle}></textarea>
-            <button type="submit" style={submitButtonStyle}>INITIATE SOURCING</button>
-          </form>
-        </div>
-      </section>
-
-      <footer style={{ backgroundColor: '#001a35', color: 'white', padding: '60px 20px', textAlign: 'center' }}>
-        <p style={{ opacity: 0.6, fontSize: '0.95rem' }}>
-          © 2026 Jedo Technologies Pvt. Ltd. | Aviation Tyre Intelligence & Brokerage
-        </p>
-      </footer>
     </div>
   )
 }
 
-// STYLE OBJECTS
-const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
-const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.9rem' };
-const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '12px 25px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const };
-
-const heroSectionStyle = { 
-  width: '100%',
-  minHeight: '90vh', 
-  display: 'flex', 
-  alignItems: 'center', 
-  justifyContent: 'center', 
-  backgroundImage: 'linear-gradient(rgba(0,45,91,0.6), rgba(0,45,91,0.6)), url("/hero-aircraft.png")', 
-  backgroundSize: 'cover', 
-  backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'center',
-  backgroundColor: '#002d5b', 
-  color: 'white', 
-  textAlign: 'center' as const
-};
-
-const statCardStyle = { padding: '25px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center' };
-const statLabelStyle = { fontSize: '0.7rem', fontWeight: '900', letterSpacing: '2px', color: '#ffb400', marginBottom: '5px' };
-const statValueStyle = { fontSize: '2rem', fontWeight: '900', color: 'white' };
-
-const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '15px 35px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem' };
-const secondaryButtonStyle = { backgroundColor: 'transparent', color: 'white', padding: '15px 35px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem', border: '2px solid white' };
-const thStyle = { padding: '20px', fontSize: '0.75rem', textTransform: 'uppercase' as const, letterSpacing: '1px' };
-const tdStyle = { padding: '25px', color: '#002d5b', fontSize: '1rem' };
-const inputStyle = { padding: '18px', borderRadius: '10px', border: '2px solid #cbd5e1', width: '100%', fontSize: '1rem', outline: 'none' };
-const submitButtonStyle = { backgroundColor: '#002d5b', color: '#ffb400', padding: '20px', borderRadius: '10px', border: 'none', fontWeight: 'bold' as const, cursor: 'pointer', fontSize: '1.1rem' };
+// STYLES
+const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
+const switcherContainer = { display: 'flex', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '20px', padding: '2px', backgroundColor: 'rgba(0,0,0,0.2)' };
+const switchBtn = { border: 'none', padding: '6px 15px', borderRadius: '18px', fontSize: '0.75rem', fontWeight: 'bold' as const, cursor: 'pointer' };
+const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '10px 20px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const };
+const searchFieldStyle = { width: '100%', padding: '15px 25px', borderRadius: '12px', border: '2px solid #e2e8f0', fontSize: '1rem', outline: 'none', transition: '0.2s' };
+const thStyle = { padding: '20px', fontSize: '0.7rem', letterSpacing: '1px' };
+const tdStyle = { padding: '25px', color: '#002d5b' };
+const badgeStyle = { backgroundColor: '#e2e8f0', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' as const };
+const tableBtnStyle = { backgroundColor: '#002d5b', color: 'white', padding: '12px 20px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.8rem', fontWeight: '900' };
