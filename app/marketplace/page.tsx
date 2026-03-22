@@ -31,7 +31,7 @@ export default function MarketplacePage() {
 
   const exchangeRate = 83.5;
   const filteredParts = parts.filter(p => 
-    `${p.aircraftType} ${p.tyreSize} ${p.partNumber} ${p.gearPosition}`.toLowerCase().includes(searchTerm.toLowerCase())
+    `${p.aircraftType || ''} ${p.tyreSize || ''} ${p.partNumber || ''} ${p.gearPosition || ''}`.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
@@ -51,7 +51,7 @@ export default function MarketplacePage() {
 
       <section style={{ padding: '60px 20px', maxWidth: '1400px', margin: '0 auto' }}>
         <h1 style={{ color: '#002d5b', fontSize: '2.8rem', fontWeight: '900', marginBottom: '10px' }}>Tyre Marketplace</h1>
-        <p style={{ color: '#64748b', marginBottom: '30px' }}>Real-time inventory from Singapore & Chennai hubs.</p>
+        <p style={{ color: '#64748b', marginBottom: '30px' }}>Real-time inventory pulse from Singapore & Chennai hubs.</p>
 
         <input 
           type="text" 
@@ -77,21 +77,21 @@ export default function MarketplacePage() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>Loading Hub...</td></tr>
-              ) : filteredParts.map((part) => (
+              ) : filteredParts.length > 0 ? filteredParts.map((part) => (
                 <tr key={part._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={tdStyle}><strong>{part.aircraftType}</strong></td>
+                  <td style={tdStyle}><strong>{part.aircraftType || 'N/A'}</strong></td>
                   <td style={tdStyle}><span style={badgeStyle}>{(part.gearPosition || 'MAIN').toUpperCase()}</span></td>
-                  <td style={tdStyle}><strong>{part.tyreSize}</strong></td>
-                  <td style={tdStyle}><code style={{ color: '#64748b' }}>{part.partNumber}</code></td>
+                  <td style={tdStyle}><strong>{part.tyreSize || 'N/A'}</strong></td>
+                  <td style={tdStyle}><code style={{ color: '#64748b' }}>{part.partNumber || 'Entry Req.'}</code></td>
                   <td style={tdStyle}>{part.plyRating}-Ply</td>
                   <td style={tdStyle}>
                     <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#002d5b' }}>
-                      {part.priceUSD ? (currency === 'INR' ? `₹${Math.round(part.priceUSD * exchangeRate).toLocaleString('en-IN')}` : `$${part.priceUSD}`) : 'Quote Req'}
+                      {part.priceUSD ? (currency === 'INR' ? `₹${Math.round(part.priceUSD * exchangeRate).toLocaleString('en-IN')}` : `$${part.priceUSD.toLocaleString()}`) : 'Quote Req'}
                     </div>
                   </td>
                   <td style={tdStyle}>
                     <div style={{ color: '#16a34a', fontWeight: '900' }}>In Stock</div>
-                    <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Hub: {part.warehouse}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Hub: {part.warehouse || 'Singapore'}</div>
                   </td>
                   <td style={tdStyle}><button style={actionBtnStyle}>GET QUOTE</button></td>
                 </tr>

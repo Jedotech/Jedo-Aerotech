@@ -13,7 +13,15 @@ export default function HomePage() {
         </div>
         <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
           <Link href="/marketplace" style={navLinkStyle}>MARKETPLACE</Link>
-          <Link href="https://jedo-fleet-intel.vercel.app" style={navLinkStyle}>FLEET INTELLIGENCE</Link>
+          {/* FLEET INTEL TAB - Opens in new window */}
+          <Link 
+            href="https://jedo-fleet-intel.vercel.app" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            style={intelTabStyle}
+          >
+            FLEET INTELLIGENCE ↗
+          </Link>
           <a href="#rfq" style={quoteButtonStyle}>REQUEST SOURCING</a>
         </div>
       </nav>
@@ -31,7 +39,13 @@ export default function HomePage() {
           
           <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
             <Link href="/marketplace" style={primaryButtonStyle}>Browse Marketplace</Link>
-            <Link href="https://jedo-fleet-intel.vercel.app" style={secondaryButtonStyle}>Fleet Intel Login</Link>
+            <Link 
+              href="https://jedo-fleet-intel.vercel.app" 
+              target="_blank" 
+              style={secondaryButtonStyle}
+            >
+              Fleet Intel Login
+            </Link>
           </div>
         </div>
       </section>
@@ -47,6 +61,7 @@ export default function HomePage() {
 // STYLES
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.9rem' };
+const intelTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.9rem', border: '1px solid #ffb400', padding: '8px 15px', borderRadius: '4px' };
 const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '12px 25px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const };
 const heroSectionStyle = { minHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'linear-gradient(rgba(0,45,91,0.6), rgba(0,45,91,0.6)), url("/hero-aircraft.png")', backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#002d5b', color: 'white', textAlign: 'center' as const };
 const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '18px 40px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem' };
