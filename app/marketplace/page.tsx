@@ -69,8 +69,6 @@ export default function MarketplacePage() {
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
         
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-          
-          {/* TOP RIGHT: GLOBAL SOURCING STATUS */}
           <div style={sourcingBadgeStyle}>
             <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block', fontWeight: '900', letterSpacing: '0.5px' }}>OFFLINE PROCUREMENT</span>
             <button onClick={scrollToRFQ} style={sourcingLinkStyle}>PART NOT LISTED? REQUEST SOURCING</button>
@@ -84,13 +82,14 @@ export default function MarketplacePage() {
         </div>
       </nav>
 
-      <section style={{ padding: '80px 20px', maxWidth: '1400px', margin: '0 auto' }}>
-        <header style={{ marginBottom: '40px' }}>
-            <h1 style={{ color: '#002d5b', fontSize: '3rem', fontWeight: '900', marginBottom: '10px' }}>Tyre Marketplace</h1>
+      {/* REDUCED PADDING SECTION (Fixes the empty space) */}
+      <section style={{ padding: '20px 20px 80px', maxWidth: '1400px', margin: '0 auto' }}>
+        <header style={{ marginBottom: '30px' }}>
+            <h1 style={{ color: '#002d5b', fontSize: '3rem', fontWeight: '900', marginBottom: '5px' }}>Tyre Marketplace</h1>
             <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Global inventory intelligence for Cessna & Piper training fleets.</p>
         </header>
 
-        <div style={{ position: 'relative', marginBottom: '40px' }}>
+        <div style={{ position: 'relative', marginBottom: '30px' }}>
           <input 
             type="text" 
             placeholder="Search inventory by Model, Size, or P/N..." 
