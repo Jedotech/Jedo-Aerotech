@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. SANITY CLIENT
 const client = createClient({
   projectId: 'm2pa474h', 
   dataset: 'production',
@@ -28,7 +27,6 @@ export default function MarketplacePage() {
         setParts(data)
         setLoading(false)
       } catch (e) {
-        console.error(e)
         setLoading(false)
       }
     }
@@ -40,8 +38,15 @@ export default function MarketplacePage() {
     `${p.aircraftType || ''} ${p.tyreSize || ''} ${p.partNumber || ''} ${p.gearPosition || ''}`.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  // FUNCTION TO HANDLE QUOTE REQUESTS
+  const handleQuoteRequest = (part: any) => {
+    const subject = encodeURIComponent(`RFQ: ${part.aircraftType} Tyre (${part.partNumber})`);
+    const body = encodeURIComponent(`Hello Jedo Team,\n\nI am interested in sourcing the following tyre:\n\nAircraft: ${part.aircraftType}\nPart Number: ${part.partNumber}\nSize: ${part.tyreSize}\n\nPlease provide a formal quote and lead time.\n\nThank you.`);
+    window.location.href = `mailto:tajesudoss@gmail.com?subject=${subject}&body=${body}`;
+  };
+
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'sans-serif' }}>
+    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       
       {/* NAVIGATION */}
       <nav style={navStyle}>
@@ -66,7 +71,7 @@ export default function MarketplacePage() {
           style={searchStyle}
         />
 
-        <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+        <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
             <thead>
               <tr style={{ backgroundColor: '#002d5b', color: '#ffb400', textAlign: 'left' }}>
@@ -85,7 +90,7 @@ export default function MarketplacePage() {
                 <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>Loading Hub...</td></tr>
               ) : filteredParts.length > 0 ? (
                 filteredParts.map((part) => (
-                  <tr key={part._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <tr key={part._id} style={{ borderBottom: '1px solid #cbd5e1' }}>
                     <td style={tdStyle}><strong>{part.aircraftType || 'N/A'}</strong></td>
                     <td style={tdStyle}><span style={badgeStyle}>{(part.gearPosition || 'MAIN').toUpperCase()}</span></td>
                     <td style={tdStyle}><strong>{part.tyreSize || 'N/A'}</strong></td>
@@ -100,11 +105,18 @@ export default function MarketplacePage() {
                       <div style={{ color: '#16a34a', fontWeight: '900' }}>In Stock</div>
                       <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Hub: {part.warehouse || 'Singapore'}</div>
                     </td>
-                    <td style={tdStyle}><button style={actionBtnStyle}>GET QUOTE</button></td>
+                    <td style={tdStyle}>
+                      <button 
+                        onClick={() => handleQuoteRequest(part)}
+                        style={actionBtnStyle}
+                      >
+                        GET QUOTE
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>No results found.</td></tr>
+                <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>No matching tyres found.</td></tr>
               )}
             </tbody>
           </table>
@@ -116,10 +128,10 @@ export default function MarketplacePage() {
 
 // STYLES
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#002d5b' };
-const searchStyle = { width: '100%', padding: '18px', borderRadius: '10px', border: '2px solid #002d5b', marginBottom: '40px', outline: 'none' };
+const searchStyle = { width: '100%', padding: '18px', borderRadius: '10px', border: '2px solid #002d5b', marginBottom: '40px', outline: 'none', backgroundColor: '#fff' };
 const thStyle = { padding: '20px', fontSize: '0.7rem', letterSpacing: '1px' };
 const tdStyle = { padding: '25px', color: '#002d5b' };
 const badgeStyle = { backgroundColor: '#e2e8f0', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '900' };
 const switcherContainer = { display: 'flex', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '20px', padding: '2px' };
 const switchBtn = { border: 'none', padding: '6px 15px', borderRadius: '18px', fontSize: '0.75rem', fontWeight: 'bold' as const, cursor: 'pointer' };
-const actionBtnStyle = { backgroundColor: '#002d5b', color: 'white', border: 'none', padding: '12px 20px', borderRadius: '6px', fontWeight: 'bold' as const, cursor: 'pointer' };
+const actionBtnStyle = { backgroundColor: '#ffb400', color: '#002d5b', border: 'none', padding: '12px 20px', borderRadius: '6px', fontWeight: 'bold' as const, cursor: 'pointer', transition: '0.2s' };
