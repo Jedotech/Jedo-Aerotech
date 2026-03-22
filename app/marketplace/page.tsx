@@ -17,7 +17,6 @@ export default function MarketplacePage() {
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
   const [loading, setLoading] = useState(true)
   
-  // FORM STATE
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -49,15 +48,17 @@ export default function MarketplacePage() {
     `${p.aircraftType || ''} ${p.tyreSize || ''} ${p.partNumber || ''} ${p.gearPosition || ''}`.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // HANDLER: CLICKING GET QUOTE
+  const scrollToRFQ = () => {
+    rfqSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const triggerQuoteForm = (part: any) => {
     setFormData({
       ...formData,
       aircraft: part.aircraftType || '',
       message: `Requesting quote for:\nPart Number: ${part.partNumber}\nSize: ${part.tyreSize}\nPosition: ${part.gearPosition}\nHub: ${part.warehouse}`
     })
-    // Smooth scroll to form
-    rfqSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+    scrollToRFQ();
   };
 
   return (
@@ -66,7 +67,15 @@ export default function MarketplacePage() {
       {/* NAVIGATION */}
       <nav style={navStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
+        
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          
+          {/* TOP RIGHT: GLOBAL SOURCING STATUS */}
+          <div style={sourcingBadgeStyle}>
+            <span style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'block', fontWeight: '900', letterSpacing: '0.5px' }}>OFFLINE PROCUREMENT</span>
+            <button onClick={scrollToRFQ} style={sourcingLinkStyle}>PART NOT LISTED? REQUEST SOURCING</button>
+          </div>
+
           <div style={switcherContainer}>
             <button onClick={() => setCurrency('INR')} style={{...switchBtn, backgroundColor: currency === 'INR' ? '#ffb400' : 'transparent', color: currency === 'INR' ? '#002d5b' : 'white'}}>INR</button>
             <button onClick={() => setCurrency('USD')} style={{...switchBtn, backgroundColor: currency === 'USD' ? '#ffb400' : 'transparent', color: currency === 'USD' ? '#002d5b' : 'white'}}>USD</button>
@@ -81,12 +90,15 @@ export default function MarketplacePage() {
             <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Global inventory intelligence for Cessna & Piper training fleets.</p>
         </header>
 
-        <input 
-          type="text" 
-          placeholder="Search inventory by Model, Size, or P/N..." 
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={searchStyle}
-        />
+        <div style={{ position: 'relative', marginBottom: '40px' }}>
+          <input 
+            type="text" 
+            placeholder="Search inventory by Model, Size, or P/N..." 
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={searchStyle}
+          />
+          <span style={{ position: 'absolute', right: '20px', top: '20px', opacity: 0.4 }}>🔍</span>
+        </div>
 
         <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1.5px solid #cbd5e1', boxShadow: '0 15px 35px rgba(0,0,0,0.08)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
@@ -105,12 +117,12 @@ export default function MarketplacePage() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>Syncing Inventory...</td></tr>
-              ) : filteredParts.map((part) => (
+              ) : filteredParts.length > 0 ? filteredParts.map((part) => (
                 <tr key={part._id} style={{ borderBottom: '1.5px solid #cbd5e1' }}>
                   <td style={tdStyle}><strong>{part.aircraftType}</strong></td>
                   <td style={tdStyle}><span style={badgeStyle}>{(part.gearPosition || 'MAIN').toUpperCase()}</span></td>
                   <td style={tdStyle}><strong>{part.tyreSize}</strong></td>
-                  <td style={tdStyle}><code style={{ color: '#475569' }}>{part.partNumber}</code></td>
+                  <td style={tdStyle}><code style={{ color: '#475569', backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{part.partNumber}</code></td>
                   <td style={tdStyle}>{part.plyRating}-Ply</td>
                   <td style={tdStyle}>
                     <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#002d5b' }}>
@@ -128,7 +140,16 @@ export default function MarketplacePage() {
                     <button onClick={() => triggerQuoteForm(part)} style={actionBtnStyle}>GET QUOTE</button>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan={8} style={{ padding: '80px', textAlign: 'center', color: '#64748b' }}>
+                    <div style={{ fontSize: '1.2rem', marginBottom: '10px' }}>No direct matches found.</div>
+                    <button onClick={scrollToRFQ} style={{ color: '#002d5b', fontWeight: 'bold', textDecoration: 'underline', border: 'none', background: 'none', cursor: 'pointer' }}>
+                      Click here to let our team source this part for you.
+                    </button>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -138,7 +159,7 @@ export default function MarketplacePage() {
       <section ref={rfqSectionRef} id="rfq" style={{ backgroundColor: '#002d5b', padding: '100px 20px', color: 'white' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '10px', textAlign: 'center' }}>Sourcing Request</h2>
-          <p style={{ opacity: 0.8, marginBottom: '40px', textAlign: 'center' }}>Submit your details and we will get back to you with a formal quote and shipping timeline.</p>
+          <p style={{ opacity: 0.8, marginBottom: '40px', textAlign: 'center' }}>Can't find a specific part? Submit your requirement and our global procurement team will find it for you.</p>
           
           <form style={formStyle} onSubmit={(e) => e.preventDefault()}>
             <div style={formGrid}>
@@ -155,17 +176,17 @@ export default function MarketplacePage() {
                     value={formData.aircraft} onChange={(e) => setFormData({...formData, aircraft: e.target.value})}
                 />
                 <input 
-                    type="text" placeholder="Quantity" style={inputStyle} 
+                    type="text" placeholder="Quantity Required" style={inputStyle} 
                     value={formData.quantity} onChange={(e) => setFormData({...formData, quantity: e.target.value})}
                 />
             </div>
             <textarea 
-                placeholder="Details of your requirement..." 
+                placeholder="Details of your requirement (e.g. Part Number, Condition, Urgency)..." 
                 style={{...inputStyle, height: '150px', gridColumn: 'span 2'}}
                 value={formData.message}
                 onChange={(e) => setFormData({...formData, message: e.target.value})}
             ></textarea>
-            <button style={submitBtn}>SUBMIT QUOTE REQUEST</button>
+            <button style={submitBtn}>SUBMIT SOURCING REQUEST</button>
           </form>
         </div>
       </section>
@@ -180,6 +201,8 @@ export default function MarketplacePage() {
 // STYLES
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const homeTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem', border: '2px solid #ffb400', padding: '8px 25px', borderRadius: '6px', letterSpacing: '1px' };
+const sourcingBadgeStyle = { backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', padding: '8px 15px', borderRadius: '6px', textAlign: 'right' as const };
+const sourcingLinkStyle = { background: 'none', border: 'none', color: '#ffb400', textDecoration: 'underline', cursor: 'pointer', fontWeight: 'bold' as const, fontSize: '0.75rem', padding: 0 };
 const searchStyle = { width: '100%', padding: '20px 25px', borderRadius: '10px', border: '2px solid #002d5b', marginBottom: '40px', outline: 'none', fontSize: '1rem' };
 const thStyle = { padding: '20px', fontSize: '0.75rem', letterSpacing: '1px' };
 const tdStyle = { padding: '25px', color: '#002d5b' };
