@@ -64,7 +64,7 @@ export default function MarketplacePage() {
   return (
     <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       
-      {/* NAVIGATION */}
+      {/* 1. STICKY NAVIGATION */}
       <nav style={navStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
         
@@ -82,23 +82,28 @@ export default function MarketplacePage() {
         </div>
       </nav>
 
-      {/* REDUCED PADDING SECTION (Fixes the empty space) */}
-      <section style={{ padding: '20px 20px 80px', maxWidth: '1400px', margin: '0 auto' }}>
-        <header style={{ marginBottom: '30px' }}>
-            <h1 style={{ color: '#002d5b', fontSize: '3rem', fontWeight: '900', marginBottom: '5px' }}>Tyre Marketplace</h1>
-            <p style={{ color: '#64748b', fontSize: '1.1rem' }}>Global inventory intelligence for Cessna & Piper training fleets.</p>
-        </header>
+      {/* 2. STICKY SEARCH SECTION */}
+      <div style={stickyHeaderWrapper}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 20px 0' }}>
+          <header style={{ marginBottom: '15px' }}>
+              <h1 style={{ color: '#002d5b', fontSize: '2.2rem', fontWeight: '900', marginBottom: '5px' }}>Tyre Marketplace</h1>
+              <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Global inventory intelligence for training fleets.</p>
+          </header>
 
-        <div style={{ position: 'relative', marginBottom: '30px' }}>
-          <input 
-            type="text" 
-            placeholder="Search inventory by Model, Size, or P/N..." 
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={searchStyle}
-          />
-          <span style={{ position: 'absolute', right: '20px', top: '20px', opacity: 0.4 }}>🔍</span>
+          <div style={{ position: 'relative', paddingBottom: '20px' }}>
+            <input 
+              type="text" 
+              placeholder="Search inventory by Model, Size, or P/N..." 
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={searchStyle}
+            />
+            <span style={{ position: 'absolute', right: '20px', top: '18px', opacity: 0.4 }}>🔍</span>
+          </div>
         </div>
+      </div>
 
+      {/* 3. TABLE SECTION */}
+      <section style={{ padding: '20px 20px 80px', maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1.5px solid #cbd5e1', boxShadow: '0 15px 35px rgba(0,0,0,0.08)' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
             <thead>
@@ -124,7 +129,7 @@ export default function MarketplacePage() {
                   <td style={tdStyle}><code style={{ color: '#475569', backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{part.partNumber}</code></td>
                   <td style={tdStyle}>{part.plyRating}-Ply</td>
                   <td style={tdStyle}>
-                    <div style={{ fontSize: '1.25rem', fontWeight: '900', color: '#002d5b' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#002d5b' }}>
                       {part.priceUSD ? (currency === 'INR' ? `₹${Math.round(part.priceUSD * exchangeRate).toLocaleString('en-IN')}` : `$${part.priceUSD.toLocaleString()}`) : 'Quote Req'}
                     </div>
                   </td>
@@ -198,17 +203,18 @@ export default function MarketplacePage() {
 }
 
 // STYLES
-const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
+const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 2000 };
+const stickyHeaderWrapper = { position: 'sticky' as const, top: '70px', zIndex: 1000, backgroundColor: 'rgba(248, 250, 252, 0.9)', backdropFilter: 'blur(10px)', borderBottom: '1px solid #e2e8f0' };
 const homeTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem', border: '2px solid #ffb400', padding: '8px 25px', borderRadius: '6px', letterSpacing: '1px' };
 const sourcingBadgeStyle = { backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', padding: '8px 15px', borderRadius: '6px', textAlign: 'right' as const };
 const sourcingLinkStyle = { background: 'none', border: 'none', color: '#ffb400', textDecoration: 'underline', cursor: 'pointer', fontWeight: 'bold' as const, fontSize: '0.75rem', padding: 0 };
-const searchStyle = { width: '100%', padding: '20px 25px', borderRadius: '10px', border: '2px solid #002d5b', marginBottom: '40px', outline: 'none', fontSize: '1rem' };
-const thStyle = { padding: '20px', fontSize: '0.75rem', letterSpacing: '1px' };
-const tdStyle = { padding: '25px', color: '#002d5b' };
+const searchStyle = { width: '100%', padding: '15px 20px', borderRadius: '10px', border: '2px solid #002d5b', outline: 'none', fontSize: '1rem', backgroundColor: '#fff' };
+const thStyle = { padding: '15px', fontSize: '0.7rem', letterSpacing: '1px' };
+const tdStyle = { padding: '20px 25px', color: '#002d5b', fontSize: '0.9rem' };
 const badgeStyle = { backgroundColor: '#e2e8f0', padding: '5px 12px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '900', color: '#475569' };
 const switcherContainer = { display: 'flex', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '20px', padding: '2px', backgroundColor: 'rgba(0,0,0,0.2)' };
 const switchBtn = { border: 'none', padding: '6px 18px', borderRadius: '18px', fontSize: '0.75rem', fontWeight: 'bold' as const, cursor: 'pointer' };
-const actionBtnStyle = { backgroundColor: '#ffb400', color: '#002d5b', border: 'none', padding: '12px 24px', borderRadius: '6px', fontWeight: '900' as const, cursor: 'pointer', fontSize: '0.8rem' };
+const actionBtnStyle = { backgroundColor: '#ffb400', color: '#002d5b', border: 'none', padding: '10px 20px', borderRadius: '6px', fontWeight: '900' as const, cursor: 'pointer', fontSize: '0.75rem' };
 
 // FORM STYLES
 const formStyle = { display: 'flex', flexDirection: 'column' as const, gap: '15px' };
