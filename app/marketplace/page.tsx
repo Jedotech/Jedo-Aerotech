@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
+// 1. SANITY CLIENT
 const client = createClient({
   projectId: 'm2pa474h', 
   dataset: 'production',
@@ -22,9 +23,14 @@ export default function MarketplacePage() {
       const query = `*[_type == "part"] | order(_createdAt desc) {
         _id, aircraftType, gearPosition, tyreSize, partNumber, plyRating, priceUSD, quantity, warehouse
       }`
-      const data = await client.fetch(query)
-      setParts(data)
-      setLoading(false)
+      try {
+        const data = await client.fetch(query)
+        setParts(data)
+        setLoading(false)
+      } catch (e) {
+        console.error(e)
+        setLoading(false)
+      }
     }
     fetchData()
   }, [])
@@ -37,7 +43,7 @@ export default function MarketplacePage() {
   return (
     <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       
-      {/* NAV with BACK TO HOME */}
+      {/* NAVIGATION */}
       <nav style={navStyle}>
         <div style={{ display: 'flex', gap: '30px', alignItems: 'center' }}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
@@ -77,25 +83,29 @@ export default function MarketplacePage() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>Loading Hub...</td></tr>
-              ) : filteredParts.length > 0 ? filteredParts.map((part) => (
-                <tr key={part._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={tdStyle}><strong>{part.aircraftType || 'N/A'}</strong></td>
-                  <td style={tdStyle}><span style={badgeStyle}>{(part.gearPosition || 'MAIN').toUpperCase()}</span></td>
-                  <td style={tdStyle}><strong>{part.tyreSize || 'N/A'}</strong></td>
-                  <td style={tdStyle}><code style={{ color: '#64748b' }}>{part.partNumber || 'Entry Req.'}</code></td>
-                  <td style={tdStyle}>{part.plyRating}-Ply</td>
-                  <td style={tdStyle}>
-                    <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#002d5b' }}>
-                      {part.priceUSD ? (currency === 'INR' ? `₹${Math.round(part.priceUSD * exchangeRate).toLocaleString('en-IN')}` : `$${part.priceUSD.toLocaleString()}`) : 'Quote Req'}
-                    </div>
-                  </td>
-                  <td style={tdStyle}>
-                    <div style={{ color: '#16a34a', fontWeight: '900' }}>In Stock</div>
-                    <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Hub: {part.warehouse || 'Singapore'}</div>
-                  </td>
-                  <td style={tdStyle}><button style={actionBtnStyle}>GET QUOTE</button></td>
-                </tr>
-              ))}
+              ) : filteredParts.length > 0 ? (
+                filteredParts.map((part) => (
+                  <tr key={part._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={tdStyle}><strong>{part.aircraftType || 'N/A'}</strong></td>
+                    <td style={tdStyle}><span style={badgeStyle}>{(part.gearPosition || 'MAIN').toUpperCase()}</span></td>
+                    <td style={tdStyle}><strong>{part.tyreSize || 'N/A'}</strong></td>
+                    <td style={tdStyle}><code style={{ color: '#64748b' }}>{part.partNumber || 'Entry Req.'}</code></td>
+                    <td style={tdStyle}>{part.plyRating || '6'}-Ply</td>
+                    <td style={tdStyle}>
+                      <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#002d5b' }}>
+                        {part.priceUSD ? (currency === 'INR' ? `₹${Math.round(part.priceUSD * exchangeRate).toLocaleString('en-IN')}` : `$${part.priceUSD.toLocaleString()}`) : 'Quote Req'}
+                      </div>
+                    </td>
+                    <td style={tdStyle}>
+                      <div style={{ color: '#16a34a', fontWeight: '900' }}>In Stock</div>
+                      <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Hub: {part.warehouse || 'Singapore'}</div>
+                    </td>
+                    <td style={tdStyle}><button style={actionBtnStyle}>GET QUOTE</button></td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>No results found.</td></tr>
+              )}
             </tbody>
           </table>
         </div>
