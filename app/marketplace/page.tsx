@@ -17,6 +17,9 @@ export default function MarketplacePage() {
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
   const [loading, setLoading] = useState(true)
   
+  // LIVE EXCHANGE RATE STATE (Default fallback: 94.0)
+  const [exchangeRate, setExchangeRate] = useState(94.0)
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,6 +31,22 @@ export default function MarketplacePage() {
   const rfqSectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // 1. FETCH LIVE EXCHANGE RATE
+    async function getLiveRate() {
+      try {
+        const apiKey = 'cf89f7b96ff3c0675edcfe39'
+        const response = await fetch(`https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`)
+        const data = await response.json()
+        if (data.result === "success") {
+          setExchangeRate(data.conversion_rates.INR)
+          console.log("Live Exchange Rate Updated:", data.conversion_rates.INR)
+        }
+      } catch (error) {
+        console.error("Currency API failed, using fallback 94.0", error)
+      }
+    }
+
+    // 2. FETCH SANITY INVENTORY
     async function fetchData() {
       const query = `*[_type == "part"] | order(_createdAt desc) {
         _id, aircraftType, gearPosition, tyreSize, partNumber, plyRating, priceUSD, quantity, warehouse
@@ -40,10 +59,11 @@ export default function MarketplacePage() {
         setLoading(false)
       }
     }
+
+    getLiveRate()
     fetchData()
   }, [])
 
-  const exchangeRate = 83.5;
   const filteredParts = parts.filter(p => 
     `${p.aircraftType || ''} ${p.tyreSize || ''} ${p.partNumber || ''} ${p.gearPosition || ''}`.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -64,7 +84,7 @@ export default function MarketplacePage() {
   return (
     <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       
-      {/* 1. NAVIGATION (ONLY THIS IS STICKY) */}
+      {/* NAVIGATION */}
       <nav style={navStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
@@ -80,11 +100,11 @@ export default function MarketplacePage() {
         </div>
       </nav>
 
-      {/* 2. MARKETPLACE HEADER & SEARCH (NON-STICKY) */}
+      {/* MARKETPLACE HEADER & SEARCH */}
       <section style={{ padding: '40px 20px 0', maxWidth: '1400px', margin: '0 auto' }}>
         <header style={{ marginBottom: '30px' }}>
           <h1 style={{ color: '#002d5b', fontSize: '2.5rem', fontWeight: '900', marginBottom: '5px' }}>Tyre Marketplace</h1>
-          <p style={{ color: '#64748b', fontSize: '1rem' }}>Global inventory intelligence for Cessna & Piper training fleets.</p>
+          <p style={{ color: '#64748b', fontSize: '1rem' }}>Live Rates: 1 USD = ₹{exchangeRate.toFixed(2)}</p>
         </header>
 
         <div style={{ position: 'relative', marginBottom: '40px' }}>
@@ -97,7 +117,7 @@ export default function MarketplacePage() {
           <span style={{ position: 'absolute', right: '20px', top: '20px', opacity: 0.4 }}>🔍</span>
         </div>
 
-        {/* 3. TABLE SECTION */}
+        {/* TABLE SECTION */}
         <div style={tableContainerStyle}>
           <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
             <thead>
@@ -150,7 +170,7 @@ export default function MarketplacePage() {
         </div>
       </section>
 
-      {/* 4. RFQ FORM */}
+      {/* RFQ FORM */}
       <section ref={rfqSectionRef} id="rfq" style={{ backgroundColor: '#002d5b', padding: '100px 20px', color: 'white', marginTop: '80px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '10px', textAlign: 'center' }}>Sourcing Request</h2>
@@ -175,7 +195,7 @@ export default function MarketplacePage() {
   )
 }
 
-// STYLES
+// STYLES (Unchanged for visual consistency)
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const tableContainerStyle = { overflowX: 'auto' as const, borderRadius: '12px', border: '1.5px solid #cbd5e1', boxShadow: '0 15px 35px rgba(0,0,0,0.08)', marginBottom: '40px' };
 const thStyle = { padding: '20px', fontSize: '0.75rem', letterSpacing: '1px' };
