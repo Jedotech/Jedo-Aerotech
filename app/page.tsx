@@ -16,13 +16,13 @@ export default function HomePage() {
 
   useEffect(() => {
     async function fetchStats() {
+      // Fetches total parts and those nearing critical landing limits
       const query = `{
         "total": count(*[_type == "part"]),
         "critical": count(*[_type == "part" && totalLandings >= 300])
       }`
       try {
         const data = await client.fetch(query)
-        // Simple health logic: (Total - Critical) / Total
         const healthCalc = data.total > 0 
           ? Math.round(((data.total - data.critical) / data.total) * 100) 
           : 100;
@@ -75,16 +75,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. INTELLIGENCE PULSE BAR (NEW) */}
+      {/* 3. INTELLIGENCE PULSE BAR (UPDATED LABEL) */}
       <div style={pulseBarContainer}>
         <div style={pulseItem}>
           <span style={pulseDot}></span>
-          <span style={pulseLabel}>CHENNAI HUB:</span>
-          <span style={pulseValue}>ACTIVE</span>
+          <span style={pulseLabel}>HUB STATUS:</span>
+          <span style={pulseValue}>CHENNAI ACTIVE</span>
         </div>
         <div style={pulseDivider}></div>
         <div style={pulseItem}>
-          <span style={pulseLabel}>TRACKED ASSETS:</span>
+          <span style={pulseLabel}>GLOBAL INVENTORY:</span>
           <span style={pulseValue}>{stats.total} UNITS</span>
         </div>
         <div style={pulseDivider}></div>
@@ -114,7 +114,7 @@ export default function HomePage() {
             <p style={featureTextStyle}>Direct access to MRO inventory in Singapore and USA hubs for rapid dispatch.</p>
           </div>
           <div style={featureCardStyle}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '20px' }}>⚖️</div>
+            <div style={{ fontSize: '2.5rem', marginBottom: '20px' }}>🛡️</div>
             <h3 style={featureTitleStyle}>Technical Verification</h3>
             <p style={featureTextStyle}>Every tyre is sourced with full traceability and digital airworthiness documentation.</p>
           </div>
@@ -137,13 +137,12 @@ export default function HomePage() {
 // STYLES
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem', opacity: 0.7 };
-const intelTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem', border: '1px solid #ffb400', padding: '8px 18px', borderRadius: '4px' };
+const intelTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem', border: '1px solid #ffb400', padding: '8px 15px', borderRadius: '4px' };
 const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '12px 25px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem' };
 const heroSectionStyle = { minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'linear-gradient(rgba(0,45,91,0.6), rgba(0,45,91,0.6)), url("/hero-aircraft.png")', backgroundSize: 'cover', backgroundPosition: 'center', color: 'white', textAlign: 'center' as const };
 const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '18px 40px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem' };
 const secondaryButtonStyle = { backgroundColor: 'transparent', color: 'white', padding: '18px 40px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem', border: '2px solid white' };
 
-// PULSE BAR STYLES
 const pulseBarContainer = { backgroundColor: '#002d5b', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', borderBottom: '1px solid rgba(255,255,255,0.1)' };
 const pulseItem = { display: 'flex', alignItems: 'center', gap: '10px' };
 const pulseDot = { height: '8px', width: '8px', backgroundColor: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981' };
