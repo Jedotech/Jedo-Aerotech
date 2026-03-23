@@ -80,7 +80,6 @@ export default function MarketplacePage() {
     scrollToRFQ();
   };
 
-  // FORMSPREE SUBMISSION HANDLER
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -94,9 +93,8 @@ export default function MarketplacePage() {
 
       if (response.ok) {
         setIsSuccess(true);
-        setFormData({ name: '', email: '', aircraft: '', quantity: '', message: '' });
       } else {
-        alert("There was an error. Please try again or email tajesudoss@gmail.com");
+        alert("There was an error. Please email tajesudoss@gmail.com directly.");
       }
     } catch (error) {
       console.error("Submission error", error);
@@ -158,7 +156,7 @@ export default function MarketplacePage() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>Syncing Inventory...</td></tr>
-              ) : filteredParts.map((part) => (
+              ) : filteredParts.length > 0 ? filteredParts.map((part) => (
                 <tr key={part._id} style={{ borderBottom: '1.5px solid #cbd5e1' }}>
                   <td style={tdStyle}><strong>{part.aircraftType}</strong></td>
                   <td style={tdStyle}><span style={badgeStyle}>{(part.gearPosition || 'MAIN').toUpperCase()}</span></td>
@@ -181,13 +179,19 @@ export default function MarketplacePage() {
                     <button onClick={() => triggerQuoteForm(part)} style={actionBtnStyle}>GET QUOTE</button>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan={8} style={{ padding: '80px', textAlign: 'center', color: '#64748b' }}>
+                    No direct matches found. <button onClick={scrollToRFQ} style={{ color: '#002d5b', fontWeight: 'bold', textDecoration: 'underline', border: 'none', background: 'none', cursor: 'pointer' }}>Request Sourcing</button>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </section>
 
-      {/* SOURCING FORM (FORMSPREE INTEGRATED) */}
+      {/* SOURCING SECTION */}
       <section 
         ref={rfqSectionRef} 
         id="rfq" 
@@ -201,15 +205,33 @@ export default function MarketplacePage() {
       >
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           {isSuccess ? (
-            <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '15px', border: '2px dashed #ffb400' }}>
-              <h2 style={{ color: '#ffb400', fontSize: '2.5rem', fontWeight: '900' }}>REQUEST RECEIVED</h2>
-              <p style={{ fontSize: '1.2rem', opacity: 0.9, marginTop: '10px' }}>Our procurement desk has been notified. We will reach out to <strong>{formData.email}</strong> shortly.</p>
-              <button onClick={() => setIsSuccess(false)} style={{ marginTop: '30px', color: '#ffb400', background: 'none', border: '1px solid #ffb400', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer' }}>Send Another Request</button>
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '60px 20px', 
+              backgroundColor: '#ffffff', 
+              borderRadius: '16px', 
+              border: '2px solid #10b981', 
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}>
+              <div style={{ fontSize: '3.5rem', marginBottom: '20px' }}>✅</div>
+              <h2 style={{ color: '#002d5b', fontSize: '2.2rem', fontWeight: '900', margin: '0 0 10px 0' }}>REQUEST RECEIVED</h2>
+              <p style={{ fontSize: '1.1rem', color: '#64748b', marginBottom: '30px', lineHeight: '1.6' }}>
+                Our procurement desk has been notified.<br />
+                We will reach out to you shortly.
+              </p>
+              <button 
+                onClick={() => setIsSuccess(false)} 
+                style={{ backgroundColor: '#002d5b', color: '#ffb400', border: 'none', padding: '12px 30px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                ← Send Another Request
+              </button>
             </div>
           ) : (
             <>
               <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '10px', textAlign: 'center' }}>Sourcing Request</h2>
-              <p style={{ opacity: 0.8, marginBottom: '40px', textAlign: 'center' }}>Our global team will find the specific part you need.</p>
+              <p style={{ opacity: 0.8, marginBottom: '40px', textAlign: 'center' }}>Submit your requirements and our global desk will find the parts for you.</p>
               <form style={formStyle} onSubmit={handleSubmit}>
                 <div style={formGrid}>
                     <input required name="name" type="text" placeholder="Your Name" style={inputStyle} value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
@@ -219,7 +241,7 @@ export default function MarketplacePage() {
                 </div>
                 <textarea required name="message" placeholder="Details of your requirement..." style={{...inputStyle, height: '150px', gridColumn: 'span 2'}} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
                 <button disabled={isSubmitting} type="submit" style={submitBtn}>
-                  {isSubmitting ? 'SENDING REQUEST...' : 'SUBMIT SOURCING REQUEST'}
+                  {isSubmitting ? 'PROCESSING...' : 'SUBMIT SOURCING REQUEST'}
                 </button>
               </form>
             </>
