@@ -16,10 +16,11 @@ export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
   const [loading, setLoading] = useState(true)
-  
-  // LIVE EXCHANGE RATE STATE (Default fallback: 94.0)
   const [exchangeRate, setExchangeRate] = useState(94.0)
-
+  
+  // FORM STATES
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,7 +32,6 @@ export default function MarketplacePage() {
   const rfqSectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // 1. FETCH LIVE EXCHANGE RATE
     async function getLiveRate() {
       try {
         const apiKey = 'cf89f7b96ff3c0675edcfe39'
@@ -39,14 +39,12 @@ export default function MarketplacePage() {
         const data = await response.json()
         if (data.result === "success") {
           setExchangeRate(data.conversion_rates.INR)
-          console.log("Live Exchange Rate Updated:", data.conversion_rates.INR)
         }
       } catch (error) {
-        console.error("Currency API failed, using fallback 94.0", error)
+        console.error("Currency API failed", error)
       }
     }
 
-    // 2. FETCH SANITY INVENTORY
     async function fetchData() {
       const query = `*[_type == "part"] | order(_createdAt desc) {
         _id, aircraftType, gearPosition, tyreSize, partNumber, plyRating, priceUSD, quantity, warehouse
@@ -78,13 +76,39 @@ export default function MarketplacePage() {
       aircraft: part.aircraftType || '',
       message: `Requesting quote for:\nPart Number: ${part.partNumber}\nSize: ${part.tyreSize}\nPosition: ${part.gearPosition}\nHub: ${part.warehouse}`
     })
+    setIsSuccess(false);
     scrollToRFQ();
   };
 
+  // FORMSPREE SUBMISSION HANDLER
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('https://formspree.io/f/mdalbdqq', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setIsSuccess(true);
+        setFormData({ name: '', email: '', aircraft: '', quantity: '', message: '' });
+      } else {
+        alert("There was an error. Please try again or email tajesudoss@gmail.com");
+      }
+    } catch (error) {
+      console.error("Submission error", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'sans-serif' }}>
+    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'sans-serif', scrollBehavior: 'smooth' }}>
       
-      {/* NAVIGATION */}
+      {/* NAV BAR */}
       <nav style={navStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
@@ -100,7 +124,7 @@ export default function MarketplacePage() {
         </div>
       </nav>
 
-      {/* MARKETPLACE HEADER & SEARCH */}
+      {/* HEADER & INVENTORY */}
       <section style={{ padding: '40px 20px 0', maxWidth: '1400px', margin: '0 auto' }}>
         <header style={{ marginBottom: '30px' }}>
           <h1 style={{ color: '#002d5b', fontSize: '2.5rem', fontWeight: '900', marginBottom: '5px' }}>Tyre Marketplace</h1>
@@ -117,7 +141,6 @@ export default function MarketplacePage() {
           <span style={{ position: 'absolute', right: '20px', top: '20px', opacity: 0.4 }}>🔍</span>
         </div>
 
-        {/* TABLE SECTION */}
         <div style={tableContainerStyle}>
           <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
             <thead>
@@ -135,7 +158,7 @@ export default function MarketplacePage() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={8} style={{ padding: '100px', textAlign: 'center' }}>Syncing Inventory...</td></tr>
-              ) : filteredParts.length > 0 ? filteredParts.map((part) => (
+              ) : filteredParts.map((part) => (
                 <tr key={part._id} style={{ borderBottom: '1.5px solid #cbd5e1' }}>
                   <td style={tdStyle}><strong>{part.aircraftType}</strong></td>
                   <td style={tdStyle}><span style={badgeStyle}>{(part.gearPosition || 'MAIN').toUpperCase()}</span></td>
@@ -158,33 +181,49 @@ export default function MarketplacePage() {
                     <button onClick={() => triggerQuoteForm(part)} style={actionBtnStyle}>GET QUOTE</button>
                   </td>
                 </tr>
-              )) : (
-                <tr>
-                  <td colSpan={8} style={{ padding: '80px', textAlign: 'center', color: '#64748b' }}>
-                    No direct matches found. <button onClick={scrollToRFQ} style={{ color: '#002d5b', fontWeight: 'bold', textDecoration: 'underline', border: 'none', background: 'none', cursor: 'pointer' }}>Request Sourcing</button>
-                  </td>
-                </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>
       </section>
 
-      {/* RFQ FORM */}
-      <section ref={rfqSectionRef} id="rfq" style={{ backgroundColor: '#002d5b', padding: '100px 20px', color: 'white', marginTop: '80px' }}>
+      {/* SOURCING FORM (FORMSPREE INTEGRATED) */}
+      <section 
+        ref={rfqSectionRef} 
+        id="rfq" 
+        style={{ 
+          backgroundColor: '#002d5b', 
+          padding: '100px 20px', 
+          color: 'white', 
+          marginTop: '80px',
+          scrollMarginTop: '100px'
+        }}
+      >
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '10px', textAlign: 'center' }}>Sourcing Request</h2>
-          <p style={{ opacity: 0.8, marginBottom: '40px', textAlign: 'center' }}>Can't find a part? Our global team will find it for you.</p>
-          <form style={formStyle} onSubmit={(e) => e.preventDefault()}>
-            <div style={formGrid}>
-                <input type="text" placeholder="Your Name" style={inputStyle} value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                <input type="email" placeholder="Email Address" style={inputStyle} value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-                <input type="text" placeholder="Aircraft Model" style={inputStyle} value={formData.aircraft} onChange={(e) => setFormData({...formData, aircraft: e.target.value})} />
-                <input type="text" placeholder="Quantity Required" style={inputStyle} value={formData.quantity} onChange={(e) => setFormData({...formData, quantity: e.target.value})} />
+          {isSuccess ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '15px', border: '2px dashed #ffb400' }}>
+              <h2 style={{ color: '#ffb400', fontSize: '2.5rem', fontWeight: '900' }}>REQUEST RECEIVED</h2>
+              <p style={{ fontSize: '1.2rem', opacity: 0.9, marginTop: '10px' }}>Our procurement desk has been notified. We will reach out to <strong>{formData.email}</strong> shortly.</p>
+              <button onClick={() => setIsSuccess(false)} style={{ marginTop: '30px', color: '#ffb400', background: 'none', border: '1px solid #ffb400', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer' }}>Send Another Request</button>
             </div>
-            <textarea placeholder="Tell us more about your requirement..." style={{...inputStyle, height: '150px', gridColumn: 'span 2'}} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
-            <button style={submitBtn}>SUBMIT SOURCING REQUEST</button>
-          </form>
+          ) : (
+            <>
+              <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '10px', textAlign: 'center' }}>Sourcing Request</h2>
+              <p style={{ opacity: 0.8, marginBottom: '40px', textAlign: 'center' }}>Our global team will find the specific part you need.</p>
+              <form style={formStyle} onSubmit={handleSubmit}>
+                <div style={formGrid}>
+                    <input required name="name" type="text" placeholder="Your Name" style={inputStyle} value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                    <input required name="email" type="email" placeholder="Email Address" style={inputStyle} value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                    <input required name="aircraft" type="text" placeholder="Aircraft Model" style={inputStyle} value={formData.aircraft} onChange={(e) => setFormData({...formData, aircraft: e.target.value})} />
+                    <input required name="quantity" type="text" placeholder="Quantity Required" style={inputStyle} value={formData.quantity} onChange={(e) => setFormData({...formData, quantity: e.target.value})} />
+                </div>
+                <textarea required name="message" placeholder="Details of your requirement..." style={{...inputStyle, height: '150px', gridColumn: 'span 2'}} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
+                <button disabled={isSubmitting} type="submit" style={submitBtn}>
+                  {isSubmitting ? 'SENDING REQUEST...' : 'SUBMIT SOURCING REQUEST'}
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </section>
 
@@ -195,7 +234,7 @@ export default function MarketplacePage() {
   )
 }
 
-// STYLES (Unchanged for visual consistency)
+// STYLES
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const tableContainerStyle = { overflowX: 'auto' as const, borderRadius: '12px', border: '1.5px solid #cbd5e1', boxShadow: '0 15px 35px rgba(0,0,0,0.08)', marginBottom: '40px' };
 const thStyle = { padding: '20px', fontSize: '0.75rem', letterSpacing: '1px' };
