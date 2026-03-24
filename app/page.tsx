@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// Updated to point to your fleet dataset as discussed
 const client = createClient({
   projectId: 'm2pa474h', 
   dataset: 'fleet', 
@@ -16,14 +15,12 @@ export default function HomePage() {
   const [stats, setStats] = useState({ total: 0, health: 98 });
   const [isMobile, setIsMobile] = useState(false);
 
-  // Sync Mobile State & Fetch Stats
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
     async function fetchStats() {
-      // Querying the new 'aircraft' schema for global fleet health
       const query = `{
         "totalUnits": count(*[_type == "aircraft"]),
         "critical": count(*[_type == "aircraft" && (mainTyre.landingCount >= 225 || noseTyre.landingCount >= 270)])
@@ -45,8 +42,13 @@ export default function HomePage() {
   const whatsappNumber = "919600038089"; 
   const contactEmail = "tajesudoss@gmail.com";
 
+  // STRUCTURED RFQ MESSAGE
+  const waMessage = encodeURIComponent(
+    `Jedo Tech RFQ Inquiry\n---\nPart Number: \nDescription: \nAOG Status (Yes/No): \nQuantity: `
+  );
+
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'sans-serif', margin: 0, padding: 0 }}>
+    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif', margin: 0, padding: 0 }}>
       
       {/* 1. NAVIGATION BAR */}
       <nav style={{...navStyle, padding: isMobile ? '15px 20px' : '20px 60px', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '15px' : '0'}}>
@@ -57,7 +59,7 @@ export default function HomePage() {
         </div>
         <div style={{ display: 'flex', gap: isMobile ? '12px' : '25px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link href="/marketplace" style={navLinkStyle}>MARKETPLACE</Link>
-          <Link href="https://jedo-fleet-intel.vercel.app" target="_blank" rel="noopener noreferrer" style={{...intelTabStyle, fontSize: isMobile ? '0.7rem' : '0.85rem'}}>
+          <Link href="https://jedo-fleet-intel.vercel.app" target="_blank" style={{...intelTabStyle, fontSize: isMobile ? '0.7rem' : '0.85rem'}}>
             FLEET INTEL ↗
           </Link>
           <Link href="/marketplace#rfq" style={{...quoteButtonStyle, padding: isMobile ? '8px 12px' : '12px 25px', fontSize: isMobile ? '0.7rem' : '0.85rem'}}>REQUEST SOURCING</Link>
@@ -67,133 +69,109 @@ export default function HomePage() {
       {/* 2. HERO SECTION */}
       <section style={{...heroSectionStyle, padding: isMobile ? '80px 20px' : '0'}}>
         <div style={{ maxWidth: '1100px', padding: '0 20px', zIndex: 2 }}>
-          <h1 style={{ 
-            fontSize: isMobile ? '2.8rem' : '5rem', 
-            fontWeight: '900', 
-            marginBottom: '15px', 
-            lineHeight: '1.1', 
-            textShadow: '2px 2px 10px rgba(0,0,0,0.3)' 
-          }}>
+          <h1 style={{ fontSize: isMobile ? '2.8rem' : '5rem', fontWeight: '900', marginBottom: '15px', lineHeight: '1.1' }}>
             THE TYRE HUB FOR <br />
             <span style={{ color: '#ffb400' }}>TRAINING FLEETS.</span>
           </h1>
-          <p style={{ fontSize: isMobile ? '1.1rem' : '1.5rem', fontWeight: '600', maxWidth: '850px', margin: '0 auto 40px', opacity: 0.95 }}>
-            Specialized brokerage for Cessna & Piper. We source, verify, and deliver certified aviation tyres to your hangar.
+          <p style={{ fontSize: isMobile ? '1.1rem' : '1.4rem', fontWeight: '500', maxWidth: '800px', margin: '0 auto 40px', color: 'rgba(255,255,255,0.9)' }}>
+            Precision sourcing for Cessna & Piper. High-traceability certified aviation components for the Indian training sector.
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', flexDirection: isMobile ? 'column' : 'row' }}>
             <Link href="/marketplace" style={primaryButtonStyle}>Browse Marketplace</Link>
             <Link href="https://jedo-fleet-intel.vercel.app" target="_blank" style={secondaryButtonStyle}>Fleet Intel Login</Link>
           </div>
         </div>
       </section>
 
-      {/* 3. INTELLIGENCE PULSE BAR */}
-      <div style={{...pulseBarContainer, flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '15px' : '40px'}}>
-        <div style={pulseItem}>
-          <span style={pulseDot}></span>
-          <span style={pulseLabel}>HUB STATUS:</span>
-          <span style={pulseValue}>CHENNAI ACTIVE</span>
-        </div>
-        {!isMobile && <div style={pulseDivider}></div>}
-        <div style={pulseItem}>
-          <span style={pulseLabel}>ACTIVE FLEET:</span>
-          <span style={pulseValue}>{stats.total} AIRCRAFT</span>
-        </div>
-        {!isMobile && <div style={pulseDivider}></div>}
-        <div style={pulseItem}>
-          <span style={pulseLabel}>FLEET SAFETY:</span>
-          <span style={pulseValue}>{stats.health}% OPTIMAL</span>
-        </div>
-      </div>
-
-      {/* 4. LOGO BAR */}
-      <div style={{ backgroundColor: '#ffffff', padding: '40px 0', borderBottom: '1px solid #f1f5f9', textAlign: 'center' }}>
-        <p style={{ fontSize: '0.65rem', fontWeight: '900', color: '#cbd5e1', letterSpacing: '2px', marginBottom: '20px' }}>SUPPORTED AIRCRAFT PLATFORMS</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? '20px' : '60px', opacity: 0.4, flexWrap: 'wrap', padding: '0 20px' }}>
-          <span style={platformLabelStyle}>CESSNA</span>
-          <span style={platformLabelStyle}>PIPER</span>
-          <span style={platformLabelStyle}>BEECHCRAFT</span>
-          <span style={platformLabelStyle}>CIRRUS</span>
-        </div>
-      </div>
-
-      {/* 5. CORE CAPABILITIES */}
+      {/* 3. CORE CAPABILITIES (Improved for Mobile) */}
       <section style={{ padding: isMobile ? '60px 20px' : '100px 20px', maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: isMobile ? '30px' : '60px' }}>
           <div style={featureCardStyle}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '20px' }}>🌐</div>
+            <div style={featureIconStyle}>🌐</div>
             <h3 style={featureTitleStyle}>Global Procurement</h3>
             <p style={featureTextStyle}>Direct access to MRO inventory in Singapore and USA hubs for rapid dispatch.</p>
           </div>
           <div style={featureCardStyle}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '20px' }}>🛡️</div>
+            <div style={featureIconStyle}>🛡️</div>
             <h3 style={featureTitleStyle}>Technical Verification</h3>
-            <p style={featureTextStyle}>Every tyre is sourced with full traceability and digital airworthiness documentation.</p>
+            <p style={featureTextStyle}>Every unit is sourced with full traceability and digital airworthiness documentation.</p>
           </div>
           <div style={featureCardStyle}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '20px' }}>🚚</div>
+            <div style={featureIconStyle}>🚚</div>
             <h3 style={featureTitleStyle}>Hangar Delivery</h3>
             <p style={featureTextStyle}>Seamless customs handling and last-mile delivery to any flight school in India.</p>
           </div>
         </div>
       </section>
 
-      {/* 6. CONTACT HUB */}
-      <section style={{ backgroundColor: '#f8fafc', padding: isMobile ? '60px 20px' : '80px 20px', textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>
-        <h2 style={{ color: '#002d5b', fontWeight: '900', marginBottom: '10px', fontSize: isMobile ? '1.5rem' : '2rem' }}>DIRECT LINE TO LOGISTICS</h2>
-        <p style={{ color: '#64748b', marginBottom: '35px', fontSize: '1rem' }}>Speak with our Chennai sourcing hub today.</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: isMobile ? '25px' : '50px', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center' }}>
-          <a href={`tel:+${whatsappNumber}`} style={contactMethodStyle}>
-            <span style={{fontSize: '1.5rem'}}>📞</span> +91 96000 38089
-          </a>
-          <a href={`mailto:${contactEmail}`} style={contactMethodStyle}>
-            <span style={{fontSize: '1.5rem'}}>✉️</span> {contactEmail}
-          </a>
+      {/* 4. PROFESSIONAL CONTACT HUB */}
+      <section style={{ backgroundColor: '#001529', color: 'white', padding: isMobile ? '60px 20px' : '100px 20px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: isMobile ? '1.8rem' : '2.5rem', fontWeight: '800', marginBottom: '20px', letterSpacing: '-0.5px' }}>
+            URGENT SOURCING & AOG
+          </h2>
+          <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginBottom: '40px' }}>
+            Contact our Chennai logistics desk for immediate part verification and shipping quotes.
+          </p>
+          
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', gap: isMobile ? '20px' : '40px' }}>
+            <a href={`tel:+${whatsappNumber}`} style={contactBoxStyle}>
+              <span style={{ color: '#ffb400', fontSize: '0.8rem', fontWeight: 'bold' }}>TELEPHONE</span>
+              <span style={{ fontSize: '1.3rem', fontWeight: '700' }}>+91 96000 38089</span>
+            </a>
+            <a href={`mailto:${contactEmail}`} style={contactBoxStyle}>
+              <span style={{ color: '#ffb400', fontSize: '0.8rem', fontWeight: 'bold' }}>OFFICIAL EMAIL</span>
+              <span style={{ fontSize: '1.3rem', fontWeight: '700' }}>{contactEmail}</span>
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* FLOATING WHATSAPP BUTTON */}
+      {/* FLOATING WHATSAPP BUTTON (RFQ TEMPLATE) */}
       <a 
-        href={`https://wa.me/${whatsappNumber}?text=Hello%20Jedo%20Technologies,%20I%20am%20interested%20in%20aircraft%20tyre%20sourcing.`} 
+        href={`https://wa.me/${whatsappNumber}?text=${waMessage}`} 
         target="_blank" 
         rel="noopener noreferrer"
-        style={{...whatsappFloatingStyle, padding: isMobile ? '12px' : '12px 20px'}}
+        style={whatsappFloatingStyle}
       >
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style={{ width: '30px', height: '30px' }} />
-        {!isMobile && <span style={{ marginLeft: '10px', fontWeight: 'bold' }}>Chat with Us</span>}
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style={{ width: '28px', height: '28px' }} />
+        <span style={{ marginLeft: '12px', fontWeight: '700', fontSize: '0.9rem' }}>SEND RFQ / AOG</span>
       </a>
 
-      {/* 7. FOOTER */}
-      <footer style={{ backgroundColor: '#001a35', color: 'rgba(255,255,255,0.4)', padding: '60px 20px', textAlign: 'center', fontSize: '0.85rem' }}>
-        <p>© 2026 Jedo Technologies Pvt. Ltd. | Sourcing Excellence</p>
+      {/* FOOTER */}
+      <footer style={{ backgroundColor: '#000c17', color: 'rgba(255,255,255,0.3)', padding: '40px 20px', textAlign: 'center', fontSize: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        <p>© 2026 Jedo Technologies Pvt. Ltd. | DGCA & International Standards Compliance</p>
       </footer>
     </div>
   )
 }
 
 // STYLES
-const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#002d5b', position: 'sticky' as const, top: 0, zIndex: 1000 };
-const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem', opacity: 0.7 };
-const intelTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.85rem', border: '1px solid #ffb400', padding: '8px 15px', borderRadius: '4px' };
-const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const };
+const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#001a35', position: 'sticky' as const, top: 0, zIndex: 1000 };
+const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: '600' as const, fontSize: '0.8rem', opacity: 0.8, letterSpacing: '1px' };
+const intelTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, border: '1px solid #ffb400', padding: '8px 15px', borderRadius: '4px' };
+const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const };
 
-const heroSectionStyle = { minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'linear-gradient(rgba(0,45,91,0.6), rgba(0,45,91,0.6)), url("/hero-aircraft.png")', backgroundSize: 'cover', backgroundPosition: 'center', color: 'white', textAlign: 'center' as const };
-const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#002d5b', padding: '18px 40px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem' };
-const secondaryButtonStyle = { backgroundColor: 'transparent', color: 'white', padding: '18px 40px', borderRadius: '8px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem', border: '2px solid white' };
-
-const pulseBarContainer = { backgroundColor: '#002d5b', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', borderBottom: '1px solid rgba(255,255,255,0.1)' };
-const pulseItem = { display: 'flex', alignItems: 'center', gap: '10px' };
-const pulseDot = { height: '8px', width: '8px', backgroundColor: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981' };
-const pulseLabel = { fontSize: '0.7rem', fontWeight: '900', color: '#94a3b8', letterSpacing: '1px' };
-const pulseValue = { fontSize: '0.9rem', fontWeight: 'bold', color: 'white' };
-const pulseDivider = { height: '20px', width: '1px', backgroundColor: 'rgba(255,255,255,0.2)' };
+const heroSectionStyle = { minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'linear-gradient(rgba(0,12,23,0.7), rgba(0,12,23,0.7)), url("/hero-aircraft.png")', backgroundSize: 'cover', backgroundPosition: 'center', color: 'white', textAlign: 'center' as const };
+const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '16px 36px', borderRadius: '4px', textDecoration: 'none', fontWeight: '800' as const, fontSize: '1rem' };
+const secondaryButtonStyle = { backgroundColor: 'transparent', color: 'white', padding: '16px 36px', borderRadius: '4px', textDecoration: 'none', fontWeight: '800' as const, fontSize: '1rem', border: '2px solid white' };
 
 const featureCardStyle = { textAlign: 'center' as const, padding: '20px' };
-const featureTitleStyle = { color: '#002d5b', fontSize: '1.4rem', fontWeight: '900', marginBottom: '15px' };
-const featureTextStyle = { color: '#64748b', lineHeight: '1.7', fontSize: '0.95rem' };
-const platformLabelStyle = { fontWeight: '900' as const, fontSize: '1.1rem', color: '#cbd5e1' };
+const featureIconStyle = { fontSize: '2.5rem', marginBottom: '20px', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' };
+const featureTitleStyle = { color: '#001a35', fontSize: '1.3rem', fontWeight: '800', marginBottom: '15px', letterSpacing: '-0.3px' };
+const featureTextStyle = { color: '#475569', lineHeight: '1.7', fontSize: '0.95rem' };
 
-const contactMethodStyle = { color: '#002d5b', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '10px' };
+const contactBoxStyle = { 
+  display: 'flex', 
+  flexDirection: 'column' as const, 
+  backgroundColor: 'rgba(255,255,255,0.05)', 
+  padding: '25px 40px', 
+  borderRadius: '8px', 
+  border: '1px solid rgba(255,255,255,0.1)',
+  textDecoration: 'none',
+  color: 'white',
+  transition: 'all 0.3s ease'
+};
 
 const whatsappFloatingStyle = {
   position: 'fixed' as const,
@@ -201,11 +179,11 @@ const whatsappFloatingStyle = {
   right: '30px',
   backgroundColor: '#25D366',
   color: 'white',
+  padding: '14px 24px',
   borderRadius: '50px',
   display: 'flex',
   alignItems: 'center',
   textDecoration: 'none',
-  boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
-  zIndex: 10000,
-  transition: 'transform 0.3s ease'
+  boxShadow: '0 15px 30px rgba(37, 211, 102, 0.3)',
+  zIndex: 10000
 };
