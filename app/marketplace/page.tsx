@@ -34,7 +34,6 @@ export default function Marketplace() {
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
 
-  // Form Auto-fill State
   const [selectedPartNumber, setSelectedPartNumber] = useState('')
   const [selectedAircraft, setSelectedAircraft] = useState('')
 
@@ -97,14 +96,24 @@ export default function Marketplace() {
   return (
     <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* 1. NAVIGATION - Reordered for Home Link -> Currency Switcher */}
+      {/* 1. UPDATED NAVIGATION - Home Link before Large Currency Switcher */}
       <nav style={navBarStyle}>
-        <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+        <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '45px' }} /></Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '35px' }}>
           <Link href="/" style={navLinkStyle}>HOME</Link>
-          <div style={smallSwitcherCircle}>
-            <button onClick={() => setCurrency('USD')} style={currency === 'USD' ? activeCircle : inactiveCircle}>$</button>
-            <button onClick={() => setCurrency('INR')} style={currency === 'INR' ? activeCircle : inactiveCircle}>₹</button>
+          <div style={currencySwitcherPill}>
+            <button 
+              onClick={() => setCurrency('USD')} 
+              style={currency === 'USD' ? activePillBtn : inactivePillBtn}
+            >
+              USD
+            </button>
+            <button 
+              onClick={() => setCurrency('INR')} 
+              style={currency === 'INR' ? activePillBtn : inactivePillBtn}
+            >
+              INR
+            </button>
           </div>
         </div>
       </nav>
@@ -162,7 +171,7 @@ export default function Marketplace() {
           </table>
         </div>
 
-        {/* 4. SOURCING CARD - AUTO-FILLED FIELDS */}
+        {/* 4. SOURCING CARD */}
         <section id="rfq" style={formSectionStyle}>
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
             <h2 style={{ color: '#ffffff', fontWeight: '900', fontSize: '1.6rem', margin: 0 }}>
@@ -227,25 +236,64 @@ export default function Marketplace() {
   )
 }
 
-// --- CSS STYLES (AS CONST FIXED) ---
-const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#001a35' } as const;
-const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold' } as const;
+// --- UPDATED STYLES ---
+const navBarStyle = { 
+  display: 'flex', 
+  justifyContent: 'space-between', 
+  alignItems: 'center', 
+  padding: '20px 60px', 
+  backgroundColor: '#001a35',
+  boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+} as const;
 
-const smallSwitcherCircle = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '30px', padding: '3px' } as const;
-const activeCircle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', width: '28px', height: '28px', borderRadius: '50%', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' } as const;
-const inactiveCircle = { backgroundColor: 'transparent', color: '#ffb400', border: 'none', width: '28px', height: '28px', borderRadius: '50%', fontSize: '0.7rem', cursor: 'pointer' } as const;
+const navLinkStyle = { 
+  color: '#ffb400', 
+  textDecoration: 'none', 
+  fontSize: '0.9rem', 
+  fontWeight: 'bold',
+  letterSpacing: '1px'
+} as const;
+
+// LARGE CURRENCY SWITCHER
+const currencySwitcherPill = { 
+  display: 'flex', 
+  backgroundColor: 'rgba(255,255,255,0.05)', 
+  borderRadius: '50px', 
+  padding: '4px',
+  border: '1px solid rgba(255,180,0,0.3)'
+} as const;
+
+const activePillBtn = { 
+  backgroundColor: '#ffb400', 
+  color: '#001a35', 
+  border: 'none', 
+  padding: '8px 18px', 
+  borderRadius: '40px', 
+  fontWeight: '900', 
+  fontSize: '0.75rem', 
+  cursor: 'pointer',
+  transition: 'all 0.3s ease'
+} as const;
+
+const inactivePillBtn = { 
+  backgroundColor: 'transparent', 
+  color: '#ffffff', 
+  border: 'none', 
+  padding: '8px 18px', 
+  borderRadius: '40px', 
+  fontSize: '0.75rem', 
+  fontWeight: 'bold',
+  cursor: 'pointer',
+  transition: 'all 0.3s ease'
+} as const;
 
 const searchBarStyle = { width: '100%', padding: '20px 40px', borderRadius: '100px', border: '2px solid #001a35', fontSize: '1rem', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' } as const;
-
-// FIX: Added 'as const' to resolve overflowX type error
 const tableWrapperStyle = { overflowX: 'auto', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #001a35' } as const;
-
 const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '1px' } as const;
 const trStyle = { borderBottom: '1px solid #001a35' } as const;
 const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' } as const;
 const badgeStyle = { backgroundColor: '#fff7e6', color: '#ffb400', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' } as const;
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer' } as const;
-
 const formSectionStyle = { marginTop: '80px', backgroundColor: '#001a35', padding: '40px', borderRadius: '20px', maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto' } as const;
 const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
 const sideBySide = { display: 'flex', gap: '20px' } as const;
