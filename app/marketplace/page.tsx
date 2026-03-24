@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// TYPE-SAFE INTERFACE
+// 1. UPDATED SANITY SCHEMA INTERFACE
 interface AviationPart {
   _id: string;
+  aircraftModel: string;
+  gearPosition: string;
+  tyreSize: string;
   partNumber: string;
-  description: string;
-  category?: string;
-  condition?: string;
-  location?: string;
-  stockStatus?: string;
-  price?: number;
+  plyRating: string;
+  condition: string;
+  price: number; // Stored as USD in Sanity per your schema
+  warehouseLocation: string;
 }
 
 const client = createClient({
@@ -27,170 +28,166 @@ export default function Marketplace() {
   const [parts, setParts] = useState<AviationPart[]>([])
   const [filteredParts, setFilteredParts] = useState<AviationPart[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [currency, setCurrency] = useState<'USD' | 'INR'>('USD')
+  const [exchangeRate, setExchangeRate] = useState<number>(83.50) 
   const [isMobile, setIsMobile] = useState(false)
-  
-  // CURRENCY STATE
-  const [currency, setCurrency] = useState<'INR' | 'USD'>('INR')
-  const [exchangeRate, setExchangeRate] = useState<number>(93.86) // Default fallback
+  const [loading, setLoading] = useState(true)
+
+  const whatsappNumber = "919600038089"
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
     checkMobile()
     window.addEventListener('resize', checkMobile)
 
-    async function fetchData() {
-      // 1. Fetch Parts from Sanity
-      const partQuery = `*[_type == "part"]{
-        _id,
-        partNumber,
-        description,
-        category,
-        condition,
-        location,
-        stockStatus,
-        price
-      }`
-      
+    async function initMarketplace() {
       try {
         const [partData, exchangeData] = await Promise.all([
-          client.fetch(partQuery),
-          // 2. Fetch Live Exchange Rate (Using standard ExchangeRate-API)
+          client.fetch(`*[_type == "part"]{
+            _id, aircraftModel, gearPosition, tyreSize, partNumber, 
+            plyRating, condition, price, warehouseLocation
+          }`),
           fetch('https://api.exchangerate-api.com/v4/latest/USD').then(res => res.json())
         ])
-        
         setParts(partData)
         setFilteredParts(partData)
-        if (exchangeData?.rates?.INR) {
-          setExchangeRate(exchangeData.rates.INR)
-        }
-      } catch (e) {
-        console.error("Data sync error", e)
+        if (exchangeData?.rates?.INR) setExchangeRate(exchangeData.rates.INR)
+      } catch (error) {
+        console.error("Marketplace fetch error:", error)
+      } finally {
+        setLoading(false)
       }
     }
-    
-    fetchData()
+    initMarketplace()
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   useEffect(() => {
-    const results = parts.filter((part) =>
-      part.partNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      part.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    const results = parts.filter(p => 
+      p.partNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.aircraftModel?.toLowerCase().includes(searchTerm.toLowerCase())
     )
     setFilteredParts(results)
   }, [searchTerm, parts])
 
-  const formatPrice = (price?: number) => {
-    if (!price) return 'Quote';
-    if (currency === 'USD') {
-      const usdPrice = price / exchangeRate;
-      return `$${usdPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+  const formatPrice = (priceUSD: number) => {
+    if (currency === 'INR') {
+      return `₹${(priceUSD * exchangeRate).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
     }
-    return `₹${price.toLocaleString('en-IN')}`;
+    return `$${priceUSD.toLocaleString('en-US')}`
   }
 
-  const whatsappNumber = "919600038089"
+  if (loading) return <div style={loaderStyle}>SYNCHRONIZING JEDO INVENTORY...</div>
 
   return (
     <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* HEADER WITH SEARCH & CURRENCY SWITCH */}
+      {/* FIXED NAVIGATION */}
       <nav style={navStyle}>
-        <Link href="/">
-          <img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} />
-        </Link>
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
-          
-          {/* SEARCH BAR */}
-          <input 
-            type="text" 
-            placeholder="Search Inventory..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={searchBarStyle} 
-          />
-
-          {/* CURRENCY SWITCHER */}
-          <div style={switcherContainer}>
-            <button 
-              onClick={() => setCurrency('INR')} 
-              style={currency === 'INR' ? activeToggle : inactiveToggle}
-            >INR</button>
-            <button 
-              onClick={() => setCurrency('USD')} 
-              style={currency === 'USD' ? activeToggle : inactiveToggle}
-            >USD</button>
-          </div>
-
-          <Link href="/" style={{ color: 'white', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.8rem' }}>HUB</Link>
+        <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
+        <div style={switcherContainer}>
+          <button onClick={() => setCurrency('USD')} style={currency === 'USD' ? activeToggle : inactiveToggle}>USD</button>
+          <button onClick={() => setCurrency('INR')} style={currency === 'INR' ? activeToggle : inactiveToggle}>INR</button>
         </div>
       </nav>
 
-      {/* MAIN TABLE AREA */}
-      <main style={{ padding: isMobile ? '20px 10px' : '40px 60px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-          <h1 style={{ color: '#001a35', fontWeight: '900', margin: 0 }}>AIRCRAFT COMPONENT MARKETPLACE</h1>
-          <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-            {filteredParts.length} Items Found | 1 USD = {exchangeRate.toFixed(2)} INR
-          </div>
+      {/* HERO & SEARCH */}
+      <header style={heroStyle}>
+        <h1 style={{ fontSize: isMobile ? '2rem' : '3.5rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>TYRE MARKETPLACE</h1>
+        <p style={{ color: '#ffb400', fontWeight: 'bold', letterSpacing: '2px', marginBottom: '30px' }}>GLOBAL AOG SOURCING HUB</p>
+        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+          <input 
+            type="text" 
+            placeholder="Search by Part Number or Aircraft Model..." 
+            style={searchBarStyle}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-        
-        <div style={{ overflowX: 'auto', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1000px' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#001a35', color: 'white', textAlign: 'left' }}>
-                <th style={thStyle}>PART NUMBER</th>
-                <th style={thStyle}>DESCRIPTION</th>
-                <th style={thStyle}>MODEL/CAT</th>
-                <th style={thStyle}>CONDITION</th>
-                <th style={thStyle}>LOCATION</th>
-                <th style={thStyle}>STATUS</th>
-                <th style={thStyle}>UNIT PRICE</th>
-                <th style={thStyle}>ACTION</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredParts.map((part) => (
-                <tr key={part._id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={tdStyle}><b>{part.partNumber}</b></td>
-                  <td style={tdStyle}>{part.description}</td>
-                  <td style={tdStyle}>{part.category || 'General'}</td>
-                  <td style={tdStyle}>{part.condition || 'New'}</td>
-                  <td style={tdStyle}>{part.location || 'Chennai'}</td>
-                  <td style={tdStyle}>
-                    <span style={{ 
-                      color: part.stockStatus === 'OUT OF STOCK' ? '#ef4444' : '#10b981',
-                      fontWeight: 'bold',
-                      fontSize: '0.75rem'
-                    }}>
-                      {part.stockStatus || 'AVAILABLE'}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>{formatPrice(part.price)}</td>
-                  <td style={tdStyle}>
-                    <a 
-                      href={`https://wa.me/${whatsappNumber}?text=RFQ:%20PN%20${part.partNumber}%20(${part.description})`}
-                      target="_blank"
-                      style={inquireButtonStyle}
-                    >
-                      INQUIRE
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      </header>
 
-        {/* SOURCING REQUEST FORM */}
-        <section id="rfq" style={sourcingFormStyle}>
-          <h2 style={{ color: '#001a35', fontSize: '1.5rem', fontWeight: '800' }}>Can't find a specific part?</h2>
-          <p style={{ color: '#64748b', marginBottom: '25px' }}>Submit a sourcing request and our Chennai desk will track it down globally.</p>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr 1fr', gap: '15px' }}>
-            <input type="text" placeholder="Desired Part Number" style={inputStyle} />
-            <input type="text" placeholder="Aircraft Model (e.g. C172)" style={inputStyle} />
-            <button style={submitButtonStyle}>Submit Sourcing Request</button>
+      {/* MAIN CONTENT */}
+      <main style={{ padding: isMobile ? '20px' : '60px', maxWidth: '1440px', margin: '0 auto' }}>
+        
+        {isMobile ? (
+          /* MOBILE CARDS LAYOUT */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            {filteredParts.map(part => (
+              <div key={part._id} style={mobileCardStyle}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px', marginBottom: '10px' }}>
+                  <span style={{ fontWeight: '900', color: '#001a35' }}>{part.partNumber}</span>
+                  <span style={badgeStyle}>{part.condition}</span>
+                </div>
+                <div style={cardGridStyle}>
+                  <div><label style={cardLabel}>MODEL:</label> {part.aircraftModel}</div>
+                  <div><label style={cardLabel}>GEAR:</label> {part.gearPosition}</div>
+                  <div><label style={cardLabel}>LOC:</label> {part.warehouseLocation}</div>
+                </div>
+                <div style={{ marginTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                   <span style={{ fontSize: '1.2rem', fontWeight: '800' }}>{formatPrice(part.price)}</span>
+                   <a 
+                    href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hello Jedo Tech,\n\nI am interested in:\nPart Number: ${part.partNumber}\nAircraft: ${part.aircraftModel}\nCondition: ${part.condition}\n\nQuote requested in ${currency}.`)}`}
+                    target="_blank"
+                    style={inquireButtonStyle}
+                   >INQUIRE</a>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* DESKTOP TABLE LAYOUT - 8 COLUMNS */
+          <div style={{ overflowX: 'auto', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#001a35', color: 'white' }}>
+                  <th style={thStyle}>AIRCRAFT MODEL</th>
+                  <th style={thStyle}>GEAR POSITION</th>
+                  <th style={thStyle}>TYRE SIZE</th>
+                  <th style={thStyle}>PART NUMBER</th>
+                  <th style={thStyle}>PLY RATING</th>
+                  <th style={thStyle}>CONDITION</th>
+                  <th style={thStyle}>EST. COST</th>
+                  <th style={thStyle}>WAREHOUSE</th>
+                  <th style={thStyle}>ACTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredParts.map(part => (
+                  <tr key={part._id} style={trStyle}>
+                    <td style={tdStyle}>{part.aircraftModel}</td>
+                    <td style={tdStyle}>{part.gearPosition}</td>
+                    <td style={tdStyle}>{part.tyreSize}</td>
+                    <td style={tdStyle}><b>{part.partNumber}</b></td>
+                    <td style={tdStyle}>{part.plyRating}</td>
+                    <td style={tdStyle}><span style={badgeStyle}>{part.condition}</span></td>
+                    <td style={tdStyle}><b>{formatPrice(part.price)}</b></td>
+                    <td style={tdStyle}>{part.warehouseLocation}</td>
+                    <td style={tdStyle}>
+                      <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hello Jedo Tech,\n\nI am interested in:\nPart Number: ${part.partNumber}\nAircraft: ${part.aircraftModel}\nCondition: ${part.condition}\n\nQuote requested in ${currency}.`)}`} target="_blank" style={inquireButtonStyle}>INQUIRE</a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* SOURCING REQUEST FORM (FORMSPREE) */}
+        <section id="rfq" style={formSectionStyle}>
+          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+            <h2 style={{ color: '#001a35', fontWeight: '900' }}>CAN'T FIND A SPECIFIC TYRE?</h2>
+            <p style={{ color: '#64748b', marginBottom: '40px' }}>Our global network spans Chennai, Singapore, and the USA.</p>
+            
+            <form action="https://formspree.io/f/mdalbdqq" method="POST" style={formGridStyle}>
+              <input name="partNumber" type="text" placeholder="Desired Part Number" required style={inputStyle} />
+              <input name="aircraft" type="text" placeholder="Aircraft Model (e.g. C152)" required style={inputStyle} />
+              <select name="priority" style={inputStyle} required>
+                <option value="Routine">Routine Sourcing</option>
+                <option value="AOG">AOG - Aircraft on Ground (Urgent)</option>
+              </select>
+              <textarea name="message" placeholder="Additional details (Condition, Quantity...)" style={{ ...inputStyle, gridColumn: '1 / -1', height: '100px' }}></textarea>
+              <button type="submit" style={submitButtonStyle}>SUBMIT SOURCING REQUEST</button>
+            </form>
           </div>
         </section>
       </main>
@@ -199,15 +196,22 @@ export default function Marketplace() {
 }
 
 // STYLES
-const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#001a35' };
-const searchBarStyle = { padding: '10px 20px', borderRadius: '4px', border: 'none', width: '250px', fontSize: '0.9rem', outline: 'none' };
-const thStyle = { padding: '15px', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '1px' };
-const tdStyle = { padding: '15px', fontSize: '0.85rem', color: '#001a35' };
-const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 12px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.7rem' };
-const sourcingFormStyle = { marginTop: '60px', padding: '40px', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' };
-const inputStyle = { padding: '12px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none' };
-const submitButtonStyle = { backgroundColor: '#001a35', color: '#ffb400', padding: '12px', borderRadius: '6px', border: 'none', fontWeight: 'bold', cursor: 'pointer' };
-
-const switcherContainer = { display: 'flex', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '4px', overflow: 'hidden' };
-const activeToggle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '5px 10px', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' };
-const inactiveToggle = { backgroundColor: 'transparent', color: 'white', border: 'none', padding: '5px 10px', fontSize: '0.7rem', cursor: 'pointer' };
+const navStyle = { position: 'fixed' as const, top: 0, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#001a35', zIndex: 1000, boxSizing: 'border-box' as const };
+const switcherContainer = { display: 'flex', border: '1px solid #ffb400', borderRadius: '6px', overflow: 'hidden' };
+const activeToggle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '8px 15px', fontWeight: 'bold', cursor: 'pointer' };
+const inactiveToggle = { backgroundColor: 'transparent', color: '#ffb400', border: 'none', padding: '8px 15px', cursor: 'pointer' };
+const heroStyle = { backgroundColor: '#001a35', padding: '120px 20px 80px', textAlign: 'center' as const };
+const searchBarStyle = { width: '100%', padding: '20px 30px', borderRadius: '50px', border: 'none', fontSize: '1.1rem', boxShadow: '0 15px 35px rgba(0,0,0,0.2)', outline: 'none' };
+const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '1px' };
+const trStyle = { borderBottom: '1px solid #f1f5f9' };
+const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' };
+const badgeStyle = { backgroundColor: '#f1f5f9', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold', color: '#001a35' };
+const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.8rem' };
+const mobileCardStyle = { backgroundColor: 'white', padding: '20px', borderRadius: '12px', borderLeft: '5px solid #ffb400', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' };
+const cardGridStyle = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.8rem', color: '#475569' };
+const cardLabel = { fontWeight: '800', color: '#94a3b8' };
+const formSectionStyle = { marginTop: '80px', backgroundColor: '#ffffff', padding: '60px 20px', borderRadius: '20px', border: '1px solid #e2e8f0' };
+const formGridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' };
+const inputStyle = { padding: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '1rem', outline: 'none' };
+const submitButtonStyle = { backgroundColor: '#001a35', color: '#ffb400', padding: '18px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', gridColumn: '1 / -1' };
+const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' };
