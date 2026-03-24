@@ -74,7 +74,6 @@ export default function Marketplace() {
     return `$${(priceUSD || 0).toLocaleString('en-US')}`
   }
 
-  // AUTO-FILL & SMOOTH SCROLL
   const handleInquire = (pn: string, model: string) => {
     setSelectedPartNumber(pn)
     setSelectedAircraft(model)
@@ -98,7 +97,7 @@ export default function Marketplace() {
   return (
     <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* 1. NAVIGATION - Home link before small circular switcher */}
+      {/* 1. NAVIGATION - Reordered for Home Link -> Currency Switcher */}
       <nav style={navBarStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
@@ -228,28 +227,31 @@ export default function Marketplace() {
   )
 }
 
-// --- STYLES ---
-const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#001a35' };
-const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold' };
+// --- CSS STYLES (AS CONST FIXED) ---
+const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#001a35' } as const;
+const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold' } as const;
 
-// SMALL CIRCULAR SWITCHER
-const smallSwitcherCircle = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '30px', padding: '3px' };
-const activeCircle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', width: '28px', height: '28px', borderRadius: '50%', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' };
-const inactiveCircle = { backgroundColor: 'transparent', color: '#ffb400', border: 'none', width: '28px', height: '28px', borderRadius: '50%', fontSize: '0.7rem', cursor: 'pointer' };
+const smallSwitcherCircle = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '30px', padding: '3px' } as const;
+const activeCircle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', width: '28px', height: '28px', borderRadius: '50%', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' } as const;
+const inactiveCircle = { backgroundColor: 'transparent', color: '#ffb400', border: 'none', width: '28px', height: '28px', borderRadius: '50%', fontSize: '0.7rem', cursor: 'pointer' } as const;
 
-const searchBarStyle = { width: '100%', padding: '20px 40px', borderRadius: '100px', border: '2px solid #001a35', fontSize: '1rem', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' };
-const tableWrapperStyle = { overflowX: 'auto', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #001a35' };
-const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '1px' };
-const trStyle = { borderBottom: '1px solid #001a35' };
-const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' };
-const badgeStyle = { backgroundColor: '#fff7e6', color: '#ffb400', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' };
-const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer' };
-const formSectionStyle = { marginTop: '80px', backgroundColor: '#001a35', padding: '40px', borderRadius: '20px', maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto' };
-const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' };
-const sideBySide = { display: 'flex', gap: '20px' };
-const fullCol = { display: 'flex', flexDirection: 'column', gap: '20px' };
-const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 };
-const labelStyle = { color: '#ffb400', fontSize: '0.7rem', fontWeight: 'bold' };
-const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem', outline: 'none' };
-const submitButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '15px 50px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' };
-const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' };
+const searchBarStyle = { width: '100%', padding: '20px 40px', borderRadius: '100px', border: '2px solid #001a35', fontSize: '1rem', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' } as const;
+
+// FIX: Added 'as const' to resolve overflowX type error
+const tableWrapperStyle = { overflowX: 'auto', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #001a35' } as const;
+
+const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '1px' } as const;
+const trStyle = { borderBottom: '1px solid #001a35' } as const;
+const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' } as const;
+const badgeStyle = { backgroundColor: '#fff7e6', color: '#ffb400', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' } as const;
+const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer' } as const;
+
+const formSectionStyle = { marginTop: '80px', backgroundColor: '#001a35', padding: '40px', borderRadius: '20px', maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto' } as const;
+const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
+const sideBySide = { display: 'flex', gap: '20px' } as const;
+const fullCol = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
+const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 } as const;
+const labelStyle = { color: '#ffb400', fontSize: '0.7rem', fontWeight: 'bold' } as const;
+const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem', outline: 'none' } as const;
+const submitButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '15px 50px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' } as const;
+const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' } as const;
