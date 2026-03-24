@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. DATA INTERFACE
 interface AviationPart {
   _id: string;
   aircraftType: string;
@@ -33,6 +32,7 @@ export default function Marketplace() {
   const [isMobile, setIsMobile] = useState(false)
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const [isAOG, setIsAOG] = useState(false)
 
   const [selectedPartNumber, setSelectedPartNumber] = useState('')
   const [selectedAircraft, setSelectedAircraft] = useState('')
@@ -79,21 +79,11 @@ export default function Marketplace() {
     setSelectedPartNumber(pn)
     setSelectedAircraft(model)
     const element = document.getElementById('rfq')
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
-    }
+    if (element) element.scrollIntoView({ behavior: 'smooth' })
   }
 
   if (!mounted) return null
-  if (loading) {
-    return (
-      <div style={loaderStyle}>
-        <div style={{ textAlign: 'center' }}>
-          <p style={{ color: '#ffb400', fontWeight: 'bold', letterSpacing: '3px' }}>SYNCING JEDO CLOUD INVENTORY...</p>
-        </div>
-      </div>
-    )
-  }
+  if (loading) return <div style={loaderStyle}><p>SYNCING JEDO CLOUD INVENTORY...</p></div>
 
   return (
     <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' }}>
@@ -110,34 +100,34 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      {/* 2. SEARCH AREA */}
-      <section style={{ padding: '100px 20px 40px', textAlign: 'center' }}>
+      {/* 2. TECHNICAL SYSTEM STATUS BAR */}
+      <div style={intelBar}>
+        <div style={intelItem}><span style={pulseDot}></span> GLOBAL HUB: ACTIVE</div>
+        <div style={intelItem}>RATE: 1 USD = {exchangeRate.toFixed(2)} INR</div>
+        <div style={intelItem}>COMPLIANCE: DGCA / EASA / FAA</div>
+      </div>
+
+      {/* 3. SEARCH AREA */}
+      <section style={{ padding: '60px 20px 40px', textAlign: 'center' }}>
         <h1 style={{ color: '#001a35', fontWeight: '900', fontSize: '2.5rem', margin: '0 0 10px' }}>
           AIRCRAFT <span style={{ color: '#ffb400' }}>TYRE</span> INVENTORY
         </h1>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <input 
-            type="text" 
-            placeholder="Search Part Number or Aircraft Model..." 
-            style={searchBarStyle}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          <input type="text" placeholder="Search Part Number or Aircraft Model..." style={searchBarStyle} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
       </section>
 
-      {/* 3. INVENTORY TABLE */}
+      {/* 4. INVENTORY TABLE */}
       <main style={{ padding: '20px 40px 80px', maxWidth: '1440px', margin: '0 auto', flex: 1 }}>
         <div style={tableWrapperStyle}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ backgroundColor: '#001a35', color: 'white' }}>
                 <th style={thStyle}>AIRCRAFT MODEL</th>
-                <th style={thStyle}>GEAR POSITION</th>
-                <th style={thStyle}>TYRE SIZE</th>
+                <th style={thStyle}>TYRE SIZE / PLY</th>
                 <th style={thStyle}>PART NUMBER</th>
-                <th style={thStyle}>PLY RATING</th>
                 <th style={thStyle}>CONDITION</th>
+                <th style={thStyle}>CERTIFICATION</th>
                 <th style={thStyle}>UNIT PRICE</th>
                 <th style={thStyle}>WAREHOUSE</th>
                 <th style={thStyle}>ACTION</th>
@@ -147,11 +137,15 @@ export default function Marketplace() {
               {filteredParts.map(part => (
                 <tr key={part._id} style={trStyle}>
                   <td style={tdStyle}><b>{part.aircraftType}</b></td>
-                  <td style={tdStyle}>{part.gearPosition}</td>
-                  <td style={tdStyle}>{part.tyreSize}</td>
-                  <td style={{ ...tdStyle, color: '#ffb400', fontWeight: '800' }}>{part.partNumber}</td>
-                  <td style={tdStyle}>{part.plyRating}</td>
+                  <td style={tdStyle}>{part.tyreSize} <span style={{fontSize: '0.7rem', opacity: 0.6}}>{part.plyRating}P</span></td>
+                  <td style={{ ...tdStyle, color: '#ffb400', fontWeight: '800', fontFamily: 'monospace' }}>{part.partNumber}</td>
                   <td style={tdStyle}><span style={badgeStyle}>{part.condition}</span></td>
+                  <td style={tdStyle}>
+                    <div style={{display: 'flex', gap: '4px'}}>
+                      <span style={docBadge}>8130-3</span>
+                      <span style={docBadge}>CoC</span>
+                    </div>
+                  </td>
                   <td style={tdStyle}><b>{formatPrice(part.priceUSD)}</b></td>
                   <td style={tdStyle}>{part.warehouse}</td>
                   <td style={{...tdStyle, display: 'flex', alignItems: 'center', gap: '10px'}}>
@@ -166,54 +160,48 @@ export default function Marketplace() {
           </table>
         </div>
 
-        {/* 4. SOURCING CARD */}
-        <section id="rfq" style={formSectionStyle}>
-          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+        {/* 5. ENHANCED SOURCING CARD */}
+        <section id="rfq" style={{...formSectionStyle, border: isAOG ? '2px solid #ef4444' : '1px solid rgba(255,180,0,0.2)'}}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
             <h2 style={{ color: '#ffffff', fontWeight: '900', fontSize: '1.6rem', margin: 0 }}>
-                SUBMIT <span style={{ color: '#ffb400' }}>SOURCING</span> REQUEST
+                SUBMIT <span style={{ color: isAOG ? '#ef4444' : '#ffb400' }}>{isAOG ? 'AOG' : 'SOURCING'}</span> REQUEST
             </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(255,255,255,0.1)', padding: '8px 15px', borderRadius: '30px' }}>
+               <span style={{color: '#fff', fontSize: '0.7rem', fontWeight: 'bold'}}>AOG PRIORITY</span>
+               <input type="checkbox" checked={isAOG} onChange={(e) => setIsAOG(e.target.checked)} style={{cursor: 'pointer'}} />
+            </div>
           </div>
           
           <form action="https://formspree.io/f/mdalbdqq" method="POST" style={formGridStyle}>
             <input type="hidden" name="_next" value="https://jedotech.com/success" />
+            <input type="hidden" name="priority" value={isAOG ? 'AIRCRAFT ON GROUND' : 'Routine'} />
             
             <div style={isMobile ? fullCol : sideBySide}>
-              <div style={inputGroup}>
-                <label style={labelStyle}>Full Name / Buyer</label>
-                <input name="buyerName" type="text" placeholder="Full Name" required style={inputStyle} />
-              </div>
-              <div style={inputGroup}>
-                <label style={labelStyle}>Email Address</label>
-                <input name="email" type="email" placeholder="official@company.com" required style={emailInputStyle} />
-              </div>
+              <div style={inputGroup}><label style={labelStyle}>Contact Person</label><input name="buyerName" type="text" placeholder="Full Name" required style={inputStyle} /></div>
+              <div style={inputGroup}><label style={labelStyle}>Official Email</label><input name="email" type="email" placeholder="official@company.com" required style={emailInputStyle} /></div>
             </div>
 
             <div style={isMobile ? fullCol : sideBySide}>
-              <div style={inputGroup}>
-                <label style={labelStyle}>Part Number</label>
-                <input name="partNumber" type="text" value={selectedPartNumber} onChange={(e) => setSelectedPartNumber(e.target.value)} placeholder="Specify PN" style={inputStyle} />
-              </div>
-              <div style={inputGroup}>
-                <label style={labelStyle}>Aircraft Model</label>
-                <input name="aircraft" type="text" value={selectedAircraft} onChange={(e) => setSelectedAircraft(e.target.value)} placeholder="e.g. Cessna 172" required style={inputStyle} />
-              </div>
+              <div style={inputGroup}><label style={labelStyle}>Company / Flight School</label><input name="organization" type="text" placeholder="Organization Name" required style={inputStyle} /></div>
+              <div style={inputGroup}><label style={labelStyle}>Aircraft Tail No.</label><input name="tailNumber" type="text" placeholder="e.g. VT-XXX" style={inputStyle} /></div>
+            </div>
+
+            <div style={isMobile ? fullCol : sideBySide}>
+              <div style={inputGroup}><label style={labelStyle}>Part Number</label><input name="partNumber" type="text" value={selectedPartNumber} onChange={(e) => setSelectedPartNumber(e.target.value)} placeholder="Specify PN" style={inputStyle} /></div>
+              <div style={inputGroup}><label style={labelStyle}>Aircraft Model</label><input name="aircraft" type="text" value={selectedAircraft} onChange={(e) => setSelectedAircraft(e.target.value)} placeholder="e.g. Cessna 172" required style={inputStyle} /></div>
             </div>
 
             <div style={{ width: '100%' }}>
-              <div style={inputGroup}>
-                <label style={labelStyle}>Technical Requirements</label>
-                <textarea name="description" placeholder="Specify requirements..." required style={{...inputStyle, height: '80px'}} />
-              </div>
+              <div style={inputGroup}><label style={labelStyle}>Technical Requirements / Remarks</label><textarea name="description" placeholder="Specify quantity, lead time requirements, or specific paperwork needed..." required style={{...inputStyle, height: '80px'}} /></div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', width: '100%' }}>
-               <button type="submit" style={submitButtonStyle}>SEND SOURCING REQUEST</button>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+               <button type="submit" style={{...submitButtonStyle, backgroundColor: isAOG ? '#ef4444' : '#ffb400'}}>{isAOG ? 'INITIALIZE AOG DISPATCH' : 'SEND SOURCING REQUEST'}</button>
             </div>
           </form>
         </section>
       </main>
 
-      {/* 5. UPDATED FOOTER - Matches Home Page exactly */}
       <footer style={footerStyle}>
         <p>© 2026 Jedo Technologies Pvt. Ltd. | DGCA & International Standards Compliance</p>
       </footer>
@@ -222,20 +210,28 @@ export default function Marketplace() {
 }
 
 // --- STYLES ---
-const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 60px', backgroundColor: '#001a35', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' } as const;
+const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 60px', backgroundColor: '#001a35' } as const;
 const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
 const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '50px', padding: '4px', border: '1px solid rgba(255,180,0,0.3)' } as const;
 const activePillBtn = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '8px 18px', borderRadius: '40px', fontWeight: '900', fontSize: '0.75rem', cursor: 'pointer' } as const;
 const inactivePillBtn = { backgroundColor: 'transparent', color: '#ffffff', border: 'none', padding: '8px 18px', borderRadius: '40px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' } as const;
+
+const intelBar = { display: 'flex', justifyContent: 'center', gap: '30px', padding: '10px', backgroundColor: '#001328', borderBottom: '1px solid rgba(255,180,0,0.2)', flexWrap: 'wrap' as const } as const;
+const intelItem = { color: '#94a3b8', fontSize: '0.65rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
+const pulseDot = { display: 'inline-block', width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', marginRight: '8px', boxShadow: '0 0 8px #10b981' } as const;
+
 const searchBarStyle = { width: '100%', padding: '20px 40px', borderRadius: '100px', border: '2px solid #001a35', fontSize: '1rem', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' } as const;
-const tableWrapperStyle = { overflowX: 'auto', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #001a35' } as const;
+const tableWrapperStyle = { overflowX: 'auto', backgroundColor: 'white', borderRadius: '12px', border: '1px solid #001a35' } as const;
 const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '1px' } as const;
 const trStyle = { borderBottom: '1px solid #001a35' } as const;
 const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' } as const;
 const badgeStyle = { backgroundColor: '#fff7e6', color: '#ffb400', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' } as const;
+const docBadge = { fontSize: '0.6rem', background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '3px', border: '1px solid #e2e8f0', fontWeight: 'bold' as const } as const;
+
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 15px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer' } as const;
 const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const;
-const formSectionStyle = { marginTop: '80px', backgroundColor: '#001a35', padding: '40px', borderRadius: '20px', maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto' } as const;
+
+const formSectionStyle = { marginTop: '80px', backgroundColor: '#001a35', padding: '40px', borderRadius: '20px', maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto', transition: 'all 0.3s ease' } as const;
 const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
 const sideBySide = { display: 'flex', gap: '20px' } as const;
 const fullCol = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
@@ -243,22 +239,7 @@ const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px', flex:
 const labelStyle = { color: '#ffb400', fontSize: '0.7rem', fontWeight: 'bold' } as const;
 const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem', outline: 'none' } as const;
 
-// UPDATED: Subtle Placeholder Styling
-const emailInputStyle = {
-  ...inputStyle,
-  boxShadow: '0 0 0px 1000px #001a35 inset', 
-  WebkitTextFillColor: 'white',
-  opacity: 0.8 // Makes the example/placeholder less "bright"
-} as const;
-
-const submitButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '15px 50px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' } as const;
+const emailInputStyle = { ...inputStyle, boxShadow: '0 0 0px 1000px #001a35 inset', WebkitTextFillColor: 'white', opacity: 0.8 } as const;
+const submitButtonStyle = { color: '#001a35', padding: '15px 50px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.3s ease' } as const;
 const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' } as const;
-
-// UPDATED: Standard Corporate Footer (Matching Home Page)
-const footerStyle = { 
-  backgroundColor: '#000c17', 
-  color: 'rgba(255,255,255,0.3)', 
-  padding: '40px 20px', 
-  textAlign: 'center' as const, 
-  fontSize: '0.75rem' 
-} as const;
+const footerStyle = { backgroundColor: '#000c17', color: 'rgba(255,255,255,0.3)', padding: '40px 20px', textAlign: 'center' as const, fontSize: '0.75rem' } as const;
