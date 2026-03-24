@@ -37,7 +37,7 @@ export default function Marketplace() {
   const [selectedPartNumber, setSelectedPartNumber] = useState('')
   const [selectedAircraft, setSelectedAircraft] = useState('')
 
-  const whatsappNumber = "919600038089"
+  const whatsappNumber = "919600038089"; 
 
   useEffect(() => {
     setMounted(true)
@@ -202,7 +202,7 @@ export default function Marketplace() {
             <div style={{ width: '100%' }}>
               <div style={inputGroup}>
                 <label style={labelStyle}>Technical Requirements</label>
-                <textarea name="description" placeholder="Specify size, ply, condition, and quantity..." required style={{...inputStyle, height: '80px'}} />
+                <textarea name="description" placeholder="Specify requirements..." required style={{...inputStyle, height: '80px'}} />
               </div>
             </div>
 
@@ -213,15 +213,15 @@ export default function Marketplace() {
         </section>
       </main>
 
-      {/* 5. FOOTER */}
+      {/* 5. UPDATED FOOTER - Matches Home Page exactly */}
       <footer style={footerStyle}>
-        © 2026 Jedo Technologies Pvt. Ltd. | DGCA & International Standards Compliance
+        <p>© 2026 Jedo Technologies Pvt. Ltd. | DGCA & International Standards Compliance</p>
       </footer>
     </div>
   )
 }
 
-// --- CSS STYLES ---
+// --- STYLES ---
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 60px', backgroundColor: '#001a35', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' } as const;
 const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
 const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '50px', padding: '4px', border: '1px solid rgba(255,180,0,0.3)' } as const;
@@ -243,16 +243,22 @@ const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px', flex:
 const labelStyle = { color: '#ffb400', fontSize: '0.7rem', fontWeight: 'bold' } as const;
 const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem', outline: 'none' } as const;
 
-// UPDATED: Subtle placeholder color for email
+// UPDATED: Subtle Placeholder Styling
 const emailInputStyle = {
   ...inputStyle,
   boxShadow: '0 0 0px 1000px #001a35 inset', 
   WebkitTextFillColor: 'white',
-  colorScheme: 'dark' // Helps browsers use dark-mode subtle placeholders
+  opacity: 0.8 // Makes the example/placeholder less "bright"
 } as const;
 
 const submitButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '15px 50px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' } as const;
 const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' } as const;
 
-// NEW: Footer Style
-const footerStyle = { textAlign: 'center' as const, padding: '40px 20px', color: '#64748b', fontSize: '0.75rem', borderTop: '1px solid #e2e8f0', marginTop: '60px', backgroundColor: '#fcfcfc' } as const;
+// UPDATED: Standard Corporate Footer (Matching Home Page)
+const footerStyle = { 
+  backgroundColor: '#000c17', 
+  color: 'rgba(255,255,255,0.3)', 
+  padding: '40px 20px', 
+  textAlign: 'center' as const, 
+  fontSize: '0.75rem' 
+} as const;
