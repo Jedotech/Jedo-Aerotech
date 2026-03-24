@@ -1,39 +1,144 @@
 'use client'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [accessCode, setAccessCode] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, you'd verify a password or send a magic link
-    // For now, we store the email to filter the dashboard data
-    localStorage.setItem('client_email', email.toLowerCase())
-    router.push('/fleet-health')
+    setLoading(true)
+    setError('')
+
+    // Simple security logic for initial setup
+    // You can later expand this to check against your 'serviceClients' in Sanity
+    if (accessCode.trim().toUpperCase() === 'CFC2026' || accessCode.trim().toUpperCase() === 'JEDO99') {
+      // Simulate session storage
+      localStorage.setItem('fleet_access', 'true')
+      router.push('https://jedo-fleet-intel.vercel.app/dashboard')
+    } else {
+      setError('Invalid Access Code. Please contact Jedo Logistics.')
+      setLoading(false)
+    }
   }
 
   return (
-    <div style={loginContainer}>
-      <form onSubmit={handleLogin} style={loginCard}>
-        <img src="/jedo-logo.png" alt="Jedo Logo" style={{ width: '150px', marginBottom: '20px' }} />
-        <h2 style={{ color: '#002d5b' }}>Client Fleet Portal</h2>
-        <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Enter your registered email to view your tyre health.</p>
-        <input 
-          type="email" 
-          placeholder="email@flightschool.com" 
-          required 
-          style={inputStyle}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <button type="submit" style={btnStyle}>ACCESS DASHBOARD</button>
-      </form>
+    <div style={containerStyle}>
+      <div style={loginCardStyle}>
+        {/* LOGO */}
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+          <Link href="/">
+            <img src="/jedo-logo.png" alt="Jedo Technologies" style={{ height: '50px', width: 'auto' }} />
+          </Link>
+          <h2 style={{ color: '#001a35', marginTop: '20px', fontWeight: '800', letterSpacing: '-0.5px' }}>
+            FLEET INTELLIGENCE LOGIN
+          </h2>
+          <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Enter your authorized access code</p>
+        </div>
+
+        {/* LOGIN FORM */}
+        <form onSubmit={handleLogin}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={labelStyle}>ACCESS CODE</label>
+            <input 
+              type="text" 
+              placeholder="e.g. CFCXXXX" 
+              value={accessCode}
+              onChange={(e) => setAccessCode(e.target.value)}
+              style={inputStyle}
+              required
+            />
+          </div>
+
+          {error && <p style={errorStyle}>{error}</p>}
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={buttonStyle}
+          >
+            {loading ? 'VERIFYING...' : 'AUTHORIZE ACCESS'}
+          </button>
+        </form>
+
+        {/* SUPPORT FOOTER */}
+        <div style={{ marginTop: '30px', textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '20px' }}>
+          <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+            Don't have a code? <br />
+            <a href="https://wa.me/919600038089" style={{ color: '#ffb400', fontWeight: 'bold', textDecoration: 'none' }}>
+              Contact Sourcing Desk
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
 
-const loginContainer = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f1f5f9' };
-const loginCard = { padding: '40px', backgroundColor: '#fff', borderRadius: '12px', textAlign: 'center' as const, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', maxWidth: '400px' };
-const inputStyle = { width: '100%', padding: '12px', margin: '20px 0', borderRadius: '6px', border: '1px solid #cbd5e1' };
-const btnStyle = { width: '100%', padding: '12px', backgroundColor: '#002d5b', color: '#ffb400', border: 'none', borderRadius: '6px', fontWeight: 'bold' as const, cursor: 'pointer' };
+// STYLES
+const containerStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: '100vh',
+  backgroundColor: '#001a35',
+  backgroundImage: 'radial-gradient(circle at center, #002d5b 0%, #001a35 100%)',
+  padding: '20px'
+};
+
+const loginCardStyle = {
+  backgroundColor: '#ffffff',
+  padding: '40px',
+  borderRadius: '16px',
+  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+  width: '100%',
+  maxWidth: '400px'
+};
+
+const labelStyle = {
+  display: 'block',
+  fontSize: '0.7rem',
+  fontWeight: '800',
+  color: '#94a3b8',
+  marginBottom: '8px',
+  letterSpacing: '1px'
+};
+
+const inputStyle = {
+  width: '100%',
+  padding: '14px 18px',
+  borderRadius: '8px',
+  border: '2px solid #f1f5f9',
+  fontSize: '1rem',
+  outline: 'none',
+  transition: 'border-color 0.2s ease',
+  color: '#001a35',
+  boxSizing: 'border-box' as const
+};
+
+const buttonStyle = {
+  width: '100%',
+  backgroundColor: '#ffb400',
+  color: '#001a35',
+  padding: '16px',
+  borderRadius: '8px',
+  border: 'none',
+  fontSize: '1rem',
+  fontWeight: '800',
+  cursor: 'pointer',
+  transition: 'transform 0.1s ease',
+  boxShadow: '0 4px 12px rgba(255, 180, 0, 0.3)'
+};
+
+const errorStyle = {
+  color: '#ef4444',
+  fontSize: '0.8rem',
+  fontWeight: 'bold',
+  marginBottom: '15px',
+  textAlign: 'center' as const
+};

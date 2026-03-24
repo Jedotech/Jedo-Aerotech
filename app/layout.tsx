@@ -1,36 +1,34 @@
-import './globals.css'
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import type { Metadata, Viewport } from "next";
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'] })
-
+// 1. GLOBAL METADATA (SEO & Branding)
 export const metadata: Metadata = {
-  title: 'Jedo Technologies | Global Aviation Sourcing Chennai',
-  description: 'Premier sourcing agency for Cessna, Piper, and Diamond aircraft parts. FAA 8130-3 & EASA Form 1 certified parts with Indian customs clearance.',
-  keywords: 'Aircraft parts India, Cessna parts Chennai, Piper parts sourcing, Aviation MRO India, Jedo Tech',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  title: "Jedo Technologies | Aviation Tyre Hub",
+  description: "Specialized aircraft tyre sourcing and fleet intelligence for training fleets in India.",
   icons: {
-    icon: '/favicon.ico', // Ensure you have a favicon.ico in your /public folder
+    icon: "/favicon.ico", // Ensure you have a favicon in your public folder
   },
-}
+};
+
+// 2. GLOBAL VIEWPORT (Fixed the Mobile Scaling Error)
+// This replaces the old 'viewport' inside metadata and fixes the build errors.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode
-}) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="en" style={{ scrollBehavior: 'smooth' }}>
-      <head>
-        {/* Global SEO and Social Media Meta Tags */}
-        <meta property="og:title" content="Jedo Technologies | Aviation Sourcing" />
-        <meta property="og:description" content="Certified aircraft parts delivered to your hangar in India." />
-        <meta property="og:image" content="/hero-aircraft.png" />
-        <meta name="theme-color" content="#002d5b" />
-      </head>
-      <body className={inter.className} style={{ margin: 0, padding: 0, boxSizing: 'border-box' }}>
+    <html lang="en">
+      <body style={{ margin: 0, padding: 0, boxSizing: 'border-box' }}>
         {children}
       </body>
     </html>
-  )
+  );
 }

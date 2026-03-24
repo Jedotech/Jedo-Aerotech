@@ -42,7 +42,7 @@ export default function HomePage() {
   const whatsappNumber = "919600038089"; 
   const contactEmail = "tajesudoss@gmail.com";
 
-  // STRUCTURED RFQ MESSAGE
+  // RFQ Template for WhatsApp
   const waMessage = encodeURIComponent(
     `Jedo Tech RFQ Inquiry\n---\nPart Number: \nDescription: \nAOG Status (Yes/No): \nQuantity: `
   );
@@ -83,31 +83,50 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. CORE CAPABILITIES (Improved for Mobile) */}
+      {/* 3. INTELLIGENCE PULSE BAR */}
+      <div style={{...pulseBarContainer, flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '15px' : '40px'}}>
+        <div style={pulseItem}>
+          <span style={pulseDot}></span>
+          <span style={pulseLabel}>HUB STATUS:</span>
+          <span style={pulseValue}>CHENNAI ACTIVE</span>
+        </div>
+        {!isMobile && <div style={pulseDivider}></div>}
+        <div style={pulseItem}>
+          <span style={pulseLabel}>ACTIVE FLEET:</span>
+          <span style={pulseValue}>{stats.total} AIRCRAFT</span>
+        </div>
+        {!isMobile && <div style={pulseDivider}></div>}
+        <div style={pulseItem}>
+          <span style={pulseLabel}>FLEET SAFETY:</span>
+          <span style={pulseValue}>{stats.health}% OPTIMAL</span>
+        </div>
+      </div>
+
+      {/* 4. CORE CAPABILITIES */}
       <section style={{ padding: isMobile ? '60px 20px' : '100px 20px', maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: isMobile ? '30px' : '60px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '40px' }}>
           <div style={featureCardStyle}>
-            <div style={featureIconStyle}>🌐</div>
+            <div style={{ fontSize: '2.5rem', marginBottom: '20px' }}>🌐</div>
             <h3 style={featureTitleStyle}>Global Procurement</h3>
             <p style={featureTextStyle}>Direct access to MRO inventory in Singapore and USA hubs for rapid dispatch.</p>
           </div>
           <div style={featureCardStyle}>
-            <div style={featureIconStyle}>🛡️</div>
+            <div style={{ fontSize: '2.5rem', marginBottom: '20px' }}>🛡️</div>
             <h3 style={featureTitleStyle}>Technical Verification</h3>
             <p style={featureTextStyle}>Every unit is sourced with full traceability and digital airworthiness documentation.</p>
           </div>
           <div style={featureCardStyle}>
-            <div style={featureIconStyle}>🚚</div>
+            <div style={{ fontSize: '2.5rem', marginBottom: '20px' }}>🚚</div>
             <h3 style={featureTitleStyle}>Hangar Delivery</h3>
             <p style={featureTextStyle}>Seamless customs handling and last-mile delivery to any flight school in India.</p>
           </div>
         </div>
       </section>
 
-      {/* 4. PROFESSIONAL CONTACT HUB */}
+      {/* 5. PROFESSIONAL CONTACT HUB */}
       <section style={{ backgroundColor: '#001529', color: 'white', padding: isMobile ? '60px 20px' : '100px 20px', textAlign: 'center' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: isMobile ? '1.8rem' : '2.5rem', fontWeight: '800', marginBottom: '20px', letterSpacing: '-0.5px' }}>
+          <h2 style={{ fontSize: isMobile ? '1.8rem' : '2.5rem', fontWeight: '800', marginBottom: '20px' }}>
             URGENT SOURCING & AOG
           </h2>
           <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginBottom: '40px' }}>
@@ -115,7 +134,7 @@ export default function HomePage() {
           </p>
           
           <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'center', gap: isMobile ? '20px' : '40px' }}>
-            <a href={`tel:+${whatsappNumber}`} style={contactBoxStyle}>
+            <a href={`tel:+919600038089`} style={contactBoxStyle}>
               <span style={{ color: '#ffb400', fontSize: '0.8rem', fontWeight: 'bold' }}>TELEPHONE</span>
               <span style={{ fontSize: '1.3rem', fontWeight: '700' }}>+91 96000 38089</span>
             </a>
@@ -127,7 +146,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FLOATING WHATSAPP BUTTON (RFQ TEMPLATE) */}
+      {/* FLOATING WHATSAPP BUTTON */}
       <a 
         href={`https://wa.me/${whatsappNumber}?text=${waMessage}`} 
         target="_blank" 
@@ -139,7 +158,7 @@ export default function HomePage() {
       </a>
 
       {/* FOOTER */}
-      <footer style={{ backgroundColor: '#000c17', color: 'rgba(255,255,255,0.3)', padding: '40px 20px', textAlign: 'center', fontSize: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <footer style={{ backgroundColor: '#000c17', color: 'rgba(255,255,255,0.3)', padding: '40px 20px', textAlign: 'center', fontSize: '0.75rem' }}>
         <p>© 2026 Jedo Technologies Pvt. Ltd. | DGCA & International Standards Compliance</p>
       </footer>
     </div>
@@ -151,39 +170,17 @@ const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems:
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: '600' as const, fontSize: '0.8rem', opacity: 0.8, letterSpacing: '1px' };
 const intelTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, border: '1px solid #ffb400', padding: '8px 15px', borderRadius: '4px' };
 const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const };
-
 const heroSectionStyle = { minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'linear-gradient(rgba(0,12,23,0.7), rgba(0,12,23,0.7)), url("/hero-aircraft.png")', backgroundSize: 'cover', backgroundPosition: 'center', color: 'white', textAlign: 'center' as const };
 const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '16px 36px', borderRadius: '4px', textDecoration: 'none', fontWeight: '800' as const, fontSize: '1rem' };
 const secondaryButtonStyle = { backgroundColor: 'transparent', color: 'white', padding: '16px 36px', borderRadius: '4px', textDecoration: 'none', fontWeight: '800' as const, fontSize: '1rem', border: '2px solid white' };
-
+const pulseBarContainer = { backgroundColor: '#001a35', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', borderBottom: '1px solid rgba(255,255,255,0.1)' };
+const pulseItem = { display: 'flex', alignItems: 'center', gap: '10px' };
+const pulseDot = { height: '8px', width: '8px', backgroundColor: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981' };
+const pulseLabel = { fontSize: '0.7rem', fontWeight: '900', color: '#94a3b8', letterSpacing: '1px' };
+const pulseValue = { fontSize: '0.9rem', fontWeight: 'bold', color: 'white' };
+const pulseDivider = { height: '20px', width: '1px', backgroundColor: 'rgba(255,255,255,0.2)' };
 const featureCardStyle = { textAlign: 'center' as const, padding: '20px' };
-const featureIconStyle = { fontSize: '2.5rem', marginBottom: '20px', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' };
-const featureTitleStyle = { color: '#001a35', fontSize: '1.3rem', fontWeight: '800', marginBottom: '15px', letterSpacing: '-0.3px' };
+const featureTitleStyle = { color: '#001a35', fontSize: '1.3rem', fontWeight: '800', marginBottom: '15px' };
 const featureTextStyle = { color: '#475569', lineHeight: '1.7', fontSize: '0.95rem' };
-
-const contactBoxStyle = { 
-  display: 'flex', 
-  flexDirection: 'column' as const, 
-  backgroundColor: 'rgba(255,255,255,0.05)', 
-  padding: '25px 40px', 
-  borderRadius: '8px', 
-  border: '1px solid rgba(255,255,255,0.1)',
-  textDecoration: 'none',
-  color: 'white',
-  transition: 'all 0.3s ease'
-};
-
-const whatsappFloatingStyle = {
-  position: 'fixed' as const,
-  bottom: '30px',
-  right: '30px',
-  backgroundColor: '#25D366',
-  color: 'white',
-  padding: '14px 24px',
-  borderRadius: '50px',
-  display: 'flex',
-  alignItems: 'center',
-  textDecoration: 'none',
-  boxShadow: '0 15px 30px rgba(37, 211, 102, 0.3)',
-  zIndex: 10000
-};
+const contactBoxStyle = { display: 'flex', flexDirection: 'column' as const, backgroundColor: 'rgba(255,255,255,0.05)', padding: '25px 40px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', color: 'white' };
+const whatsappFloatingStyle = { position: 'fixed' as const, bottom: '30px', right: '30px', backgroundColor: '#25D366', color: 'white', padding: '14px 24px', borderRadius: '50px', display: 'flex', alignItems: 'center', textDecoration: 'none', boxShadow: '0 15px 30px rgba(37, 211, 102, 0.3)', zIndex: 10000 };
