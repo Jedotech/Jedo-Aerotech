@@ -45,7 +45,6 @@ export default function Marketplace() {
     async function fetchData() {
       setLoading(true)
       try {
-        // Querying documents of type 'part' now in the production dataset
         const partData = await client.fetch(`*[_type == "part"] | order(aircraftType asc)`)
         setParts(partData || [])
         setFilteredParts(partData || [])
@@ -204,10 +203,15 @@ const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.8rem
 const switcherContainer = { display: 'flex', border: '1px solid #ffb400', borderRadius: '4px', overflow: 'hidden' as const };
 const activeToggle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '6px 15px', fontWeight: 'bold' as const, cursor: 'pointer' };
 const inactiveToggle = { backgroundColor: 'transparent', color: '#ffb400', border: 'none', padding: '6px 15px', cursor: 'pointer' };
-const searchBarStyle = { width: '100%', padding: '20px 40px', borderRadius: '100px', border: '1px solid #e2e8f0', fontSize: '1rem', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', boxSizing: 'border-box' as const };
-const tableWrapperStyle = { overflowX: 'auto' as const, backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' };
-const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900' as const, letterSpacing: '1px' };
-const trStyle = { borderBottom: '1px solid #f1f5f9' };
+
+// UPDATED: Brightened search bar border (2px solid Navy)
+const searchBarStyle = { width: '100%', padding: '20px 40px', borderRadius: '100px', border: '2px solid #001a35', fontSize: '1rem', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', boxSizing: 'border-box' as const };
+
+// UPDATED: Brightened table wrapper border
+const tableWrapperStyle = { overflowX: 'auto' as const, backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #001a35' };
+
+const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900' as const, letterSpacing: '1px', borderRight: '1px solid rgba(255,255,255,0.1)' };
+const trStyle = { borderBottom: '1px solid #001a35' }; // Brightened row borders
 const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' };
 const badgeStyle = { backgroundColor: '#fff7e6', color: '#ffb400', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' as const };
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.75rem' };
