@@ -34,8 +34,6 @@ export default function Marketplace() {
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
 
-  const whatsappNumber = "919600038089"
-
   useEffect(() => {
     setMounted(true)
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -76,6 +74,14 @@ export default function Marketplace() {
     return `$${(priceUSD || 0).toLocaleString('en-US')}`
   }
 
+  // Smooth scroll function for Inquire button
+  const scrollToSourcing = () => {
+    const element = document.getElementById('rfq');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
   if (!mounted) return null
 
   if (loading) {
@@ -92,18 +98,15 @@ export default function Marketplace() {
   return (
     <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* 1. NAVIGATION */}
+      {/* 1. NAVIGATION - Home moved to right, Fleet removed */}
       <nav style={navBarStyle}>
+        <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-          <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
-          <div style={{ display: 'flex', gap: '25px' }}>
-            <Link href="/" style={navLinkStyle}>HOME</Link>
-            <Link href="/fleet-health" style={navLinkStyle}>FLEET HEALTH</Link>
+          <div style={switcherContainer}>
+            <button onClick={() => setCurrency('USD')} style={currency === 'USD' ? activeToggle : inactiveToggle}>USD</button>
+            <button onClick={() => setCurrency('INR')} style={currency === 'INR' ? activeToggle : inactiveToggle}>INR</button>
           </div>
-        </div>
-        <div style={switcherContainer}>
-          <button onClick={() => setCurrency('USD')} style={currency === 'USD' ? activeToggle : inactiveToggle}>USD</button>
-          <button onClick={() => setCurrency('INR')} style={currency === 'INR' ? activeToggle : inactiveToggle}>INR</button>
+          <Link href="/" style={navLinkStyle}>HOME</Link>
         </div>
       </nav>
 
@@ -152,7 +155,7 @@ export default function Marketplace() {
                   <td style={tdStyle}><b>{formatPrice(part.priceUSD)}</b></td>
                   <td style={tdStyle}>{part.warehouse}</td>
                   <td style={tdStyle}>
-                    <a href={`https://wa.me/${whatsappNumber}?text=RFQ for PN: ${part.partNumber}`} target="_blank" style={inquireButtonStyle}>INQUIRE</a>
+                    <button onClick={scrollToSourcing} style={inquireButtonStyle}>INQUIRE</button>
                   </td>
                 </tr>
               )) : (
@@ -204,17 +207,15 @@ const switcherContainer = { display: 'flex', border: '1px solid #ffb400', border
 const activeToggle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '6px 15px', fontWeight: 'bold' as const, cursor: 'pointer' };
 const inactiveToggle = { backgroundColor: 'transparent', color: '#ffb400', border: 'none', padding: '6px 15px', cursor: 'pointer' };
 
-// UPDATED: Brightened search bar border (2px solid Navy)
 const searchBarStyle = { width: '100%', padding: '20px 40px', borderRadius: '100px', border: '2px solid #001a35', fontSize: '1rem', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', boxSizing: 'border-box' as const };
 
-// UPDATED: Brightened table wrapper border
 const tableWrapperStyle = { overflowX: 'auto' as const, backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #001a35' };
 
 const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900' as const, letterSpacing: '1px', borderRight: '1px solid rgba(255,255,255,0.1)' };
-const trStyle = { borderBottom: '1px solid #001a35' }; // Brightened row borders
+const trStyle = { borderBottom: '1px solid #001a35' };
 const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' };
 const badgeStyle = { backgroundColor: '#fff7e6', color: '#ffb400', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' as const };
-const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.75rem' };
+const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', border: 'none', fontWeight: 'bold' as const, fontSize: '0.75rem', cursor: 'pointer' };
 
 const formSectionStyle = { marginTop: '80px', backgroundColor: '#001a35', padding: '40px', borderRadius: '20px', maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto', boxShadow: '0 30px 60px rgba(0,0,0,0.2)' };
 const formGridStyle = { display: 'flex', flexDirection: 'column' as const, gap: '20px' };
