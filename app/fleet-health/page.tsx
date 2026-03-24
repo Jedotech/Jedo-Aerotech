@@ -4,149 +4,142 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. TYPE-SAFE INTERFACE
-interface InventoryPart {
+// 1. DATA INTERFACE (Aligned with src/sanity/schemaTypes/fleet.ts)
+interface FleetAsset {
   _id: string;
+  aircraftType: string;
   partNumber: string;
-  description: string;
-  price?: number;
-  stockStatus?: string;
-  condition?: string;
-  location?: string; // e.g., 'Chennai Hangar 1'
-  imageUrl?: string;
+  totalLandings: number;
+  maxDesignLife: number;
+  ownerEmail: string;
 }
 
 const client = createClient({
   projectId: 'm2pa474h', 
-  dataset: 'production',
+  dataset: 'production', // Pointing to the merged production dataset
   apiVersion: '2023-05-03',
-  useCdn: false, 
+  useCdn: true, // Staying within Sanity free tier API quotas
 })
 
-export default function InventoryPage() {
-  const [items, setItems] = useState<InventoryPart[]>([])
-  const [filteredItems, setFilteredItems] = useState<InventoryPart[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [isMobile, setIsMobile] = useState(false)
+export default function FleetHealth() {
+  const [assets, setAssets] = useState<FleetAsset[]>([])
+  const [loading, setLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-
-    async function fetchInventory() {
-      const query = `*[_type == "part"]{
-        _id,
-        partNumber,
-        description,
-        price,
-        stockStatus,
-        condition,
-        location,
-        "imageUrl": image.asset->url
-      }`
+    setMounted(true)
+    async function fetchFleet() {
       try {
-        const data = await client.fetch(query)
-        setItems(data)
-        setFilteredItems(data)
+        // Querying for 'fleet' type documents now in the production bucket
+        const data = await client.fetch(`*[_type == "fleet"] | order(aircraftType asc)`)
+        setAssets(data || [])
       } catch (e) {
-        console.error("Inventory fetch error", e)
+        console.error("Fleet Sync Error:", e)
+      } finally {
+        setLoading(false)
       }
     }
-    fetchInventory()
-    return () => window.removeEventListener('resize', checkMobile)
+    fetchFleet()
   }, [])
 
-  // SEARCH LOGIC
-  useEffect(() => {
-    const results = items.filter((item) =>
-      item.partNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const calculateHealth = (current: number, max: number) => {
+    const totalMax = max || 350; // Fallback to schema initialValue
+    const remaining = totalMax - current
+    const percentage = (remaining / totalMax) * 100
+    return Math.max(0, Math.min(100, percentage)).toFixed(1)
+  }
+
+  if (!mounted) return null
+
+  if (loading) {
+    return (
+      <div style={loaderStyle}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ color: '#ffb400', fontWeight: 'bold', letterSpacing: '3px' }}>INITIALIZING FLEET INTELLIGENCE...</p>
+          <p style={{ fontSize: '0.8rem', color: '#ffffff', opacity: 0.6 }}>Synchronizing Lifecycle Data</p>
+        </div>
+      </div>
     )
-    setFilteredItems(results)
-  }, [searchTerm, items])
+  }
 
   return (
-    <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* 1. TOP NAVIGATION */}
-      <nav style={navStyle}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <Link href="/">
-            <img src="/jedo-logo.png" alt="Jedo" style={{ height: '30px' }} />
-          </Link>
-          <span style={dividerStyle}>|</span>
-          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '0.9rem' }}>INVENTORY CONTROL</span>
+      {/* NAVIGATION */}
+      <nav style={navBarStyle}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
+          <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
+          <div style={{ display: 'flex', gap: '25px' }}>
+            <Link href="/" style={navLinkStyle}>HOME</Link>
+            <Link href="/marketplace" style={navLinkStyle}>MARKETPLACE</Link>
+          </div>
         </div>
-        <Link href="https://jedo-fleet-intel.vercel.app/studio" target="_blank" style={adminButtonStyle}>
-          + ADD STOCK
-        </Link>
+        <div style={statusBadge}>NETWORK STATUS: PRODUCTION DATASET</div>
       </nav>
 
-      {/* 2. SEARCH & SUMMARY HEADER */}
-      <header style={{ padding: isMobile ? '20px' : '40px 60px', backgroundColor: 'white', borderBottom: '1px solid #e2e8f0' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
-          <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#001a35', margin: 0 }}>Global Parts Repository</h1>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '5px 0 0' }}>{items.length} Total Units | {items.filter(i => i.stockStatus !== 'OUT OF STOCK').length} Available</p>
-          </div>
-          <div style={{ width: isMobile ? '100%' : '400px' }}>
-            <input 
-              type="text" 
-              placeholder="Filter by PN or Description..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={searchFieldStyle}
-            />
-          </div>
-        </div>
+      {/* HEADER */}
+      <header style={{ padding: '100px 40px 40px', maxWidth: '1440px', margin: '0 auto' }}>
+        <h1 style={{ color: '#001a35', fontWeight: '900', fontSize: '2.5rem', margin: 0 }}>
+          FLEET <span style={{ color: '#ffb400' }}>HEALTH</span> MONITOR
+        </h1>
+        <p style={{ color: '#94a3b8', fontWeight: '600', marginTop: '10px', fontSize: '0.9rem' }}>
+          Predictive Maintenance & Component Lifecycle Intelligence
+        </p>
       </header>
 
-      {/* 3. INVENTORY LIST */}
-      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '20px' : '40px 60px' }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(340px, 1fr))', 
-          gap: '20px' 
-        }}>
-          {filteredItems.length > 0 ? filteredItems.map((item) => (
-            <div key={item._id} style={itemCardStyle}>
-              <div style={{ display: 'flex', gap: '15px' }}>
-                <div style={imageThumbStyle}>
-                  <img 
-                    src={item.imageUrl || '/tyre-placeholder.png'} 
-                    alt="part" 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                  />
+      {/* ASSET GRID */}
+      <main style={{ padding: '0 40px 80px', maxWidth: '1440px', margin: '0 auto' }}>
+        <div style={gridStyle}>
+          {assets.length > 0 ? assets.map((asset) => {
+            const health = parseFloat(calculateHealth(asset.totalLandings, asset.maxDesignLife))
+            const isCritical = health < 20
+            const isWarning = health >= 20 && health < 45
+
+            return (
+              <div key={asset._id} style={cardStyle}>
+                <div style={cardHeader}>
+                  <span style={typeBadge}>{asset.aircraftType || 'Unassigned Model'}</span>
+                  <span style={{ ...healthText, color: isCritical ? '#ef4444' : isWarning ? '#ffb400' : '#10b981' }}>
+                    {health}% REMAINING
+                  </span>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <span style={pnLabelStyle}>{item.partNumber}</span>
-                    <span style={statusBadgeStyle(item.stockStatus || 'AVAILABLE')}>
-                      {item.stockStatus || 'AVAILABLE'}
-                    </span>
+
+                <div style={dataRow}>
+                  <span style={label}>PART NUMBER</span>
+                  <span style={value}>{asset.partNumber || 'N/A'}</span>
+                </div>
+
+                <div style={progressContainer}>
+                  <div style={{ 
+                    ...progressFill, 
+                    width: `${health}%`, 
+                    backgroundColor: isCritical ? '#ef4444' : isWarning ? '#ffb400' : '#10b981' 
+                  }}></div>
+                </div>
+
+                <div style={statsRow}>
+                  <div>
+                    <div style={statLabel}>LANDINGS</div>
+                    <div style={statValue}>{asset.totalLandings}</div>
                   </div>
-                  <h3 style={descStyle}>{item.description}</h3>
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <span style={metaLabelStyle}>COND: <b style={{color: '#001a35'}}>{item.condition || 'NEW'}</b></span>
-                    <span style={metaLabelStyle}>LOC: <b style={{color: '#001a35'}}>{item.location || 'CHENNAI'}</b></span>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={statLabel}>DESIGN LIFE</div>
+                    <div style={statValue}>{asset.maxDesignLife}</div>
                   </div>
+                </div>
+
+                <div style={cardFooter}>
+                  <span style={ownerInfo}>{asset.ownerEmail || 'No Operator Assigned'}</span>
+                  <Link href={`mailto:${asset.ownerEmail}`} style={actionBtn}>
+                    CONTACT OPS
+                  </Link>
                 </div>
               </div>
-              <div style={cardFooterStyle}>
-                <span style={{ fontWeight: '800', color: '#001a35' }}>₹{item.price?.toLocaleString('en-IN') || '---'}</span>
-                <Link 
-                  href={`https://jedo-fleet-intel.vercel.app/studio/structure/part;${item._id}`}
-                  target="_blank"
-                  style={editButtonStyle}
-                >
-                  EDIT RECORD
-                </Link>
-              </div>
-            </div>
-          )) : (
-            <div style={{ textAlign: 'center', gridColumn: '1/-1', padding: '100px 0' }}>
-              <p style={{ color: '#64748b', fontSize: '1.1rem' }}>No stock items found.</p>
+            )
+          }) : (
+            <div style={emptyState}>
+              <p>No fleet assets detected in the production dataset.</p>
+              <p style={{ fontSize: '0.8rem', fontWeight: 'normal', marginTop: '10px' }}>Verify documents are "Published" in Sanity Studio.</p>
             </div>
           )}
         </div>
@@ -155,27 +148,31 @@ export default function InventoryPage() {
   )
 }
 
-// STYLES
-const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 25px', backgroundColor: '#001a35' };
-const dividerStyle = { color: 'rgba(255,255,255,0.2)', fontSize: '1.2rem' };
-const adminButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 16px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.8rem' };
+// --- PROFESSIONAL STYLING ---
+const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#001a35', boxSizing: 'border-box' as const };
+const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold' as const, letterSpacing: '1px' };
+const statusBadge = { color: '#ffb400', fontSize: '0.65rem', fontWeight: '900', letterSpacing: '1px', border: '1px solid #ffb400', padding: '4px 12px', borderRadius: '4px' };
 
-const searchFieldStyle = { width: '100%', padding: '12px 20px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none', backgroundColor: '#f8fafc', boxSizing: 'border-box' as const };
+const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '30px' };
+const cardStyle = { backgroundColor: 'white', borderRadius: '16px', padding: '25px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' };
+const cardHeader = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' };
+const typeBadge = { backgroundColor: '#001a35', color: 'white', padding: '5px 12px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold' as const };
+const healthText = { fontSize: '0.85rem', fontWeight: '900' as const };
 
-const itemCardStyle = { backgroundColor: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' as const, gap: '15px' };
-const imageThumbStyle = { width: '70px', height: '70px', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#f1f5f9', flexShrink: 0 };
-const pnLabelStyle = { fontSize: '0.7rem', fontWeight: '900', color: '#ffb400', letterSpacing: '0.5px' };
-const descStyle = { fontSize: '1rem', fontWeight: '700', color: '#001a35', margin: '4px 0 0', lineHeight: '1.3' };
-const metaLabelStyle = { fontSize: '0.65rem', color: '#94a3b8', fontWeight: 'bold' as const };
+const dataRow = { display: 'flex', justifyContent: 'space-between', marginBottom: '15px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' };
+const label = { color: '#94a3b8', fontSize: '0.7rem', fontWeight: 'bold' as const };
+const value = { color: '#001a35', fontSize: '0.8rem', fontWeight: '800' as const };
 
-const statusBadgeStyle = (status: string) => ({
-  fontSize: '0.6rem',
-  fontWeight: '800' as const,
-  padding: '3px 8px',
-  borderRadius: '4px',
-  backgroundColor: status === 'OUT OF STOCK' ? '#fee2e2' : '#dcfce7',
-  color: status === 'OUT OF STOCK' ? '#ef4444' : '#10b981'
-});
+const progressContainer = { height: '8px', backgroundColor: '#f1f5f9', borderRadius: '10px', marginBottom: '20px', overflow: 'hidden' as const };
+const progressFill = { height: '100%', borderRadius: '10px', transition: 'width 1s ease-in-out' };
 
-const cardFooterStyle = { borderTop: '1px solid #f1f5f9', paddingTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
-const editButtonStyle = { fontSize: '0.75rem', fontWeight: 'bold' as const, color: '#64748b', textDecoration: 'none', padding: '5px 10px', border: '1px solid #e2e8f0', borderRadius: '4px' };
+const statsRow = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '25px' };
+const statLabel = { color: '#94a3b8', fontSize: '0.65rem', fontWeight: 'bold' as const, marginBottom: '4px' };
+const statValue = { color: '#001a35', fontSize: '1.2rem', fontWeight: '900' as const };
+
+const cardFooter = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '20px', borderTop: '1px solid #f1f5f9' };
+const ownerInfo = { fontSize: '0.7rem', color: '#64748b', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis' };
+const actionBtn = { fontSize: '0.7rem', color: '#ffb400', fontWeight: 'bold' as const, textDecoration: 'none', border: '1px solid #ffb400', padding: '4px 10px', borderRadius: '4px' };
+
+const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400' };
+const emptyState = { gridColumn: '1 / -1', textAlign: 'center' as const, padding: '100px', color: '#94a3b8', border: '2px dashed #e2e8f0', borderRadius: '20px', backgroundColor: '#ffffff' };
