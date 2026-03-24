@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// STRICT INTERFACE FOR BUILD STABILITY
+// 1. DATA INTERFACE (Exact Sanity field names)
 interface AviationPart {
   _id: string;
   "Aircraft Model": string;
@@ -53,7 +53,7 @@ export default function Marketplace() {
         const rateData = await rateRes.json()
         if (rateData?.rates?.INR) setExchangeRate(rateData.rates.INR)
       } catch (e) { 
-        console.error("Sync Error:", e) 
+        console.error("Sanity Sync Error:", e) 
       } finally {
         setLoading(false)
       }
@@ -85,7 +85,7 @@ export default function Marketplace() {
   return (
     <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* 1. PROFESSIONAL NAV */}
+      {/* 1. NAVIGATION */}
       <nav style={navBarStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
@@ -102,7 +102,6 @@ export default function Marketplace() {
         <h1 style={{ color: '#001a35', fontWeight: '900', fontSize: '2.5rem', margin: '0 0 10px' }}>
           AIRCRAFT <span style={{ color: '#ffb400' }}>TYRE</span> INVENTORY
         </h1>
-        <p style={{ color: '#94a3b8', fontWeight: '600', fontSize: '0.9rem', marginBottom: '40px' }}>REAL-TIME STOCK FROM CHENNAI & USA HUBS</p>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <input 
             type="text" 
@@ -153,42 +152,49 @@ export default function Marketplace() {
           </table>
         </div>
 
-        {/* 4. SOURCING REQUEST FORM */}
+        {/* 4. SOURCING REQUEST CARD (3-ROW STRUCTURE) */}
         <section id="rfq" style={formSectionStyle}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <h2 style={{ color: '#ffffff', fontWeight: '900', fontSize: '1.8rem', margin: 0 }}>SUBMIT <span style={{ color: '#ffb400' }}>SOURCING</span> REQUEST</h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '10px' }}>Global supply chain support for AOG and routine maintenance.</p>
           </div>
           
           <form action="https://formspree.io/f/mdalbdqq" method="POST" style={formGridStyle}>
             <input type="hidden" name="_next" value="https://jedotech.com/success" />
             
-            <div style={inputContainer}>
-              <label style={labelStyle}>Buyer Name</label>
-              <input name="buyerName" type="text" placeholder="Full Name" required style={inputStyle} />
+            {/* ROW 1: Name & Email */}
+            <div style={rowStyle}>
+              <div style={inputGroup}>
+                <label style={labelStyle}>Full Name / Buyer</label>
+                <input name="buyerName" type="text" placeholder="Enter name" required style={inputStyle} />
+              </div>
+              <div style={inputGroup}>
+                <label style={labelStyle}>Email Address</label>
+                <input name="email" type="email" placeholder="official@company.com" required style={inputStyle} />
+              </div>
             </div>
 
-            <div style={inputContainer}>
-              <label style={labelStyle}>Email Address</label>
-              <input name="email" type="email" placeholder="official@company.com" required style={inputStyle} />
+            {/* ROW 2: Part Number & Aircraft Model */}
+            <div style={rowStyle}>
+              <div style={inputGroup}>
+                <label style={labelStyle}>Part Number</label>
+                <input name="partNumber" type="text" placeholder="Specify PN" style={inputStyle} />
+              </div>
+              <div style={inputGroup}>
+                <label style={labelStyle}>Aircraft Model</label>
+                <input name="aircraft" type="text" placeholder="e.g. Cessna 172" required style={inputStyle} />
+              </div>
             </div>
 
-            <div style={inputContainer}>
-              <label style={labelStyle}>Aircraft Model</label>
-              <input name="aircraft" type="text" placeholder="e.g. Cessna 152" required style={inputStyle} />
+            {/* ROW 3: Technical Requirements */}
+            <div style={{ width: '100%' }}>
+              <div style={inputGroup}>
+                <label style={labelStyle}>Technical Requirements</label>
+                <textarea name="description" placeholder="Specify size, ply, condition, and quantity..." required style={{...inputStyle, height: '100px'}} />
+              </div>
             </div>
 
-            <div style={inputContainer}>
-              <label style={labelStyle}>Part Number</label>
-              <input name="partNumber" type="text" placeholder="PN (Optional)" style={inputStyle} />
-            </div>
-
-            <div style={{ ...inputContainer, gridColumn: isMobile ? 'span 1' : 'span 2' }}>
-              <label style={labelStyle}>Technical Requirements</label>
-              <textarea name="description" placeholder="Specify tyre size, ply rating, condition requirements..." required style={{...inputStyle, height: '100px'}} />
-            </div>
-
-            <div style={{ gridColumn: isMobile ? 'span 1' : 'span 2', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+            {/* ROW 4: Centered Submit */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', width: '100%' }}>
                <button type="submit" style={submitButtonStyle}>SEND SOURCING REQUEST</button>
             </div>
           </form>
@@ -200,14 +206,14 @@ export default function Marketplace() {
 
 // --- CSS STYLES ---
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#001a35', boxSizing: 'border-box' as const };
-const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold' as const, letterSpacing: '1px' };
+const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold' as const };
 const switcherContainer = { display: 'flex', border: '1px solid #ffb400', borderRadius: '4px', overflow: 'hidden' as const };
 const activeToggle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '6px 15px', fontWeight: 'bold' as const, cursor: 'pointer' };
 const inactiveToggle = { backgroundColor: 'transparent', color: '#ffb400', border: 'none', padding: '6px 15px', cursor: 'pointer' };
 
 const searchBarStyle = { width: '100%', padding: '20px 40px', borderRadius: '100px', border: '1px solid #e2e8f0', fontSize: '1rem', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', boxSizing: 'border-box' as const };
 
-const tableWrapperStyle = { overflowX: 'auto' as const, backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', minHeight: '300px' };
+const tableWrapperStyle = { overflowX: 'auto' as const, backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' };
 const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900' as const, letterSpacing: '1px' };
 const trStyle = { borderBottom: '1px solid #f1f5f9' };
 const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' };
@@ -215,8 +221,9 @@ const badgeStyle = { backgroundColor: '#fff7e6', color: '#ffb400', padding: '4px
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.75rem' };
 
 const formSectionStyle = { marginTop: '100px', backgroundColor: '#001a35', padding: '60px', borderRadius: '24px', boxShadow: '0 30px 60px rgba(0,0,0,0.2)' };
-const formGridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' };
-const inputContainer = { display: 'flex', flexDirection: 'column' as const, gap: '10px' };
+const formGridStyle = { display: 'flex', flexDirection: 'column' as const, gap: '25px' };
+const rowStyle = { display: 'flex', gap: '25px', flexWrap: 'wrap' as const };
+const inputGroup = { display: 'flex', flexDirection: 'column' as const, gap: '10px', flex: 1, minWidth: '280px' };
 const labelStyle = { color: '#ffb400', fontSize: '0.7rem', fontWeight: 'bold' as const, letterSpacing: '1px' };
 const inputStyle = { padding: '15px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem', outline: 'none' };
 const submitButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '18px 60px', borderRadius: '8px', border: 'none', fontWeight: 'bold' as const, fontSize: '0.95rem', cursor: 'pointer' };
