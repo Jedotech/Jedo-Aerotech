@@ -113,7 +113,8 @@ export default function Marketplace() {
         setShowSuccess(true)
         setIsAOG(false)
         setFormData({ buyerName: '', email: '', organization: '', tailNumber: '', partNumber: '', aircraft: '', description: '' })
-        setTimeout(() => setShowSuccess(false), 6000)
+        // Increased to 10 seconds for professional review
+        setTimeout(() => setShowSuccess(false), 10000)
       }
     } finally {
       setIsSubmitting(false)
@@ -121,10 +122,10 @@ export default function Marketplace() {
   }
 
   if (!mounted) return null
-  if (loading) return <div style={loaderStyle}><p>INITIALIZING PROCUREMENT SYSTEM...</p></div>
+  if (loading) return <div style={loaderStyle}><p>ESTABLISHING SECURE CONNECTION...</p></div>
 
   return (
-    <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' }}>
       
       {/* 1. NAVIGATION */}
       <nav style={navBarStyle}>
@@ -140,29 +141,29 @@ export default function Marketplace() {
 
       {/* 2. SYSTEM STATUS */}
       <div style={intelBar}>
-        <div style={intelItem}><span style={pulseDot}></span> SYSTEM: ONLINE</div>
-        <div style={intelItem}>X-RATE: 1.00 USD = {exchangeRate.toFixed(2)} INR</div>
+        <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
+        <div style={intelItem}>X-RATE: 1 USD = {exchangeRate.toFixed(2)} INR</div>
         <div style={intelItem}>STANDARDS: DGCA / EASA / FAA</div>
       </div>
 
-      {/* 3. COMPACT SEARCH BAR */}
-      <section style={{ padding: '40px 60px 20px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '2px solid #001a35', paddingBottom: '15px' }}>
-          <h1 style={{ color: '#001a35', fontWeight: '900', fontSize: '1.8rem', margin: 0 }}>
-            INVENTORY <span style={{ color: '#ffb400' }}>MANIFEST</span>
-          </h1>
+      {/* 3. INVENTORY SECTION - WHITE BLOCK */}
+      <section style={whiteSection}>
+        <div style={{ padding: '40px 60px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
+          <div>
+            <h1 style={{ color: '#001a35', fontWeight: '900', fontSize: '1.8rem', margin: 0, letterSpacing: '-0.5px' }}>
+              INVENTORY <span style={{ color: '#ffb400' }}>MANIFEST</span>
+            </h1>
+            <p style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '4px' }}>Real-time availability for training fleet components</p>
+          </div>
           <input 
             type="text" 
-            placeholder="Search Part Number or Model..." 
+            placeholder="Search P/N or Model..." 
             style={searchBarStyle} 
             value={searchTerm} 
             onChange={(e) => setSearchTerm(e.target.value)} 
           />
         </div>
-      </section>
 
-      {/* 4. FULL-WIDTH TABLE */}
-      <main style={{ padding: '0 0 80px', flex: 1 }}>
         <div style={tableWrapperStyle}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
@@ -174,7 +175,7 @@ export default function Marketplace() {
                 <th style={thStyle}>CONDITION</th>
                 <th style={thStyle}>CERTIFICATION</th>
                 <th style={thStyle}>UNIT PRICE</th>
-                <th style={thStyle}>PROCUREMENT</th>
+                <th style={thStyle}>ACTION</th>
               </tr>
             </thead>
             <tbody>
@@ -202,105 +203,117 @@ export default function Marketplace() {
             </tbody>
           </table>
         </div>
+      </section>
 
-        {/* 5. COMPACT SOURCING REQUEST (3-COL GRID) */}
-        <section id="rfq" style={{...formSectionStyle, border: isAOG ? '2px solid #ef4444' : '1px solid #e2e8f0'}}>
-          
-          {showSuccess && <div style={successBanner}>✓ REQUEST TRANSMITTED. LOGISTICS DESK NOTIFIED.</div>}
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
-            <div>
-              <h2 style={{ color: '#001a35', fontWeight: '900', fontSize: '1.4rem', margin: 0 }}>
-                  SOURCING <span style={{ color: isAOG ? '#ef4444' : '#ffb400' }}>REQUEST</span>
-              </h2>
-              <p style={{fontSize: '0.75rem', color: '#64748b', margin: '5px 0 0'}}>Submit technical requirements for rapid procurement</p>
+      {/* 4. SOURCING SECTION - NAVY BLOCK FOR SEPARATION */}
+      <section id="rfq" style={navySection}>
+        <div style={formContainer}>
+          {showSuccess && (
+            <div style={successBanner}>
+              <div style={{ marginBottom: '5px' }}>✓ REQUEST TRANSMITTED SUCCESSFULLY</div>
+              <div style={{ fontSize: '0.65rem', opacity: 0.8 }}>Our logistics desk in Chennai has been notified.</div>
+              {/* Visual Countdown */}
+              <div style={countdownLine} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: isAOG ? '#ef4444' : '#f1f5f9', padding: '6px 12px', borderRadius: '4px', transition: '0.3s' }}>
-               <span style={{color: isAOG ? '#fff' : '#001a35', fontSize: '0.65rem', fontWeight: '800'}}>AOG PRIORITY</span>
-               <input type="checkbox" checked={isAOG} onChange={(e) => setIsAOG(e.target.checked)} style={{cursor: 'pointer'}} />
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+            <div>
+              <h2 style={{ color: '#ffb400', fontWeight: '900', fontSize: '1.5rem', margin: 0 }}>
+                GLOBAL <span style={{ color: '#ffffff' }}>SOURCING HUB</span>
+              </h2>
+              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginTop: '4px' }}>Request parts not listed in the current manifest</p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: isAOG ? '#ef4444' : 'rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '4px', transition: '0.3s' }}>
+              <span style={{ color: '#fff', fontSize: '0.65rem', fontWeight: '900' }}>AOG PRIORITY</span>
+              <input type="checkbox" checked={isAOG} onChange={(e) => setIsAOG(e.target.checked)} style={{ cursor: 'pointer' }} />
             </div>
           </div>
-          
+
           <form onSubmit={handleSubmit} style={formGridStyle}>
             <div style={gridRow3}>
-              <div style={inputGroup}><label style={labelStyle}>CONTACT PERSON</label>
-                <input value={formData.buyerName} onChange={(e)=>setFormData({...formData, buyerName: e.target.value})} type="text" placeholder="John Doe" required style={inputStyle} />
+              <div style={inputGroup}><label style={navyLabel}>PERSONNEL</label>
+                <input value={formData.buyerName} onChange={(e) => setFormData({ ...formData, buyerName: e.target.value })} type="text" placeholder="Contact Name" required style={navyInput} />
               </div>
-              <div style={inputGroup}><label style={labelStyle}>OFFICIAL EMAIL</label>
-                <input value={formData.email} onChange={(e)=>setFormData({...formData, email: e.target.value})} type="email" placeholder="ops@airline.com" required style={emailInputStyle} />
+              <div style={inputGroup}><label style={navyLabel}>OFFICIAL EMAIL</label>
+                <input value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} type="email" placeholder="ops@airline.com" required style={navyInput} />
               </div>
-              <div style={inputGroup}><label style={labelStyle}>ORGANIZATION</label>
-                <input value={formData.organization} onChange={(e)=>setFormData({...formData, organization: e.target.value})} type="text" placeholder="Flight School Name" required style={inputStyle} />
+              <div style={inputGroup}><label style={navyLabel}>ORGANIZATION</label>
+                <input value={formData.organization} onChange={(e) => setFormData({ ...formData, organization: e.target.value })} type="text" placeholder="Flight School / MRO" required style={navyInput} />
               </div>
             </div>
 
             <div style={gridRow3}>
-              <div style={inputGroup}><label style={labelStyle}>AIRCRAFT MODEL</label>
-                <input value={formData.aircraft} onChange={(e)=>setFormData({...formData, aircraft: e.target.value})} type="text" placeholder="Cessna 172" required style={inputStyle} />
+              <div style={inputGroup}><label style={navyLabel}>AIRCRAFT TYPE</label>
+                <input value={formData.aircraft} onChange={(e) => setFormData({ ...formData, aircraft: e.target.value })} type="text" placeholder="e.g. C172" required style={navyInput} />
               </div>
-              <div style={inputGroup}><label style={labelStyle}>PART NUMBER</label>
-                <input value={formData.partNumber} onChange={(e)=>setFormData({...formData, partNumber: e.target.value})} type="text" placeholder="P/N" style={inputStyle} />
+              <div style={inputGroup}><label style={navyLabel}>PART NUMBER</label>
+                <input value={formData.partNumber} onChange={(e) => setFormData({ ...formData, partNumber: e.target.value })} type="text" placeholder="Required P/N" style={navyInput} />
               </div>
-              <div style={inputGroup}><label style={labelStyle}>TAIL NUMBER</label>
-                <input value={formData.tailNumber} onChange={(e)=>setFormData({...formData, tailNumber: e.target.value})} type="text" placeholder="VT-XXX" style={inputStyle} />
+              <div style={inputGroup}><label style={navyLabel}>TAIL NUMBER</label>
+                <input value={formData.tailNumber} onChange={(e) => setFormData({ ...formData, tailNumber: e.target.value })} type="text" placeholder="VT-XXX" style={navyInput} />
               </div>
             </div>
 
             <div style={{ width: '100%' }}>
-              <div style={inputGroup}><label style={labelStyle}>TECHNICAL SPECIFICATIONS / REMARKS</label>
-                <textarea value={formData.description} onChange={(e)=>setFormData({...formData, description: e.target.value})} placeholder="Specify quantity, certification needs, and required delivery date..." required style={{...inputStyle, height: '60px'}} />
+              <div style={inputGroup}><label style={navyLabel}>TECHNICAL SPECIFICATIONS</label>
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Specify quantity, certification requirements (8130/DGCA), and AOG deadline..." required style={{ ...navyInput, height: '80px' }} />
               </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-               <button type="submit" disabled={isSubmitting} style={{...submitButtonStyle, backgroundColor: isAOG ? '#ef4444' : '#001a35'}}>
-                 {isSubmitting ? 'TRANSMITTING...' : (isAOG ? 'INITIALIZE AOG DISPATCH' : 'SUBMIT RFQ')}
-               </button>
+              <button type="submit" disabled={isSubmitting} style={{ ...submitButtonStyle, backgroundColor: isAOG ? '#ef4444' : '#ffb400', color: '#001a35' }}>
+                {isSubmitting ? 'TRANSMITTING...' : (isAOG ? 'INITIALIZE AOG DISPATCH' : 'SUBMIT PROCUREMENT REQUEST')}
+              </button>
             </div>
           </form>
-        </section>
-      </main>
+        </div>
+      </section>
 
       <footer style={footerStyle}><p>© 2026 Jedo Technologies Pvt. Ltd. | DGCA & International Standards Compliance</p></footer>
     </div>
   )
 }
 
-// --- REFINED STYLES ---
-const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 60px', backgroundColor: '#001a35' } as const;
+// --- VISUAL POLISH STYLES ---
+
+const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 60px', backgroundColor: '#001a35', borderBottom: '1px solid rgba(255,180,0,0.2)' } as const;
 const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
 const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '2px', border: '1px solid rgba(255,180,0,0.3)' } as const;
 const activePillBtn = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '5px 12px', borderRadius: '2px', fontWeight: '900', fontSize: '0.65rem', cursor: 'pointer' } as const;
 const inactivePillBtn = { backgroundColor: 'transparent', color: '#ffffff', border: 'none', padding: '5px 12px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 'bold', cursor: 'pointer' } as const;
 
-const intelBar = { display: 'flex', justifyContent: 'flex-start', gap: '40px', padding: '8px 60px', backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' } as const;
+const intelBar = { display: 'flex', justifyContent: 'flex-start', gap: '40px', padding: '8px 60px', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0' } as const;
 const intelItem = { color: '#64748b', fontSize: '0.6rem', fontWeight: '800', letterSpacing: '0.5px' } as const;
 const pulseDot = { display: 'inline-block', width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', marginRight: '8px' } as const;
 
-// Compact Search
-const searchBarStyle = { width: '320px', padding: '10px 20px', borderRadius: '4px', border: '1px solid #cbd5e1', fontSize: '0.85rem', outline: 'none' } as const;
-
-// Edge-to-Edge Table
-const tableWrapperStyle = { width: '100%', overflowX: 'auto', backgroundColor: 'white' } as const;
-const thStyle = { padding: '15px 20px', fontSize: '0.65rem', fontWeight: '900', letterSpacing: '1px', borderRight: '1px solid rgba(255,255,255,0.1)' } as const;
-const trStyle = { borderBottom: '1px solid #e2e8f0' } as const;
-const tdStyle = { padding: '15px 20px', fontSize: '0.8rem', color: '#334155' } as const;
+// Manifest Section
+const whiteSection = { backgroundColor: '#ffffff', margin: '30px 60px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.04)', overflow: 'hidden' } as const;
+const searchBarStyle = { width: '320px', padding: '12px 20px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontSize: '0.85rem', outline: 'none' } as const;
+const tableWrapperStyle = { width: '100%', overflowX: 'auto' } as const;
+const thStyle = { padding: '18px 20px', fontSize: '0.65rem', fontWeight: '900', letterSpacing: '1px' } as const;
+const trStyle = { borderBottom: '1px solid #f1f5f9' } as const;
+const tdStyle = { padding: '18px 20px', fontSize: '0.8rem', color: '#334155' } as const;
 const badgeStyle = { backgroundColor: '#f1f5f9', color: '#001a35', padding: '3px 8px', borderRadius: '3px', fontSize: '0.65rem', fontWeight: 'bold' } as const;
 const docBadge = { fontSize: '0.6rem', background: '#001a35', color: '#fff', padding: '2px 6px', borderRadius: '2px', fontWeight: 'bold' } as const;
 
+// Buttons
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 16px', borderRadius: '4px', border: 'none', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' } as const;
-const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const;
+const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const;
 
-// Compact 3-Column Sourcing Card
-const formSectionStyle = { margin: '40px 60px', backgroundColor: '#ffffff', padding: '30px', borderRadius: '8px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' } as const;
-const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '15px' } as const;
-const gridRow3 = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' } as const;
-const inputGroup = { display: 'flex', flexDirection: 'column', gap: '6px' } as const;
-const labelStyle = { color: '#64748b', fontSize: '0.6rem', fontWeight: '900', letterSpacing: '0.5px' } as const;
-const inputStyle = { padding: '10px', borderRadius: '4px', border: '1px solid #cbd5e1', backgroundColor: '#f8fafc', color: '#001a35', fontSize: '0.85rem', outline: 'none' } as const;
-const emailInputStyle = { ...inputStyle, boxShadow: '0 0 0px 1000px #f8fafc inset' } as const;
-const submitButtonStyle = { color: '#ffffff', padding: '12px 40px', borderRadius: '4px', border: 'none', fontWeight: 'bold', fontSize: '0.8rem', cursor: 'pointer' } as const;
+// Hub Section (Navy)
+const navySection = { backgroundColor: '#001a35', padding: '80px 60px', marginTop: '40px' } as const;
+const formContainer = { maxWidth: '1200px', margin: '0 auto' } as const;
+const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
+const gridRow3 = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '25px' } as const;
+const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px' } as const;
+const navyLabel = { color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem', fontWeight: '900', letterSpacing: '1px' } as const;
+const navyInput = { padding: '14px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: '#ffffff', fontSize: '0.9rem', outline: 'none' } as const;
+
+const submitButtonStyle = { padding: '16px 50px', borderRadius: '6px', border: 'none', fontWeight: '900', fontSize: '0.85rem', cursor: 'pointer', transition: '0.3s' } as const;
+const footerStyle = { backgroundColor: '#000c17', color: 'rgba(255,255,255,0.2)', padding: '40px 20px', textAlign: 'center' as const, fontSize: '0.7rem' } as const;
 const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' } as const;
-const footerStyle = { backgroundColor: '#000c17', color: 'rgba(255,255,255,0.3)', padding: '30px 20px', textAlign: 'center' as const, fontSize: '0.7rem' } as const;
 
-const successBanner = { backgroundColor: '#10b981', color: 'white', padding: '12px', borderRadius: '4px', marginBottom: '20px', fontSize: '0.75rem', fontWeight: 'bold', textAlign: 'center' as const };
+// Success & Animation
+const successBanner = { backgroundColor: '#10b981', color: 'white', padding: '20px', borderRadius: '8px', marginBottom: '30px', fontSize: '0.9rem', fontWeight: 'bold', textAlign: 'center' as const, position: 'relative' as const, overflow: 'hidden' } as const;
+const countdownLine = { position: 'absolute' as const, bottom: 0, left: 0, height: '4px', backgroundColor: 'rgba(255,255,255,0.5)', width: '100%', animation: 'shrink 10s linear forwards' } as const;
