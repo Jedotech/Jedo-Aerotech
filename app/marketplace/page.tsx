@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. DATA INTERFACE
+// 1. DATA INTERFACE (Matches your 8 columns)
 interface AviationPart {
   _id: string;
   aircraftModel: string;
@@ -22,7 +22,7 @@ const client = createClient({
   projectId: 'm2pa474h', 
   dataset: 'production',
   apiVersion: '2023-05-03',
-  useCdn: false, // ENSURES REAL-TIME SYNC
+  useCdn: false, // Real-time sync
 })
 
 export default function Marketplace() {
@@ -45,8 +45,8 @@ export default function Marketplace() {
     async function fetchData() {
       try {
         const partData = await client.fetch(`*[_type == "part"] | order(aircraftModel asc)`)
-        setParts(partData)
-        setFilteredParts(partData)
+        setParts(partData || [])
+        setFilteredParts(partData || [])
         
         const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD')
         const rateData = await rateRes.json()
@@ -58,9 +58,10 @@ export default function Marketplace() {
   }, [])
 
   useEffect(() => {
+    const term = searchTerm.toLowerCase()
     const results = parts.filter(p => 
-      p.partNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.aircraftModel?.toLowerCase().includes(searchTerm.toLowerCase())
+      p.partNumber?.toLowerCase().includes(term) ||
+      p.aircraftModel?.toLowerCase().includes(term)
     )
     setFilteredParts(results)
   }, [searchTerm, parts])
@@ -75,12 +76,14 @@ export default function Marketplace() {
   return (
     <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* PROFESSIONAL NAV BAR */}
+      {/* NAV BAR */}
       <nav style={navBarStyle}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
-          <Link href="/" style={navLinkStyle}>HOME</Link>
-          <Link href="/fleet-health" style={navLinkStyle}>FLEET HEALTH</Link>
+          <div style={{ display: 'flex', gap: '25px' }}>
+            <Link href="/" style={navLinkStyle}>HOME</Link>
+            <Link href="/fleet-health" style={navLinkStyle}>FLEET HEALTH</Link>
+          </div>
         </div>
         <div style={switcherContainer}>
           <button onClick={() => setCurrency('USD')} style={currency === 'USD' ? activeToggle : inactiveToggle}>USD</button>
@@ -88,15 +91,15 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      {/* REFINED HERO SECTION */}
+      {/* HERO SECTION */}
       <header style={heroSectionStyle}>
-        <h1 style={{ fontSize: isMobile ? '2.2rem' : '3.5rem', fontWeight: '900', color: '#ffffff', letterSpacing: '-1px' }}>
+        <h1 style={{ fontSize: isMobile ? '2.2rem' : '3.5rem', fontWeight: '900', color: '#ffffff', margin: 0 }}>
           TYRE MARKETPLACE
         </h1>
         <div style={{ maxWidth: '600px', margin: '40px auto 0' }}>
           <input 
             type="text" 
-            placeholder="Search Part Number or Aircraft (e.g. Cessna 172)..." 
+            placeholder="Search Part Number or Aircraft Model..." 
             style={searchBarStyle}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -104,7 +107,7 @@ export default function Marketplace() {
         </div>
       </header>
 
-      {/* INVENTORY TABLE */}
+      {/* TABLE */}
       <main style={{ padding: isMobile ? '20px' : '60px', maxWidth: '1400px', margin: '0 auto' }}>
         <div style={tableWrapperStyle}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -141,17 +144,18 @@ export default function Marketplace() {
           </table>
         </div>
 
-        {/* COMPREHENSIVE SOURCING FORM */}
+        {/* SOURCING FORM */}
         <section style={formSectionStyle}>
           <h2 style={{ color: '#001a35', fontWeight: '900', textAlign: 'center', marginBottom: '10px' }}>SUBMIT SOURCING REQUEST</h2>
-          <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '40px' }}>Can't find your part? Let our Chennai logistics desk source it for you.</p>
-          
           <form action="https://formspree.io/f/mdalbdqq" method="POST" style={formGridStyle}>
-            <input name="buyerName" type="text" placeholder="Your Full Name" required style={inputStyle} />
+            {/* Redirect to Success Page after form submission */}
+            <input type="hidden" name="_next" value="https://jedotech.com/success" />
+            
+            <input name="buyerName" type="text" placeholder="Full Name" required style={inputStyle} />
             <input name="email" type="email" placeholder="Email Address" required style={inputStyle} />
-            <input name="aircraft" type="text" placeholder="Aircraft Model (e.g. C172)" required style={inputStyle} />
-            <input name="partNumber" type="text" placeholder="Part Number (If known)" style={inputStyle} />
-            <textarea name="description" placeholder="Describe the parts needed (Tyre size, ply, etc.)" required style={{...inputStyle, gridColumn: isMobile ? 'auto' : 'span 2', height: '100px'}} />
+            <input name="aircraft" type="text" placeholder="Aircraft Model" required style={inputStyle} />
+            <input name="partNumber" type="text" placeholder="Part Number" style={inputStyle} />
+            <textarea name="description" placeholder="Additional Details..." required style={{...inputStyle, gridColumn: isMobile ? 'auto' : 'span 2', height: '100px'}} />
             <div style={{ gridColumn: isMobile ? 'auto' : 'span 2', textAlign: 'center' }}>
                <button type="submit" style={submitButtonStyle}>SEND SOURCING REQUEST</button>
             </div>
@@ -162,24 +166,31 @@ export default function Marketplace() {
   )
 }
 
-// --- UPDATED STYLES ---
-const navBarStyle = { position: 'fixed' as const, top: 0, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#001a35', zIndex: 1000, borderBottom: '1px solid rgba(255,255,255,0.1)' };
-const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 'bold', letterSpacing: '1px' };
-const switcherContainer = { display: 'flex', border: '1px solid #ffb400', borderRadius: '4px', overflow: 'hidden' };
-const activeToggle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '6px 15px', fontWeight: 'bold', cursor: 'pointer' };
+// --- STYLES (Fixed with as const) ---
+const navBarStyle = { position: 'fixed' as const, top: 0, width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 60px', backgroundColor: '#001a35', zIndex: 1000, borderBottom: '1px solid rgba(255,255,255,0.1)', boxSizing: 'border-box' as const };
+const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 'bold' as const, letterSpacing: '1px' };
+const switcherContainer = { display: 'flex', border: '1px solid #ffb400', borderRadius: '4px', overflow: 'hidden' as const };
+const activeToggle = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '6px 15px', fontWeight: 'bold' as const, cursor: 'pointer' };
 const inactiveToggle = { backgroundColor: 'transparent', color: '#ffb400', border: 'none', padding: '6px 15px', cursor: 'pointer' };
 
 const heroSectionStyle = { backgroundColor: '#001a35', padding: '160px 20px 100px', textAlign: 'center' as const };
-const searchBarStyle = { width: '100%', padding: '20px 30px', borderRadius: '12px', border: 'none', fontSize: '1rem', outline: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.3)' };
+const searchBarStyle = { width: '100%', padding: '20px 30px', borderRadius: '12px', border: 'none', fontSize: '1rem', outline: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.3)', boxSizing: 'border-box' as const };
 
-const tableWrapperStyle = { overflowX: 'auto', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' };
-const thStyle = { padding: '20px', fontSize: '0.75rem', fontWeight: '900', letterSpacing: '1px' };
+const tableWrapperStyle = { 
+  overflowX: 'auto' as const, // FIXED: Added as const
+  backgroundColor: 'white', 
+  borderRadius: '12px', 
+  boxShadow: '0 10px 30px rgba(0,0,0,0.05)', 
+  border: '1px solid #e2e8f0' 
+};
+
+const thStyle = { padding: '20px', fontSize: '0.75rem', fontWeight: '900' as const, letterSpacing: '1px' };
 const trStyle = { borderBottom: '1px solid #f1f5f9' };
 const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' };
-const badgeStyle = { backgroundColor: '#f1f5f9', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' };
-const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.75rem' };
+const badgeStyle = { backgroundColor: '#f1f5f9', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' as const };
+const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.75rem' };
 
 const formSectionStyle = { marginTop: '80px', backgroundColor: 'white', padding: '60px', borderRadius: '20px', border: '1px solid #e2e8f0' };
 const formGridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' };
-const inputStyle = { padding: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none' };
-const submitButtonStyle = { backgroundColor: '#001a35', color: '#ffb400', padding: '18px 60px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer', marginTop: '20px' };
+const inputStyle = { padding: '15px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' as const };
+const submitButtonStyle = { backgroundColor: '#001a35', color: '#ffb400', padding: '18px 60px', borderRadius: '8px', border: 'none', fontWeight: 'bold' as const, cursor: 'pointer', marginTop: '20px' };
