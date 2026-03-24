@@ -152,10 +152,12 @@ export default function Marketplace() {
           </table>
         </div>
 
-        {/* 4. SOURCING REQUEST CARD (3-ROW STRUCTURE) */}
+        {/* 4. PROFESSIONAL SOURCING CARD (COMPACT & CENTERED) */}
         <section id="rfq" style={formSectionStyle}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <h2 style={{ color: '#ffffff', fontWeight: '900', fontSize: '1.8rem', margin: 0 }}>SUBMIT <span style={{ color: '#ffb400' }}>SOURCING</span> REQUEST</h2>
+          <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+            <h2 style={{ color: '#ffffff', fontWeight: '900', fontSize: '1.6rem', margin: 0 }}>
+                SUBMIT <span style={{ color: '#ffb400' }}>SOURCING</span> REQUEST
+            </h2>
           </div>
           
           <form action="https://formspree.io/f/mdalbdqq" method="POST" style={formGridStyle}>
@@ -189,12 +191,12 @@ export default function Marketplace() {
             <div style={{ width: '100%' }}>
               <div style={inputGroup}>
                 <label style={labelStyle}>Technical Requirements</label>
-                <textarea name="description" placeholder="Specify size, ply, condition, and quantity..." required style={{...inputStyle, height: '100px'}} />
+                <textarea name="description" placeholder="Specify size, ply, condition, and quantity..." required style={{...inputStyle, height: '80px'}} />
               </div>
             </div>
 
             {/* ROW 4: Centered Submit */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', width: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', width: '100%' }}>
                <button type="submit" style={submitButtonStyle}>SEND SOURCING REQUEST</button>
             </div>
           </form>
@@ -220,12 +222,22 @@ const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' };
 const badgeStyle = { backgroundColor: '#fff7e6', color: '#ffb400', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' as const };
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.75rem' };
 
-const formSectionStyle = { marginTop: '100px', backgroundColor: '#001a35', padding: '60px', borderRadius: '24px', boxShadow: '0 30px 60px rgba(0,0,0,0.2)' };
-const formGridStyle = { display: 'flex', flexDirection: 'column' as const, gap: '25px' };
-const rowStyle = { display: 'flex', gap: '25px', flexWrap: 'wrap' as const };
-const inputGroup = { display: 'flex', flexDirection: 'column' as const, gap: '10px', flex: 1, minWidth: '280px' };
+const formSectionStyle = { 
+    marginTop: '80px', 
+    backgroundColor: '#001a35', 
+    padding: '40px', 
+    borderRadius: '20px', 
+    boxShadow: '0 30px 60px rgba(0,0,0,0.2)',
+    maxWidth: '900px', // REDUCED WIDTH
+    marginLeft: 'auto',
+    marginRight: 'auto' 
+};
+
+const formGridStyle = { display: 'flex', flexDirection: 'column' as const, gap: '20px' };
+const rowStyle = { display: 'flex', gap: '20px', flexWrap: 'wrap' as const };
+const inputGroup = { display: 'flex', flexDirection: 'column' as const, gap: '8px', flex: 1, minWidth: '280px' };
 const labelStyle = { color: '#ffb400', fontSize: '0.7rem', fontWeight: 'bold' as const, letterSpacing: '1px' };
-const inputStyle = { padding: '15px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem', outline: 'none' };
-const submitButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '18px 60px', borderRadius: '8px', border: 'none', fontWeight: 'bold' as const, fontSize: '0.95rem', cursor: 'pointer' };
+const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem', outline: 'none' };
+const submitButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '15px 50px', borderRadius: '8px', border: 'none', fontWeight: 'bold' as const, fontSize: '0.9rem', cursor: 'pointer' };
 
 const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' as const };
