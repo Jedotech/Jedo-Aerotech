@@ -37,6 +37,8 @@ export default function Marketplace() {
   const [selectedPartNumber, setSelectedPartNumber] = useState('')
   const [selectedAircraft, setSelectedAircraft] = useState('')
 
+  const whatsappNumber = "919600038089"
+
   useEffect(() => {
     setMounted(true)
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -96,7 +98,7 @@ export default function Marketplace() {
   return (
     <div style={{ backgroundColor: '#fcfcfc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* 1. UPDATED NAVIGATION - Home Link before Large Currency Switcher */}
+      {/* 1. NAVIGATION */}
       <nav style={navBarStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '45px' }} /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '35px' }}>
@@ -162,8 +164,9 @@ export default function Marketplace() {
                   <td style={tdStyle}><span style={badgeStyle}>{part.condition}</span></td>
                   <td style={tdStyle}><b>{formatPrice(part.priceUSD)}</b></td>
                   <td style={tdStyle}>{part.warehouse}</td>
-                  <td style={tdStyle}>
+                  <td style={{...tdStyle, display: 'flex', gap: '8px'}}>
                     <button onClick={() => handleInquire(part.partNumber, part.aircraftType)} style={inquireButtonStyle}>INQUIRE</button>
+                    <a href={`https://wa.me/${whatsappNumber}?text=RFQ for PN: ${part.partNumber}`} target="_blank" style={whatsappButtonStyle}>WA</a>
                   </td>
                 </tr>
               ))}
@@ -189,7 +192,7 @@ export default function Marketplace() {
               </div>
               <div style={inputGroup}>
                 <label style={labelStyle}>Email Address</label>
-                <input name="email" type="email" placeholder="official@company.com" required style={inputStyle} />
+                <input name="email" type="email" placeholder="official@company.com" required style={emailInputStyle} />
               </div>
             </div>
 
@@ -236,56 +239,13 @@ export default function Marketplace() {
   )
 }
 
-// --- UPDATED STYLES ---
-const navBarStyle = { 
-  display: 'flex', 
-  justifyContent: 'space-between', 
-  alignItems: 'center', 
-  padding: '20px 60px', 
-  backgroundColor: '#001a35',
-  boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-} as const;
+// --- CSS STYLES ---
+const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 60px', backgroundColor: '#001a35', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' } as const;
+const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
 
-const navLinkStyle = { 
-  color: '#ffb400', 
-  textDecoration: 'none', 
-  fontSize: '0.9rem', 
-  fontWeight: 'bold',
-  letterSpacing: '1px'
-} as const;
-
-// LARGE CURRENCY SWITCHER
-const currencySwitcherPill = { 
-  display: 'flex', 
-  backgroundColor: 'rgba(255,255,255,0.05)', 
-  borderRadius: '50px', 
-  padding: '4px',
-  border: '1px solid rgba(255,180,0,0.3)'
-} as const;
-
-const activePillBtn = { 
-  backgroundColor: '#ffb400', 
-  color: '#001a35', 
-  border: 'none', 
-  padding: '8px 18px', 
-  borderRadius: '40px', 
-  fontWeight: '900', 
-  fontSize: '0.75rem', 
-  cursor: 'pointer',
-  transition: 'all 0.3s ease'
-} as const;
-
-const inactivePillBtn = { 
-  backgroundColor: 'transparent', 
-  color: '#ffffff', 
-  border: 'none', 
-  padding: '8px 18px', 
-  borderRadius: '40px', 
-  fontSize: '0.75rem', 
-  fontWeight: 'bold',
-  cursor: 'pointer',
-  transition: 'all 0.3s ease'
-} as const;
+const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '50px', padding: '4px', border: '1px solid rgba(255,180,0,0.3)' } as const;
+const activePillBtn = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '8px 18px', borderRadius: '40px', fontWeight: '900', fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.3s ease' } as const;
+const inactivePillBtn = { backgroundColor: 'transparent', color: '#ffffff', border: 'none', padding: '8px 18px', borderRadius: '40px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.3s ease' } as const;
 
 const searchBarStyle = { width: '100%', padding: '20px 40px', borderRadius: '100px', border: '2px solid #001a35', fontSize: '1rem', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' } as const;
 const tableWrapperStyle = { overflowX: 'auto', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 20px 50px rgba(0,0,0,0.05)', border: '1px solid #001a35' } as const;
@@ -293,13 +253,33 @@ const thStyle = { padding: '20px', fontSize: '0.7rem', fontWeight: '900', letter
 const trStyle = { borderBottom: '1px solid #001a35' } as const;
 const tdStyle = { padding: '20px', fontSize: '0.85rem', color: '#001a35' } as const;
 const badgeStyle = { backgroundColor: '#fff7e6', color: '#ffb400', padding: '4px 10px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' } as const;
-const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 20px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer' } as const;
+const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '10px 15px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer' } as const;
+const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', padding: '10px 12px', borderRadius: '6px', border: 'none', fontWeight: 'bold', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'none' } as const;
+
 const formSectionStyle = { marginTop: '80px', backgroundColor: '#001a35', padding: '40px', borderRadius: '20px', maxWidth: '900px', marginLeft: 'auto', marginRight: 'auto' } as const;
 const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
 const sideBySide = { display: 'flex', gap: '20px' } as const;
 const fullCol = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
 const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 } as const;
 const labelStyle = { color: '#ffb400', fontSize: '0.7rem', fontWeight: 'bold' } as const;
-const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: 'white', fontSize: '0.9rem', outline: 'none' } as const;
+
+// UPDATED: Input style with fixed autofill color
+const inputStyle = { 
+  padding: '12px', 
+  borderRadius: '8px', 
+  border: '1px solid rgba(255,255,255,0.1)', 
+  backgroundColor: 'rgba(255,255,255,0.05)', 
+  color: 'white', 
+  fontSize: '0.9rem', 
+  outline: 'none' 
+} as const;
+
+// Special style for email to combat browser autofill white background
+const emailInputStyle = {
+  ...inputStyle,
+  boxShadow: '0 0 0px 1000px #001a35 inset', // Forces the internal color even on autofill
+  WebkitTextFillColor: 'white'
+} as const;
+
 const submitButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '15px 50px', borderRadius: '8px', border: 'none', fontWeight: 'bold', fontSize: '0.9rem', cursor: 'pointer' } as const;
 const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' } as const;
