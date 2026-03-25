@@ -118,15 +118,15 @@ export default function Marketplace() {
     }
   }
 
-  // UPDATED WHATSAPP MESSAGE FORMAT
   const getWhatsAppURL = (part: AviationPart) => {
-    const message = `Hi Jedo Tech,
-I am interested in the following component:
-
-*Part Number:* ${part.partNumber}
-*Aircraft Model:* ${part.aircraftType}
-*Quantity:* *AOG Status:* Please provide availability and a quote.`;
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const message = `Hi Jedo Tech,%0A` +
+                    `I am interested in the following component:%0A%0A` +
+                    `*Part Number:* ${part.partNumber}%0A` +
+                    `*Aircraft Model:* ${part.aircraftType}%0A` +
+                    `*Quantity:* %0A` +
+                    `*AOG Status:* %0A%0A` +
+                    `Please provide availability and a quote.`;
+    return `https://wa.me/${whatsappNumber}?text=${message}`;
   }
 
   if (!mounted) return null
@@ -135,6 +135,7 @@ I am interested in the following component:
   return (
     <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' }}>
       
+      {/* 1. NAVIGATION */}
       <nav style={navBarStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '35px' }}>
@@ -146,6 +147,7 @@ I am interested in the following component:
         </div>
       </nav>
 
+      {/* 2. CENTERED SYSTEM STATUS */}
       <div style={intelBarCenter}>
         <div style={intelCapsule}>
           <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
@@ -156,6 +158,7 @@ I am interested in the following component:
         </div>
       </div>
 
+      {/* 3. INVENTORY SECTION */}
       <section style={whiteSection}>
         <div style={{ padding: '40px 60px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           <div>
@@ -164,7 +167,13 @@ I am interested in the following component:
             </h1>
             <p style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '4px' }}>Real-time technical asset database</p>
           </div>
-          <input type="text" placeholder="Search P/N or Model..." style={searchBarStyle} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <input 
+            type="text" 
+            placeholder="Search P/N or Model..." 
+            style={searchBarStyle} 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
+          />
         </div>
 
         <div style={tableWrapperStyle}>
@@ -208,6 +217,7 @@ I am interested in the following component:
         </div>
       </section>
 
+      {/* 4. SOURCING SECTION */}
       <section id="rfq" style={navySection}>
         <div style={formContainer}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
