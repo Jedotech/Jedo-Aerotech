@@ -1,0 +1,252 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., Cessna 172, Cessna 152, Piper Archer",
+        "name": "aircraftType",
+        "type": "string",
+        "title": "Aircraft Model"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The manufacturer part number",
+        "name": "partNumber",
+        "type": "string",
+        "title": "Part Number (P/N)"
+      },
+      {
+        "description": "e.g., 6.00-6",
+        "name": "tyreSize",
+        "type": "string"
+      },
+      {
+        "description": "e.g., 4, 6, 8",
+        "name": "plyRating",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Nose Gear",
+              "value": "Nose"
+            },
+            {
+              "title": "Main Gear",
+              "value": "Main"
+            },
+            {
+              "title": "Main (Left)",
+              "value": "Main-L"
+            },
+            {
+              "title": "Main (Right)",
+              "value": "Main-R"
+            }
+          ]
+        },
+        "description": "e.g., Nose, Main (Left), Main (Right)",
+        "name": "gearPosition",
+        "type": "string"
+      },
+      {
+        "initialValue": "New",
+        "options": {
+          "list": [
+            {
+              "title": "New / Factory New (FN)",
+              "value": "New"
+            },
+            {
+              "title": "New Surplus (NS)",
+              "value": "New Surplus"
+            },
+            {
+              "title": "Overhauled (OH)",
+              "value": "Overhauled"
+            },
+            {
+              "title": "Serviceable (SV)",
+              "value": "Serviceable"
+            }
+          ]
+        },
+        "name": "condition",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "DGCA Form 1",
+              "value": "DGCA"
+            },
+            {
+              "title": "FAA 8130-3",
+              "value": "8130-3"
+            },
+            {
+              "title": "EASA Form 1",
+              "value": "EASA"
+            },
+            {
+              "title": "CoC (Certificate of Conformance)",
+              "value": "CoC"
+            }
+          ],
+          "layout": "grid"
+        },
+        "description": "Select documentation available with this part",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "certificates",
+        "type": "array",
+        "title": "Airworthiness Certifications"
+      },
+      {
+        "initialValue": 1,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "quantity",
+        "type": "number",
+        "title": "Stock Quantity"
+      },
+      {
+        "initialValue": 0,
+        "description": "Total landings on the tyre",
+        "name": "totalLandings",
+        "type": "number",
+        "title": "Total Landings (TSN)"
+      },
+      {
+        "description": "Maximum allowable landings or cycles",
+        "name": "maxDesignLife",
+        "type": "number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "priceUSD",
+        "type": "number",
+        "title": "Unit Price (USD)"
+      },
+      {
+        "initialValue": "Chennai Hub",
+        "options": {
+          "list": [
+            "Chennai Hub",
+            "Singapore Hub",
+            "USA Hub"
+          ]
+        },
+        "name": "warehouse",
+        "type": "string",
+        "title": "Warehouse Location"
+      },
+      {
+        "description": "Additional technical remarks or specifications",
+        "name": "description",
+        "type": "text",
+        "title": "Technical Description"
+      },
+      {
+        "description": "Contact email for internal stock management",
+        "name": "ownerEmail",
+        "type": "string",
+        "title": "Owner/Manager Email"
+      }
+    ],
+    "name": "part",
+    "type": "document",
+    "title": "Tyre Inventory"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            "Cessna 172",
+            "Cessna 152",
+            "Piper Archer",
+            "Beechcraft Baron"
+          ]
+        },
+        "name": "aircraftType",
+        "type": "string",
+        "title": "Aircraft Model"
+      },
+      {
+        "description": "The Serial or Part Number for the tracked component",
+        "name": "partNumber",
+        "type": "string"
+      },
+      {
+        "initialValue": 0,
+        "name": "totalLandings",
+        "type": "number",
+        "title": "Current Landings"
+      },
+      {
+        "initialValue": 350,
+        "name": "maxDesignLife",
+        "type": "number",
+        "title": "Max Design Life (Landings)"
+      },
+      {
+        "description": "Used for automated maintenance alerts",
+        "name": "ownerEmail",
+        "type": "string",
+        "title": "Owner / Operator Email"
+      }
+    ],
+    "name": "fleet",
+    "type": "document",
+    "title": "Fleet Management"
+  }
+]
