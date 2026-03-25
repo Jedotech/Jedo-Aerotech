@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation' // Added for redirect
+import { useRouter } from 'next/navigation'
 import { createClient } from 'next-sanity'
 
 // 1. DATA INTERFACE
@@ -111,7 +111,6 @@ export default function Marketplace() {
         body: JSON.stringify({ ...formData, priority: isAOG ? 'AOG' : 'Routine' }),
       })
       if (response.ok) {
-        // Redirect to new success page
         router.push('/success');
       }
     } finally {
@@ -119,8 +118,14 @@ export default function Marketplace() {
     }
   }
 
+  // UPDATED WHATSAPP MESSAGE FORMAT
   const getWhatsAppURL = (part: AviationPart) => {
-    const message = `Hi Jedo Tech,\n\nI am interested in the following component:\n\n*Part Number:* ${part.partNumber}\n*Aircraft Model:* ${part.aircraftType}\n*Quantity:* 1\n*AOG Status:* ${isAOG ? "YES" : "NO"}\n\nPlease provide availability and a quote.`;
+    const message = `Hi Jedo Tech,
+I am interested in the following component:
+
+*Part Number:* ${part.partNumber}
+*Aircraft Model:* ${part.aircraftType}
+*Quantity:* *AOG Status:* Please provide availability and a quote.`;
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
   }
 
