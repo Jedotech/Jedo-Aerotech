@@ -120,7 +120,6 @@ export default function Marketplace() {
     }
   }
 
-  // STRUCTURED WHATSAPP MESSAGE GENERATOR
   const getWhatsAppURL = (part: AviationPart) => {
     const message = `Hi Jedo Tech,\n\nI am interested in the following component:\n\n*Part Number:* ${part.partNumber}\n*Aircraft Model:* ${part.aircraftType}\n*Quantity:* 1\n*AOG Status:* ${isAOG ? "YES" : "NO"}\n\nPlease provide availability and a quote.`;
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
@@ -144,21 +143,25 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      {/* 2. SYSTEM STATUS */}
-      <div style={intelBar}>
-        <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
-        <div style={intelItem}>X-RATE: 1 USD = {exchangeRate.toFixed(2)} INR</div>
-        <div style={intelItem}>STANDARDS: DGCA / EASA / FAA</div>
+      {/* 2. CENTERED SYSTEM STATUS */}
+      <div style={intelBarCenter}>
+        <div style={intelCapsule}>
+          <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
+          <div style={intelDivider} />
+          <div style={intelItem}>X-RATE: 1 USD = {exchangeRate.toFixed(2)} INR</div>
+          <div style={intelDivider} />
+          <div style={intelItem}>STANDARDS: DGCA / EASA / FAA</div>
+        </div>
       </div>
 
-      {/* 3. INVENTORY SECTION */}
+      {/* 3. INVENTORY MANIFEST */}
       <section style={whiteSection}>
         <div style={{ padding: '40px 60px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <h1 style={{ color: '#001a35', fontWeight: '900', fontSize: '1.8rem', margin: 0, letterSpacing: '-0.5px' }}>
               INVENTORY <span style={{ color: '#ffb400' }}>MANIFEST</span>
             </h1>
-            <p style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '4px' }}>Real-time availability for training fleet components</p>
+            <p style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '4px' }}>Real-time technical asset database</p>
           </div>
           <input type="text" placeholder="Search P/N or Model..." style={searchBarStyle} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
@@ -220,7 +223,7 @@ export default function Marketplace() {
               <h2 style={{ color: '#ffb400', fontWeight: '900', fontSize: '1.5rem', margin: 0 }}>
                 GLOBAL <span style={{ color: '#ffffff' }}>SOURCING HUB</span>
               </h2>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginTop: '4px' }}>Request parts not listed in the current manifest</p>
+              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginTop: '4px' }}>Request components not currently listed in manifest</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: isAOG ? '#ef4444' : 'rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '4px', transition: '0.3s' }}>
               <span style={{ color: '#fff', fontSize: '0.65rem', fontWeight: '900' }}>AOG PRIORITY</span>
@@ -234,7 +237,7 @@ export default function Marketplace() {
                 <input value={formData.buyerName} onChange={(e) => setFormData({ ...formData, buyerName: e.target.value })} type="text" placeholder="Contact Name" required style={navyInput} />
               </div>
               <div style={inputGroup}><label style={navyLabel}>OFFICIAL EMAIL</label>
-                <input value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} type="email" placeholder="ops@airline.com" required style={navyInput} />
+                <input value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} type="email" placeholder="ops@airline.com" required style={emailInputStyle} />
               </div>
               <div style={inputGroup}><label style={navyLabel}>ORGANIZATION</label>
                 <input value={formData.organization} onChange={(e) => setFormData({ ...formData, organization: e.target.value })} type="text" placeholder="Flight School / MRO" required style={navyInput} />
@@ -255,4 +258,61 @@ export default function Marketplace() {
 
             <div style={{ width: '100%' }}>
               <div style={inputGroup}><label style={navyLabel}>TECHNICAL SPECIFICATIONS</label>
-                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Specify quantity, certification requirements (8130/DGCA), and AOG deadline..." required style={{
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Specify quantity, certification requirements (8130/DGCA), and AOG deadline..." required style={{ ...navyInput, height: '80px' }} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+              <button type="submit" disabled={isSubmitting} style={{ ...submitButtonStyle, backgroundColor: isAOG ? '#ef4444' : '#ffb400', color: '#001a35' }}>
+                {isSubmitting ? 'TRANSMITTING...' : (isAOG ? 'INITIALIZE AOG DISPATCH' : 'SUBMIT PROCUREMENT REQUEST')}
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <footer style={footerStyle}><p>© 2026 Jedo Technologies Pvt. Ltd. | DGCA & International Standards Compliance</p></footer>
+    </div>
+  )
+}
+
+// --- STYLES ---
+const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 60px', backgroundColor: '#001a35', borderBottom: '1px solid rgba(255,180,0,0.2)' } as const;
+const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
+const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '2px', border: '1px solid rgba(255,180,0,0.3)' } as const;
+const activePillBtn = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '5px 12px', borderRadius: '2px', fontWeight: '900', fontSize: '0.65rem', cursor: 'pointer' } as const;
+const inactivePillBtn = { backgroundColor: 'transparent', color: '#ffffff', border: 'none', padding: '5px 12px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 'bold', cursor: 'pointer' } as const;
+
+const intelBarCenter = { display: 'flex', justifyContent: 'center', padding: '20px 60px' } as const;
+const intelCapsule = { display: 'flex', alignItems: 'center', gap: '20px', padding: '10px 30px', backgroundColor: '#ffffff', borderRadius: '50px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' } as const;
+const intelItem = { color: '#64748b', fontSize: '0.6rem', fontWeight: '800', letterSpacing: '0.5px' } as const;
+const intelDivider = { width: '1px', height: '14px', backgroundColor: '#e2e8f0' } as const;
+const pulseDot = { display: 'inline-block', width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', marginRight: '8px' } as const;
+
+const whiteSection = { backgroundColor: '#ffffff', margin: '0 60px 40px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.04)', overflow: 'hidden' } as const;
+const searchBarStyle = { width: '320px', padding: '12px 20px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontSize: '0.85rem', outline: 'none' } as const;
+const tableWrapperStyle = { width: '100%', overflowX: 'auto' } as const;
+const thStyle = { padding: '18px 20px', fontSize: '0.65rem', fontWeight: '900', letterSpacing: '1px' } as const;
+const trStyle = { borderBottom: '1px solid #f1f5f9' } as const;
+const tdStyle = { padding: '18px 20px', fontSize: '0.8rem', color: '#334155' } as const;
+const badgeStyle = { color: '#001a35', fontSize: '0.75rem', fontWeight: 'bold' } as const;
+const docBadge = { fontSize: '0.6rem', background: '#001a35', color: '#fff', padding: '2px 6px', borderRadius: '2px', fontWeight: 'bold' } as const;
+
+const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 16px', borderRadius: '4px', border: 'none', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' } as const;
+const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const;
+
+const navySection = { backgroundColor: '#001a35', padding: '80px 60px', marginTop: '40px' } as const;
+const formContainer = { maxWidth: '1200px', margin: '0 auto' } as const;
+const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
+const gridRow3 = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '25px' } as const;
+const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px' } as const;
+const navyLabel = { color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem', fontWeight: '900', letterSpacing: '1px' } as const;
+const navyInput = { padding: '14px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: '#ffffff', fontSize: '0.9rem', outline: 'none' } as const;
+const emailInputStyle = { ...navyInput, boxShadow: '0 0 0px 1000px #001a35 inset' } as const;
+
+const submitButtonStyle = { padding: '16px 50px', borderRadius: '6px', border: 'none', fontWeight: '900', fontSize: '0.85rem', cursor: 'pointer', transition: '0.3s' } as const;
+const footerStyle = { backgroundColor: '#000c17', color: 'rgba(255,255,255,0.2)', padding: '40px 20px', textAlign: 'center' as const, fontSize: '0.7rem' } as const;
+const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' } as const;
+
+const successBanner = { backgroundColor: '#10b981', color: 'white', padding: '20px', borderRadius: '8px', marginBottom: '30px', fontSize: '0.9rem', fontWeight: 'bold', textAlign: 'center' as const, position: 'relative' as const, overflow: 'hidden' } as const;
+const countdownLine = { position: 'absolute' as const, bottom: 0, left: 0, height: '4px', backgroundColor: 'rgba(255,255,255,0.5)', width: '100%', animation: 'shrink 10s linear forwards' } as const;
