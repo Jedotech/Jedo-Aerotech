@@ -112,6 +112,20 @@ export default defineType({
         list: ['Chennai Hub', 'Singapore Hub', 'USA Hub'],
       },
     }),
+    // NEWLY ADDED FIELDS TO RESOLVE UNKNOWN ERRORS
+    defineField({
+      name: 'description',
+      title: 'Technical Description',
+      type: 'text',
+      description: 'Additional technical remarks or specifications',
+    }),
+    defineField({
+      name: 'ownerEmail',
+      title: 'Owner/Manager Email',
+      type: 'string',
+      description: 'Contact email for internal stock management',
+      validation: (Rule) => Rule.email(),
+    }),
   ],
   preview: {
     select: {
