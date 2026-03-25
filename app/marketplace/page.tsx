@@ -126,7 +126,8 @@ export default function Marketplace() {
   }
 
   if (!mounted) return null
-  if (loading) return <div style={loaderStyle}><p>ESTABLISHING SECURE CONNECTION...</p></div>
+  // UPDATED LOADING MESSAGE
+  if (loading) return <div style={loaderStyle}><p>SYNCING LIVE INVENTORY DATA...</p></div>
 
   return (
     <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' }}>
@@ -134,7 +135,7 @@ export default function Marketplace() {
       {/* 1. NAVIGATION */}
       <nav style={navBarStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '35px' }}>
           <Link href="/" style={navLinkStyle}>HOME</Link>
           <div style={currencySwitcherPill}>
             <button onClick={() => setCurrency('USD')} style={currency === 'USD' ? activePillBtn : inactivePillBtn}>USD</button>
@@ -143,7 +144,7 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      {/* 2. CENTERED SYSTEM STATUS */}
+      {/* 2. SYSTEM STATUS */}
       <div style={intelBarCenter}>
         <div style={intelCapsule}>
           <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
@@ -154,16 +155,22 @@ export default function Marketplace() {
         </div>
       </div>
 
-      {/* 3. INVENTORY MANIFEST */}
+      {/* 3. INVENTORY SECTION - UPDATED HEADING */}
       <section style={whiteSection}>
         <div style={{ padding: '40px 60px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           <div>
             <h1 style={{ color: '#001a35', fontWeight: '900', fontSize: '1.8rem', margin: 0, letterSpacing: '-0.5px' }}>
-              INVENTORY <span style={{ color: '#ffb400' }}>MANIFEST</span>
+              TYRE <span style={{ color: '#ffb400' }}>INVENTORY</span>
             </h1>
             <p style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '4px' }}>Real-time technical asset database</p>
           </div>
-          <input type="text" placeholder="Search P/N or Model..." style={searchBarStyle} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <input 
+            type="text" 
+            placeholder="Search P/N or Model..." 
+            style={searchBarStyle} 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)} 
+          />
         </div>
 
         <div style={tableWrapperStyle}>
@@ -299,20 +306,4 @@ const badgeStyle = { color: '#001a35', fontSize: '0.75rem', fontWeight: 'bold' }
 const docBadge = { fontSize: '0.6rem', background: '#001a35', color: '#fff', padding: '2px 6px', borderRadius: '2px', fontWeight: 'bold' } as const;
 
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 16px', borderRadius: '4px', border: 'none', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' } as const;
-const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const;
-
-const navySection = { backgroundColor: '#001a35', padding: '80px 60px', marginTop: '40px' } as const;
-const formContainer = { maxWidth: '1200px', margin: '0 auto' } as const;
-const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
-const gridRow3 = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '25px' } as const;
-const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px' } as const;
-const navyLabel = { color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem', fontWeight: '900', letterSpacing: '1px' } as const;
-const navyInput = { padding: '14px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: '#ffffff', fontSize: '0.9rem', outline: 'none' } as const;
-const emailInputStyle = { ...navyInput, boxShadow: '0 0 0px 1000px #001a35 inset' } as const;
-
-const submitButtonStyle = { padding: '16px 50px', borderRadius: '6px', border: 'none', fontWeight: '900', fontSize: '0.85rem', cursor: 'pointer', transition: '0.3s' } as const;
-const footerStyle = { backgroundColor: '#000c17', color: 'rgba(255,255,255,0.2)', padding: '40px 20px', textAlign: 'center' as const, fontSize: '0.7rem' } as const;
-const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' } as const;
-
-const successBanner = { backgroundColor: '#10b981', color: 'white', padding: '20px', borderRadius: '8px', marginBottom: '30px', fontSize: '0.9rem', fontWeight: 'bold', textAlign: 'center' as const, position: 'relative' as const, overflow: 'hidden' } as const;
-const countdownLine = { position: 'absolute' as const, bottom: 0, left: 0, height: '4px', backgroundColor: 'rgba(255,255,255,0.5)', width: '100%', animation: 'shrink 10s linear forwards' } as const;
+const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const
