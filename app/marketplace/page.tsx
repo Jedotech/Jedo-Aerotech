@@ -135,7 +135,25 @@ export default function Marketplace() {
   return (
     <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' }}>
       
-      {/* 1. NAVIGATION */}
+      {/* INJECTED CUSTOM SCROLLBAR CSS */}
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #001a35;
+          border-radius: 10px;
+          border: 2px solid #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #ffb400;
+        }
+      `}</style>
+
       <nav style={navBarStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '35px' }}>
@@ -147,7 +165,6 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      {/* 2. CENTERED SYSTEM STATUS */}
       <div style={intelBarCenter}>
         <div style={intelCapsule}>
           <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
@@ -158,7 +175,6 @@ export default function Marketplace() {
         </div>
       </div>
 
-      {/* 3. INVENTORY SECTION */}
       <section style={whiteSection}>
         <div style={{ padding: '40px 60px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           <div>
@@ -167,16 +183,11 @@ export default function Marketplace() {
             </h1>
             <p style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '4px' }}>Real-time technical asset database</p>
           </div>
-          <input 
-            type="text" 
-            placeholder="Search P/N or Model..." 
-            style={searchBarStyle} 
-            value={searchTerm} 
-            onChange={(e) => setSearchTerm(e.target.value)} 
-          />
+          <input type="text" placeholder="Search P/N or Model..." style={searchBarStyle} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
 
-        <div style={tableWrapperStyle}>
+        {/* UPDATED: Added className "custom-scrollbar" */}
+        <div className="custom-scrollbar" style={tableWrapperStyle}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ backgroundColor: '#001a35', color: 'white' }}>
@@ -217,7 +228,6 @@ export default function Marketplace() {
         </div>
       </section>
 
-      {/* 4. SOURCING SECTION */}
       <section id="rfq" style={navySection}>
         <div style={formContainer}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
@@ -293,8 +303,25 @@ const pulseDot = { display: 'inline-block', width: '6px', height: '6px', backgro
 
 const whiteSection = { backgroundColor: '#ffffff', margin: '0 60px 40px', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.04)', overflow: 'hidden' } as const;
 const searchBarStyle = { width: '320px', padding: '12px 20px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc', fontSize: '0.85rem', outline: 'none' } as const;
-const tableWrapperStyle = { width: '100%', overflowX: 'auto' } as const;
-const thStyle = { padding: '18px 20px', fontSize: '0.65rem', fontWeight: '900', letterSpacing: '1px' } as const;
+
+const tableWrapperStyle = { 
+  width: '100%', 
+  overflowX: 'auto' as const,
+  maxHeight: '600px', 
+  overflowY: 'auto' as const, 
+} as const;
+
+const thStyle = { 
+  padding: '18px 20px', 
+  fontSize: '0.65rem', 
+  fontWeight: '900', 
+  letterSpacing: '1px',
+  position: 'sticky' as const, 
+  top: 0,
+  backgroundColor: '#001a35',
+  zIndex: 1,
+} as const;
+
 const trStyle = { borderBottom: '1px solid #f1f5f9' } as const;
 const tdStyle = { padding: '18px 20px', fontSize: '0.8rem', color: '#334155' } as const;
 const badgeStyle = { color: '#001a35', fontSize: '0.75rem', fontWeight: 'bold' } as const;
