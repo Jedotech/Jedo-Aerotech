@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation' // Added for redirect
 import { createClient } from 'next-sanity'
 
 // 1. DATA INTERFACE
@@ -26,6 +27,7 @@ const client = createClient({
 })
 
 export default function Marketplace() {
+  const router = useRouter();
   const [parts, setParts] = useState<AviationPart[]>([])
   const [filteredParts, setFilteredParts] = useState<AviationPart[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -46,7 +48,6 @@ export default function Marketplace() {
     description: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
 
   const whatsappNumber = "919600038089"; 
 
@@ -110,10 +111,8 @@ export default function Marketplace() {
         body: JSON.stringify({ ...formData, priority: isAOG ? 'AOG' : 'Routine' }),
       })
       if (response.ok) {
-        setShowSuccess(true)
-        setIsAOG(false)
-        setFormData({ buyerName: '', email: '', organization: '', tailNumber: '', partNumber: '', aircraft: '', description: '' })
-        setTimeout(() => setShowSuccess(false), 10000)
+        // Redirect to new success page
+        router.push('/success');
       }
     } finally {
       setIsSubmitting(false)
@@ -126,13 +125,11 @@ export default function Marketplace() {
   }
 
   if (!mounted) return null
-  // UPDATED LOADING MESSAGE
   if (loading) return <div style={loaderStyle}><p>SYNCING LIVE INVENTORY DATA...</p></div>
 
   return (
     <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' }}>
       
-      {/* 1. NAVIGATION */}
       <nav style={navBarStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '35px' }}>
@@ -144,7 +141,6 @@ export default function Marketplace() {
         </div>
       </nav>
 
-      {/* 2. SYSTEM STATUS */}
       <div style={intelBarCenter}>
         <div style={intelCapsule}>
           <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
@@ -155,7 +151,6 @@ export default function Marketplace() {
         </div>
       </div>
 
-      {/* 3. INVENTORY SECTION - UPDATED HEADING */}
       <section style={whiteSection}>
         <div style={{ padding: '40px 60px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           <div>
@@ -164,13 +159,7 @@ export default function Marketplace() {
             </h1>
             <p style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '4px' }}>Real-time technical asset database</p>
           </div>
-          <input 
-            type="text" 
-            placeholder="Search P/N or Model..." 
-            style={searchBarStyle} 
-            value={searchTerm} 
-            onChange={(e) => setSearchTerm(e.target.value)} 
-          />
+          <input type="text" placeholder="Search P/N or Model..." style={searchBarStyle} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
 
         <div style={tableWrapperStyle}>
@@ -214,17 +203,8 @@ export default function Marketplace() {
         </div>
       </section>
 
-      {/* 4. SOURCING SECTION */}
       <section id="rfq" style={navySection}>
         <div style={formContainer}>
-          {showSuccess && (
-            <div style={successBanner}>
-              <div style={{ marginBottom: '5px' }}>✓ REQUEST TRANSMITTED SUCCESSFULLY</div>
-              <div style={{ fontSize: '0.65rem', opacity: 0.8 }}>Our logistics desk in Chennai has been notified.</div>
-              <div style={countdownLine} />
-            </div>
-          )}
-
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
             <div>
               <h2 style={{ color: '#ffb400', fontWeight: '900', fontSize: '1.5rem', margin: 0 }}>
@@ -283,7 +263,7 @@ export default function Marketplace() {
   )
 }
 
-// --- STYLES ---
+// --- VISUAL POLISH STYLES ---
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 60px', backgroundColor: '#001a35', borderBottom: '1px solid rgba(255,180,0,0.2)' } as const;
 const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
 const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '2px', border: '1px solid rgba(255,180,0,0.3)' } as const;
@@ -306,4 +286,17 @@ const badgeStyle = { color: '#001a35', fontSize: '0.75rem', fontWeight: 'bold' }
 const docBadge = { fontSize: '0.6rem', background: '#001a35', color: '#fff', padding: '2px 6px', borderRadius: '2px', fontWeight: 'bold' } as const;
 
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 16px', borderRadius: '4px', border: 'none', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' } as const;
-const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const
+const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const;
+
+const navySection = { backgroundColor: '#001a35', padding: '80px 60px', marginTop: '40px' } as const;
+const formContainer = { maxWidth: '1200px', margin: '0 auto' } as const;
+const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
+const gridRow3 = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '25px' } as const;
+const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px' } as const;
+const navyLabel = { color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem', fontWeight: '900', letterSpacing: '1px' } as const;
+const navyInput = { padding: '14px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: '#ffffff', fontSize: '0.9rem', outline: 'none' } as const;
+const emailInputStyle = { ...navyInput, boxShadow: '0 0 0px 1000px #001a35 inset' } as const;
+
+const submitButtonStyle = { padding: '16px 50px', borderRadius: '6px', border: 'none', fontWeight: '900', fontSize: '0.85rem', cursor: 'pointer', transition: '0.3s' } as const;
+const footerStyle = { backgroundColor: '#000c17', color: 'rgba(255,255,255,0.2)', padding: '40px 20px', textAlign: 'center' as const, fontSize: '0.7rem' } as const;
+const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' } as const;
