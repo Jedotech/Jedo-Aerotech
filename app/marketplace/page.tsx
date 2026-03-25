@@ -135,24 +135,14 @@ export default function Marketplace() {
   return (
     <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' }}>
       
-      {/* INJECTED CUSTOM SCROLLBAR CSS */}
       <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #ffb400;
-          border-radius: 10px;
-          border: 2px solid #ffffff;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #e6a200;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ffb400; border-radius: 10px; border: 2px solid #ffffff; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #e6a200; }
       `}</style>
 
+      {/* 1. NAVIGATION */}
       <nav style={navBarStyle}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '35px' }}>
@@ -164,6 +154,7 @@ export default function Marketplace() {
         </div>
       </nav>
 
+      {/* 2. SYSTEM STATUS */}
       <div style={intelBarCenter}>
         <div style={intelCapsule}>
           <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
@@ -174,10 +165,10 @@ export default function Marketplace() {
         </div>
       </div>
 
-      {/* CONTAINER SECTION WITH CONTRASTING BACKGROUND */}
+      {/* 3. TYRE INVENTORY */}
       <section style={inventoryWrapper}>
         <div style={inventoryContentContainer}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexWrap: 'wrap', gap: '20px' }}>
             <div>
               <h1 style={{ color: '#ffffff', fontWeight: '900', fontSize: '1.8rem', margin: 0, letterSpacing: '-0.5px' }}>
                 TYRE <span style={{ color: '#ffb400' }}>INVENTORY</span>
@@ -191,7 +182,7 @@ export default function Marketplace() {
             <div className="custom-scrollbar" style={tableWrapperStyle}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
-                  <tr style={{ backgroundColor: '#001a35', color: 'white' }}>
+                  <tr style={{ backgroundColor: '#001a35' }}>
                     <th style={thStyle}>AIRCRAFT MODEL</th>
                     <th style={thStyle}>SIZE</th>
                     <th style={thStyle}>PLY</th>
@@ -231,17 +222,18 @@ export default function Marketplace() {
         </div>
       </section>
 
+      {/* 4. COMPACT SOURCING SECTION */}
       <section id="rfq" style={navySection}>
         <div style={formContainer}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <h2 style={{ color: '#ffb400', fontWeight: '900', fontSize: '1.5rem', margin: 0 }}>
+              <h2 style={{ color: '#ffb400', fontWeight: '900', fontSize: '1.4rem', margin: 0 }}>
                 GLOBAL <span style={{ color: '#ffffff' }}>SOURCING HUB</span>
               </h2>
-              <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)', marginTop: '4px' }}>Request components not currently listed in manifest</p>
+              <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', marginTop: '2px' }}>Rapid procurement for non-listed items</p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: isAOG ? '#ef4444' : 'rgba(255,255,255,0.1)', padding: '8px 16px', borderRadius: '4px', transition: '0.3s' }}>
-              <span style={{ color: '#fff', fontSize: '0.65rem', fontWeight: '900' }}>AOG PRIORITY</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: isAOG ? '#ef4444' : 'rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: '4px', transition: '0.3s' }}>
+              <span style={{ color: '#fff', fontSize: '0.6rem', fontWeight: '900' }}>AOG PRIORITY</span>
               <input type="checkbox" checked={isAOG} onChange={(e) => setIsAOG(e.target.checked)} style={{ cursor: 'pointer' }} />
             </div>
           </div>
@@ -273,13 +265,13 @@ export default function Marketplace() {
 
             <div style={{ width: '100%' }}>
               <div style={inputGroup}><label style={navyLabel}>TECHNICAL SPECIFICATIONS</label>
-                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Specify quantity, certification requirements (8130/DGCA), and AOG deadline..." required style={{ ...navyInput, height: '80px' }} />
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Specify quantity and certification requirements..." required style={{ ...navyInput, height: '60px' }} />
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px' }}>
               <button type="submit" disabled={isSubmitting} style={{ ...submitButtonStyle, backgroundColor: isAOG ? '#ef4444' : '#ffb400', color: '#001a35' }}>
-                {isSubmitting ? 'TRANSMITTING...' : (isAOG ? 'INITIALIZE AOG DISPATCH' : 'SUBMIT PROCUREMENT REQUEST')}
+                {isSubmitting ? 'TRANSMITTING...' : (isAOG ? 'INITIALIZE AOG DISPATCH' : 'SUBMIT RFQ')}
               </button>
             </div>
           </form>
@@ -291,62 +283,57 @@ export default function Marketplace() {
   )
 }
 
-// --- VISUAL POLISH STYLES ---
+// --- STYLES ---
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 60px', backgroundColor: '#001a35', borderBottom: '1px solid rgba(255,180,0,0.2)' } as const;
 const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
 const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '2px', border: '1px solid rgba(255,180,0,0.3)' } as const;
 const activePillBtn = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '5px 12px', borderRadius: '2px', fontWeight: '900', fontSize: '0.65rem', cursor: 'pointer' } as const;
 const inactivePillBtn = { backgroundColor: 'transparent', color: '#ffffff', border: 'none', padding: '5px 12px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 'bold', cursor: 'pointer' } as const;
 
-const intelBarCenter = { display: 'flex', justifyContent: 'center', padding: '20px 60px', backgroundColor: '#f1f5f9' } as const;
-const intelCapsule = { display: 'flex', alignItems: 'center', gap: '20px', padding: '10px 30px', backgroundColor: '#ffffff', borderRadius: '50px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' } as const;
+const intelBarCenter = { display: 'flex', justifyContent: 'center', padding: '15px 60px', backgroundColor: '#f1f5f9' } as const;
+const intelCapsule = { display: 'flex', alignItems: 'center', gap: '20px', padding: '8px 30px', backgroundColor: '#ffffff', borderRadius: '50px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' } as const;
 const intelItem = { color: '#64748b', fontSize: '0.6rem', fontWeight: '800', letterSpacing: '0.5px' } as const;
 const intelDivider = { width: '1px', height: '14px', backgroundColor: '#e2e8f0' } as const;
 const pulseDot = { display: 'inline-block', width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', marginRight: '8px' } as const;
 
-// New Inventory Wrapper for pop-out effect
-const inventoryWrapper = { backgroundColor: '#0f172a', padding: '60px 0' } as const;
+const inventoryWrapper = { backgroundColor: '#0f172a', padding: '50px 0' } as const;
 const inventoryContentContainer = { maxWidth: '1440px', margin: '0 auto', padding: '0 60px' } as const;
-
-// Table Card Styling
 const whiteSection = { backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', overflow: 'hidden' } as const;
-const searchBarStyle = { width: '320px', padding: '12px 20px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '0.85rem', outline: 'none', color: '#ffffff' } as const;
+const searchBarStyle = { width: '320px', padding: '10px 18px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '0.85rem', outline: 'none', color: '#ffffff' } as const;
 
-const tableWrapperStyle = { 
-  width: '100%', 
-  overflowX: 'auto' as const,
-  maxHeight: '600px', 
-  overflowY: 'auto' as const, 
-} as const;
+const tableWrapperStyle = { width: '100%', overflowX: 'auto' as const, maxHeight: '550px', overflowY: 'auto' as const } as const;
 
+// UPDATED: Table headers in Golden Yellow
 const thStyle = { 
-  padding: '18px 20px', 
+  padding: '16px 20px', 
   fontSize: '0.65rem', 
   fontWeight: '900', 
-  letterSpacing: '1px',
+  letterSpacing: '1px', 
   position: 'sticky' as const, 
-  top: 0,
-  backgroundColor: '#001a35',
-  zIndex: 1,
+  top: 0, 
+  backgroundColor: '#001a35', 
+  color: '#ffb400', // Brand Golden Yellow
+  zIndex: 1 
 } as const;
 
 const trStyle = { borderBottom: '1px solid #f1f5f9' } as const;
-const tdStyle = { padding: '18px 20px', fontSize: '0.8rem', color: '#334155' } as const;
+const tdStyle = { padding: '16px 20px', fontSize: '0.8rem', color: '#334155' } as const;
 const badgeStyle = { color: '#001a35', fontSize: '0.75rem', fontWeight: 'bold' } as const;
 const docBadge = { fontSize: '0.6rem', background: '#001a35', color: '#fff', padding: '2px 6px', borderRadius: '2px', fontWeight: 'bold' } as const;
 
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 16px', borderRadius: '4px', border: 'none', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' } as const;
 const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const;
 
-const navySection = { backgroundColor: '#001a35', padding: '80px 60px' } as const;
+// COMPACTED HUB STYLES
+const navySection = { backgroundColor: '#001a35', padding: '40px 60px' } as const;
 const formContainer = { maxWidth: '1200px', margin: '0 auto' } as const;
-const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '20px' } as const;
-const gridRow3 = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '25px' } as const;
-const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px' } as const;
+const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '12px' } as const;
+const gridRow3 = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' } as const;
+const inputGroup = { display: 'flex', flexDirection: 'column', gap: '6px' } as const;
 const navyLabel = { color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem', fontWeight: '900', letterSpacing: '1px' } as const;
-const navyInput = { padding: '14px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: '#ffffff', fontSize: '0.9rem', outline: 'none' } as const;
+const navyInput = { padding: '10px 14px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: '#ffffff', fontSize: '0.9rem', outline: 'none' } as const;
 const emailInputStyle = { ...navyInput, boxShadow: '0 0 0px 1000px #001a35 inset' } as const;
 
-const submitButtonStyle = { padding: '16px 50px', borderRadius: '6px', border: 'none', fontWeight: '900', fontSize: '0.85rem', cursor: 'pointer', transition: '0.3s' } as const;
-const footerStyle = { backgroundColor: '#000c17', color: 'rgba(255,255,255,0.2)', padding: '40px 20px', textAlign: 'center' as const, fontSize: '0.7rem' } as const;
+const submitButtonStyle = { padding: '14px 40px', borderRadius: '6px', border: 'none', fontWeight: '900', fontSize: '0.85rem', cursor: 'pointer', transition: '0.3s' } as const;
+const footerStyle = { backgroundColor: '#000c17', color: 'rgba(255,255,255,0.2)', padding: '30px 20px', textAlign: 'center' as const, fontSize: '0.7rem' } as const;
 const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold' } as const;
