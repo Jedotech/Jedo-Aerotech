@@ -40,7 +40,7 @@ export default function HomePage() {
   }, [])
 
   const whatsappNumber = "919600038089"; 
-  const contactEmail = "tajesudoss@gmail.com";
+  const contactEmail = "sales@jedotech.com";
 
   // RFQ Template for WhatsApp
   const waMessage = encodeURIComponent(
