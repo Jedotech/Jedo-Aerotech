@@ -105,7 +105,8 @@ export default function Marketplace() {
     e.preventDefault()
     setIsSubmitting(true)
     try {
-      const response = await fetch("https://formspree.io/f/mdalbdqq", {
+      // UPDATED FORMSPREE ENDPOINT
+      const response = await fetch("https://formspree.io/f/xykbznez", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, priority: isAOG ? 'AOG' : 'Routine' }),
@@ -303,7 +304,6 @@ const searchBarStyle = { width: '320px', padding: '10px 18px', borderRadius: '6p
 
 const tableWrapperStyle = { width: '100%', overflowX: 'auto' as const, maxHeight: '550px', overflowY: 'auto' as const } as const;
 
-// UPDATED: Table headers in Golden Yellow
 const thStyle = { 
   padding: '16px 20px', 
   fontSize: '0.65rem', 
@@ -312,7 +312,7 @@ const thStyle = {
   position: 'sticky' as const, 
   top: 0, 
   backgroundColor: '#001a35', 
-  color: '#ffb400', // Brand Golden Yellow
+  color: '#ffb400', 
   zIndex: 1 
 } as const;
 
@@ -324,7 +324,6 @@ const docBadge = { fontSize: '0.6rem', background: '#001a35', color: '#fff', pad
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 16px', borderRadius: '4px', border: 'none', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' } as const;
 const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const;
 
-// COMPACTED HUB STYLES
 const navySection = { backgroundColor: '#001a35', padding: '40px 60px' } as const;
 const formContainer = { maxWidth: '1200px', margin: '0 auto' } as const;
 const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '12px' } as const;
