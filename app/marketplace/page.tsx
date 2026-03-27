@@ -28,7 +28,11 @@ const client = createClient({
 
 export default function Marketplace() {
   const router = useRouter();
-  const rfqRef = useRef<HTMLDivElement>(null); // Reference for precise scrolling
+  
+  // SECTION REFS FOR SCROLLING
+  const inventoryRef = useRef<HTMLDivElement>(null);
+  const rfqRef = useRef<HTMLDivElement>(null);
+
   const [parts, setParts] = useState<AviationPart[]>([])
   const [filteredParts, setFilteredParts] = useState<AviationPart[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -97,12 +101,16 @@ export default function Marketplace() {
     return `$${(priceUSD || 0).toLocaleString('en-US')}`
   }
 
-  // FIXED: Precise scrolling to RFQ Section
+  // SMOOTH SCROLL HANDLERS
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   const handleInquire = (pn: string, model: string) => {
     setFormData(prev => ({ ...prev, partNumber: pn, aircraft: model }))
-    if (rfqRef.current) {
-      rfqRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    scrollToSection(rfqRef);
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -140,6 +148,7 @@ export default function Marketplace() {
     <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column' }}>
       
       <style jsx global>{`
+        html { scroll-behavior: smooth; }
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #ffb400; border-radius: 10px; border: 2px solid #ffffff; }
@@ -154,7 +163,8 @@ export default function Marketplace() {
       <nav style={{ ...navBarStyle, padding: isMobile ? '12px 20px' : '12px 60px' }}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: isMobile ? '30px' : '40px' }} /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '15px' : '35px' }}>
-          <Link href="/" style={navLinkStyle}>HOME</Link>
+          <button onClick={() => scrollToSection(inventoryRef)} style={navLinkButtonStyle}>MARKETPLACE</button>
+          <button onClick={() => scrollToSection(rfqRef)} style={navLinkButtonStyle}>SOURCING</button>
           <div style={currencySwitcherPill}>
             <button onClick={() => setCurrency('USD')} style={currency === 'USD' ? activePillBtn : inactivePillBtn}>USD</button>
             <button onClick={() => setCurrency('INR')} style={currency === 'INR' ? activePillBtn : inactivePillBtn}>INR</button>
@@ -174,7 +184,7 @@ export default function Marketplace() {
       </div>
 
       {/* 3. TYRE INVENTORY SECTION */}
-      <section id="inventory-section" style={{ ...inventoryWrapper, padding: isMobile ? '30px 0' : '50px 0' }}>
+      <section ref={inventoryRef} id="inventory-section" style={{ ...inventoryWrapper, padding: isMobile ? '30px 0' : '50px 0' }}>
         <div style={{ ...inventoryContentContainer, padding: isMobile ? '0 15px' : '0 60px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: '25px', flexDirection: isMobile ? 'column' : 'row', gap: '20px' }}>
             <div>
@@ -231,7 +241,7 @@ export default function Marketplace() {
         </div>
       </section>
 
-      {/* 4. COMPACT SOURCING SECTION - TARGET FOR SCROLLING */}
+      {/* 4. RFQ SECTION */}
       <section ref={rfqRef} id="rfq-section" style={{ ...navySection, padding: isMobile ? '40px 15px' : '40px 60px' }}>
         <div style={formContainer}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isMobile ? 'column' : 'row', gap: '15px' }}>
@@ -292,7 +302,17 @@ export default function Marketplace() {
   )
 }
 
-// --- STYLES --- (UNCHANGED EXCEPT FOR THOSE IN THE RENDER)
+// --- STYLES ---
+const navLinkButtonStyle = { 
+  background: 'none', 
+  border: 'none', 
+  color: '#ffb400', 
+  fontSize: '0.8rem', 
+  fontWeight: 'bold', 
+  letterSpacing: '1px', 
+  cursor: 'pointer' 
+} as const;
+
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#001a35', borderBottom: '1px solid rgba(255,180,0,0.2)' } as const;
 const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
 const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '2px', border: '1px solid rgba(255,180,0,0.3)' } as const;
