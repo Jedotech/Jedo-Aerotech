@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from 'next-sanity'
@@ -28,6 +28,7 @@ const client = createClient({
 
 export default function Marketplace() {
   const router = useRouter();
+  const rfqRef = useRef<HTMLDivElement>(null); // Reference for precise scrolling
   const [parts, setParts] = useState<AviationPart[]>([])
   const [filteredParts, setFilteredParts] = useState<AviationPart[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -96,9 +97,12 @@ export default function Marketplace() {
     return `$${(priceUSD || 0).toLocaleString('en-US')}`
   }
 
+  // FIXED: Precise scrolling to RFQ Section
   const handleInquire = (pn: string, model: string) => {
     setFormData(prev => ({ ...prev, partNumber: pn, aircraft: model }))
-    document.getElementById('rfq')?.scrollIntoView({ behavior: 'smooth' })
+    if (rfqRef.current) {
+      rfqRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -169,8 +173,8 @@ export default function Marketplace() {
         </div>
       </div>
 
-      {/* 3. TYRE INVENTORY */}
-      <section style={{ ...inventoryWrapper, padding: isMobile ? '30px 0' : '50px 0' }}>
+      {/* 3. TYRE INVENTORY SECTION */}
+      <section id="inventory-section" style={{ ...inventoryWrapper, padding: isMobile ? '30px 0' : '50px 0' }}>
         <div style={{ ...inventoryContentContainer, padding: isMobile ? '0 15px' : '0 60px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: '25px', flexDirection: isMobile ? 'column' : 'row', gap: '20px' }}>
             <div>
@@ -227,8 +231,8 @@ export default function Marketplace() {
         </div>
       </section>
 
-      {/* 4. COMPACT SOURCING SECTION */}
-      <section id="rfq" style={{ ...navySection, padding: isMobile ? '40px 15px' : '40px 60px' }}>
+      {/* 4. COMPACT SOURCING SECTION - TARGET FOR SCROLLING */}
+      <section ref={rfqRef} id="rfq-section" style={{ ...navySection, padding: isMobile ? '40px 15px' : '40px 60px' }}>
         <div style={formContainer}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isMobile ? 'column' : 'row', gap: '15px' }}>
             <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
@@ -288,7 +292,7 @@ export default function Marketplace() {
   )
 }
 
-// --- STYLES ---
+// --- STYLES --- (UNCHANGED EXCEPT FOR THOSE IN THE RENDER)
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#001a35', borderBottom: '1px solid rgba(255,180,0,0.2)' } as const;
 const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
 const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '2px', border: '1px solid rgba(255,180,0,0.3)' } as const;
