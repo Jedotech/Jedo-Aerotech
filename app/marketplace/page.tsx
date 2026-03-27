@@ -56,6 +56,13 @@ export default function Marketplace() {
 
   const whatsappNumber = "919600038089"; 
 
+  // Function to handle the scroll logic - Updated for TS Build Safety
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
+    if (ref && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   useEffect(() => {
     setMounted(true)
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -73,9 +80,22 @@ export default function Marketplace() {
         const rateData = await rateRes.json()
         if (rateData?.rates?.INR) setExchangeRate(rateData.rates.INR)
       } catch (e) { console.error("Sync Error:", e) }
-      finally { setLoading(false) }
+      finally { 
+        setLoading(false);
+        // Detect hash on initial entry from Homepage
+        if (window.location.hash === '#rfq-section') {
+           setTimeout(() => scrollToSection(rfqRef), 100);
+        }
+      }
     }
     initData()
+
+    const handleHashChange = () => {
+      if (window.location.hash === '#rfq-section') {
+        scrollToSection(rfqRef);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
 
     const subscription = client.listen(query).subscribe((update) => {
       if (update) client.fetch(query).then(setParts)
@@ -83,6 +103,7 @@ export default function Marketplace() {
 
     return () => {
       window.removeEventListener('resize', handleResize)
+      window.removeEventListener('hashchange', handleHashChange)
       subscription.unsubscribe()
     }
   }, [])
@@ -99,13 +120,6 @@ export default function Marketplace() {
   const formatPrice = (priceUSD: number) => {
     if (currency === 'INR') return `₹${(priceUSD * exchangeRate).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
     return `$${(priceUSD || 0).toLocaleString('en-US')}`
-  }
-
-  // FIXED SCROLL HANDLER (Build-safe)
-  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
-    if (ref && ref.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
   }
 
   const handleInquire = (pn: string, model: string) => {
@@ -163,8 +177,7 @@ export default function Marketplace() {
       <nav style={{ ...navBarStyle, padding: isMobile ? '12px 20px' : '12px 60px' }}>
         <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: isMobile ? '30px' : '40px' }} /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '15px' : '35px' }}>
-          <button onClick={() => scrollToSection(inventoryRef)} style={navLinkButtonStyle}>MARKETPLACE</button>
-          <button onClick={() => scrollToSection(rfqRef)} style={navLinkButtonStyle}>SOURCING</button>
+          <Link href="/" style={navLinkButtonStyle}>HOME</Link>
           <div style={currencySwitcherPill}>
             <button onClick={() => setCurrency('USD')} style={currency === 'USD' ? activePillBtn : inactivePillBtn}>USD</button>
             <button onClick={() => setCurrency('INR')} style={currency === 'INR' ? activePillBtn : inactivePillBtn}>INR</button>
@@ -236,7 +249,6 @@ export default function Marketplace() {
                 </tbody>
               </table>
             </div>
-            {isMobile && <p style={{ textAlign: 'center', fontSize: '0.65rem', color: '#64748b', padding: '10px' }}>Swipe left to view full specifications →</p>}
           </div>
         </div>
       </section>
@@ -310,7 +322,8 @@ const navLinkButtonStyle = {
   fontSize: '0.8rem', 
   fontWeight: 'bold', 
   letterSpacing: '1px', 
-  cursor: 'pointer' 
+  cursor: 'pointer',
+  textDecoration: 'none'
 } as const;
 
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#001a35', borderBottom: '1px solid rgba(255,180,0,0.2)' } as const;
