@@ -105,7 +105,6 @@ export default function Marketplace() {
     e.preventDefault()
     setIsSubmitting(true)
     try {
-      // UPDATED FORMSPREE ENDPOINT
       const response = await fetch("https://formspree.io/f/xykbznez", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -141,12 +140,16 @@ export default function Marketplace() {
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #ffb400; border-radius: 10px; border: 2px solid #ffffff; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #e6a200; }
+        @media (max-width: 768px) {
+          .mobile-hide { display: none !important; }
+          .mobile-full { width: 100% !important; }
+        }
       `}</style>
 
       {/* 1. NAVIGATION */}
-      <nav style={navBarStyle}>
-        <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '40px' }} /></Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '35px' }}>
+      <nav style={{ ...navBarStyle, padding: isMobile ? '12px 20px' : '12px 60px' }}>
+        <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: isMobile ? '30px' : '40px' }} /></Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '15px' : '35px' }}>
           <Link href="/" style={navLinkStyle}>HOME</Link>
           <div style={currencySwitcherPill}>
             <button onClick={() => setCurrency('USD')} style={currency === 'USD' ? activePillBtn : inactivePillBtn}>USD</button>
@@ -156,32 +159,32 @@ export default function Marketplace() {
       </nav>
 
       {/* 2. SYSTEM STATUS */}
-      <div style={intelBarCenter}>
-        <div style={intelCapsule}>
+      <div style={{ ...intelBarCenter, padding: isMobile ? '10px' : '15px 60px' }}>
+        <div style={{ ...intelCapsule, padding: isMobile ? '8px 15px' : '8px 30px', flexWrap: 'wrap', justifyContent: 'center', borderRadius: isMobile ? '12px' : '50px' }}>
           <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
-          <div style={intelDivider} />
-          <div style={intelItem}>X-RATE: 1 USD = {exchangeRate.toFixed(2)} INR</div>
-          <div style={intelDivider} />
-          <div style={intelItem}>STANDARDS: DGCA / EASA / FAA</div>
+          <div style={intelDivider} className="mobile-hide" />
+          <div style={intelItem}>X-RATE: {exchangeRate.toFixed(2)} INR</div>
+          <div style={intelDivider} className="mobile-hide" />
+          <div style={intelItem}>DGCA / EASA / FAA</div>
         </div>
       </div>
 
       {/* 3. TYRE INVENTORY */}
-      <section style={inventoryWrapper}>
-        <div style={inventoryContentContainer}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexWrap: 'wrap', gap: '20px' }}>
+      <section style={{ ...inventoryWrapper, padding: isMobile ? '30px 0' : '50px 0' }}>
+        <div style={{ ...inventoryContentContainer, padding: isMobile ? '0 15px' : '0 60px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', marginBottom: '25px', flexDirection: isMobile ? 'column' : 'row', gap: '20px' }}>
             <div>
-              <h1 style={{ color: '#ffffff', fontWeight: '900', fontSize: '1.8rem', margin: 0, letterSpacing: '-0.5px' }}>
+              <h1 style={{ color: '#ffffff', fontWeight: '900', fontSize: isMobile ? '1.4rem' : '1.8rem', margin: 0, letterSpacing: '-0.5px' }}>
                 TYRE <span style={{ color: '#ffb400' }}>INVENTORY</span>
               </h1>
               <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', marginTop: '4px' }}>Real-time technical asset database</p>
             </div>
-            <input type="text" placeholder="Search P/N or Model..." style={searchBarStyle} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <input type="text" placeholder="Search P/N or Model..." style={{ ...searchBarStyle, width: isMobile ? '100%' : '320px' }} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
 
           <div style={whiteSection}>
             <div className="custom-scrollbar" style={tableWrapperStyle}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: isMobile ? '800px' : 'auto' }}>
                 <thead>
                   <tr style={{ backgroundColor: '#001a35' }}>
                     <th style={thStyle}>AIRCRAFT MODEL</th>
@@ -219,16 +222,17 @@ export default function Marketplace() {
                 </tbody>
               </table>
             </div>
+            {isMobile && <p style={{ textAlign: 'center', fontSize: '0.65rem', color: '#64748b', padding: '10px' }}>Swipe left to view full specifications →</p>}
           </div>
         </div>
       </section>
 
       {/* 4. COMPACT SOURCING SECTION */}
-      <section id="rfq" style={navySection}>
+      <section id="rfq" style={{ ...navySection, padding: isMobile ? '40px 15px' : '40px 60px' }}>
         <div style={formContainer}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <div>
-              <h2 style={{ color: '#ffb400', fontWeight: '900', fontSize: '1.4rem', margin: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexDirection: isMobile ? 'column' : 'row', gap: '15px' }}>
+            <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
+              <h2 style={{ color: '#ffb400', fontWeight: '900', fontSize: isMobile ? '1.2rem' : '1.4rem', margin: 0 }}>
                 GLOBAL <span style={{ color: '#ffffff' }}>SOURCING HUB</span>
               </h2>
               <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)', marginTop: '2px' }}>Rapid procurement for non-listed items</p>
@@ -240,7 +244,7 @@ export default function Marketplace() {
           </div>
 
           <form onSubmit={handleSubmit} style={formGridStyle}>
-            <div style={gridRow3}>
+            <div style={{ ...gridRow3, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))' }}>
               <div style={inputGroup}><label style={navyLabel}>PERSONNEL</label>
                 <input value={formData.buyerName} onChange={(e) => setFormData({ ...formData, buyerName: e.target.value })} type="text" placeholder="Contact Name" required style={navyInput} />
               </div>
@@ -252,7 +256,7 @@ export default function Marketplace() {
               </div>
             </div>
 
-            <div style={gridRow3}>
+            <div style={{ ...gridRow3, gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))' }}>
               <div style={inputGroup}><label style={navyLabel}>AIRCRAFT TYPE</label>
                 <input value={formData.aircraft} onChange={(e) => setFormData({ ...formData, aircraft: e.target.value })} type="text" placeholder="e.g. C172" required style={navyInput} />
               </div>
@@ -266,12 +270,12 @@ export default function Marketplace() {
 
             <div style={{ width: '100%' }}>
               <div style={inputGroup}><label style={navyLabel}>TECHNICAL SPECIFICATIONS</label>
-                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Specify quantity and certification requirements..." required style={{ ...navyInput, height: '60px' }} />
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Specify quantity and certification requirements..." required style={{ ...navyInput, height: '80px' }} />
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px' }}>
-              <button type="submit" disabled={isSubmitting} style={{ ...submitButtonStyle, backgroundColor: isAOG ? '#ef4444' : '#ffb400', color: '#001a35' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+              <button type="submit" disabled={isSubmitting} style={{ ...submitButtonStyle, width: isMobile ? '100%' : 'auto', backgroundColor: isAOG ? '#ef4444' : '#ffb400', color: '#001a35' }}>
                 {isSubmitting ? 'TRANSMITTING...' : (isAOG ? 'INITIALIZE AOG DISPATCH' : 'SUBMIT RFQ')}
               </button>
             </div>
@@ -285,22 +289,22 @@ export default function Marketplace() {
 }
 
 // --- STYLES ---
-const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 60px', backgroundColor: '#001a35', borderBottom: '1px solid rgba(255,180,0,0.2)' } as const;
+const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#001a35', borderBottom: '1px solid rgba(255,180,0,0.2)' } as const;
 const navLinkStyle = { color: '#ffb400', textDecoration: 'none', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' } as const;
 const currencySwitcherPill = { display: 'flex', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '2px', border: '1px solid rgba(255,180,0,0.3)' } as const;
 const activePillBtn = { backgroundColor: '#ffb400', color: '#001a35', border: 'none', padding: '5px 12px', borderRadius: '2px', fontWeight: '900', fontSize: '0.65rem', cursor: 'pointer' } as const;
 const inactivePillBtn = { backgroundColor: 'transparent', color: '#ffffff', border: 'none', padding: '5px 12px', borderRadius: '2px', fontSize: '0.65rem', fontWeight: 'bold', cursor: 'pointer' } as const;
 
-const intelBarCenter = { display: 'flex', justifyContent: 'center', padding: '15px 60px', backgroundColor: '#f1f5f9' } as const;
-const intelCapsule = { display: 'flex', alignItems: 'center', gap: '20px', padding: '8px 30px', backgroundColor: '#ffffff', borderRadius: '50px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' } as const;
+const intelBarCenter = { display: 'flex', justifyContent: 'center', backgroundColor: '#f1f5f9' } as const;
+const intelCapsule = { display: 'flex', alignItems: 'center', gap: '20px', backgroundColor: '#ffffff', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' } as const;
 const intelItem = { color: '#64748b', fontSize: '0.6rem', fontWeight: '800', letterSpacing: '0.5px' } as const;
 const intelDivider = { width: '1px', height: '14px', backgroundColor: '#e2e8f0' } as const;
 const pulseDot = { display: 'inline-block', width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', marginRight: '8px' } as const;
 
-const inventoryWrapper = { backgroundColor: '#0f172a', padding: '50px 0' } as const;
-const inventoryContentContainer = { maxWidth: '1440px', margin: '0 auto', padding: '0 60px' } as const;
+const inventoryWrapper = { backgroundColor: '#0f172a' } as const;
+const inventoryContentContainer = { maxWidth: '1440px', margin: '0 auto' } as const;
 const whiteSection = { backgroundColor: '#ffffff', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', overflow: 'hidden' } as const;
-const searchBarStyle = { width: '320px', padding: '10px 18px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '0.85rem', outline: 'none', color: '#ffffff' } as const;
+const searchBarStyle = { padding: '10px 18px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', fontSize: '0.85rem', outline: 'none', color: '#ffffff' } as const;
 
 const tableWrapperStyle = { width: '100%', overflowX: 'auto' as const, maxHeight: '550px', overflowY: 'auto' as const } as const;
 
@@ -324,10 +328,10 @@ const docBadge = { fontSize: '0.6rem', background: '#001a35', color: '#fff', pad
 const inquireButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 16px', borderRadius: '4px', border: 'none', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' } as const;
 const whatsappButtonStyle = { backgroundColor: '#25D366', color: 'white', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', border: 'none', cursor: 'pointer', textDecoration: 'none' } as const;
 
-const navySection = { backgroundColor: '#001a35', padding: '40px 60px' } as const;
+const navySection = { backgroundColor: '#001a35' } as const;
 const formContainer = { maxWidth: '1200px', margin: '0 auto' } as const;
 const formGridStyle = { display: 'flex', flexDirection: 'column', gap: '12px' } as const;
-const gridRow3 = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' } as const;
+const gridRow3 = { display: 'grid', gap: '20px' } as const;
 const inputGroup = { display: 'flex', flexDirection: 'column', gap: '6px' } as const;
 const navyLabel = { color: 'rgba(255,255,255,0.5)', fontSize: '0.6rem', fontWeight: '900', letterSpacing: '1px' } as const;
 const navyInput = { padding: '10px 14px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.05)', color: '#ffffff', fontSize: '0.9rem', outline: 'none' } as const;
