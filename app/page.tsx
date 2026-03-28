@@ -42,7 +42,6 @@ export default function HomePage() {
   const whatsappNumber = "919600038089"; 
   const contactEmail = "sales@jedotech.com";
 
-  // RFQ Template for WhatsApp
   const waMessage = encodeURIComponent(
     `Jedo Tech RFQ Inquiry\n---\nPart Number: \nDescription: \nAOG Status (Yes/No): \nQuantity: `
   );
@@ -62,7 +61,6 @@ export default function HomePage() {
           <Link href="https://jedo-fleet-intel.vercel.app" target="_blank" style={{...intelTabStyle, fontSize: isMobile ? '0.7rem' : '0.85rem'}}>
             FLEET INTEL ↗
           </Link>
-          {/* UPDATED: Points to the specific rfq-section ID */}
           <Link href="/marketplace#rfq-section" style={{...quoteButtonStyle, padding: isMobile ? '8px 12px' : '12px 25px', fontSize: isMobile ? '0.7rem' : '0.85rem'}}>REQUEST SOURCING</Link>
         </div>
       </nav>
@@ -172,7 +170,8 @@ const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: '600'
 const intelTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, border: '1px solid #ffb400', padding: '8px 15px', borderRadius: '4px' };
 const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const };
 const heroSectionStyle = { minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'linear-gradient(rgba(0,12,23,0.7), rgba(0,12,23,0.7)), url("/hero-aircraft.png")', backgroundSize: 'cover', backgroundPosition: 'center', color: 'white', textAlign: 'center' as const };
-const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '16px 366px', borderRadius: '4px', textDecoration: 'none', fontWeight: '800' as const, fontSize: '1rem' };
+// FIXED: Restored original 36px horizontal padding
+const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '16px 36px', borderRadius: '4px', textDecoration: 'none', fontWeight: '800' as const, fontSize: '1rem' };
 const secondaryButtonStyle = { backgroundColor: 'transparent', color: 'white', padding: '16px 36px', borderRadius: '4px', textDecoration: 'none', fontWeight: '800' as const, fontSize: '1rem', border: '2px solid white' };
 const pulseBarContainer = { backgroundColor: '#001a35', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', borderBottom: '1px solid rgba(255,255,255,0.1)' };
 const pulseItem = { display: 'flex', alignItems: 'center', gap: '10px' };
