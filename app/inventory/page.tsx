@@ -4,29 +4,30 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. TYPE-SAFE INTERFACE
 interface InventoryPart {
   _id: string;
   partNumber: string;
   description: string;
   price?: number;
   stockStatus?: string;
+  qtyAvailable: number; // Added for Low Stock Alert
   condition?: string;
-  location?: string; // e.g., 'Chennai Hangar 1'
-  imageUrl?: string;
+  location?: string;
+  certUrl?: string; // For Certificate Preview
 }
 
 const client = createClient({
-  projectId: 'm2pa474h', 
+  projectId: 'm2pa474h',
   dataset: 'production',
   apiVersion: '2023-05-03',
-  useCdn: false, 
+  useCdn: false,
 })
 
 export default function InventoryPage() {
   const [items, setItems] = useState<InventoryPart[]>([])
   const [filteredItems, setFilteredItems] = useState<InventoryPart[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -41,23 +42,21 @@ export default function InventoryPage() {
         description,
         price,
         stockStatus,
+        qtyAvailable,
         condition,
         location,
-        "imageUrl": image.asset->url
+        "certUrl": certificate.asset->url
       }`
       try {
         const data = await client.fetch(query)
-        setItems(data)
-        setFilteredItems(data)
-      } catch (e) {
-        console.error("Inventory fetch error", e)
-      }
+        setItems(data || [])
+        setFilteredItems(data || [])
+      } catch (e) { console.error(e) }
     }
     fetchInventory()
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // SEARCH LOGIC
   useEffect(() => {
     const results = items.filter((item) =>
       item.partNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -66,116 +65,117 @@ export default function InventoryPage() {
     setFilteredItems(results)
   }, [searchTerm, items])
 
+  // Batch Selection Logic
+  const toggleSelect = (id: string) => {
+    setSelectedItems(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id])
+  }
+
   return (
-    <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* 1. TOP NAVIGATION */}
+      {/* 1. COMPACT NAV */}
       <nav style={navStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <Link href="/">
-            <img src="/jedo-logo.png" alt="Jedo" style={{ height: '30px' }} />
-          </Link>
+          <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '25px' }} /></Link>
           <span style={dividerStyle}>|</span>
-          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '0.9rem' }}>INVENTORY CONTROL</span>
+          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '0.8rem' }}>LOGISTICS TERMINAL</span>
         </div>
-        <Link href="https://jedo-fleet-intel.vercel.app/studio" target="_blank" style={adminButtonStyle}>
-          + ADD STOCK
-        </Link>
+        <div style={{ display: 'flex', gap: '10px' }}>
+            {selectedItems.length > 0 && (
+                <button style={batchActionBtn}>{selectedItems.length} SELECTED: GENERATE PACKING LIST</button>
+            )}
+            <Link href="https://jedo-fleet-intel.vercel.app/studio" target="_blank" style={adminButtonStyle}>+ NEW ENTRY</Link>
+        </div>
       </nav>
 
-      {/* 2. SEARCH & SUMMARY HEADER */}
-      <header style={{ padding: isMobile ? '20px' : '40px 60px', backgroundColor: 'white', borderBottom: '1px solid #e2e8f0' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
-          <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#001a35', margin: 0 }}>Global Parts Repository</h1>
-            <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '5px 0 0' }}>{items.length} Total Units | {items.filter(i => i.stockStatus !== 'OUT OF STOCK').length} Available</p>
-          </div>
-          <div style={{ width: isMobile ? '100%' : '400px' }}>
-            <input 
-              type="text" 
-              placeholder="Filter by PN or Description..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={searchFieldStyle}
-            />
-          </div>
+      {/* 2. TABLE CONTROL HEADER */}
+      <header style={headerStyle}>
+        <div style={{ flex: 1 }}>
+            <h1 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#001a35', margin: 0 }}>Warehouse Inventory</h1>
+            <p style={{ color: '#64748b', fontSize: '0.75rem' }}>{items.length} Units Active in Database</p>
         </div>
+        <input 
+          type="text" 
+          placeholder="Filter P/N, Description or Serial..." 
+          style={searchFieldStyle} 
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </header>
 
-      {/* 3. INVENTORY LIST */}
-      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: isMobile ? '20px' : '40px 60px' }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(340px, 1fr))', 
-          gap: '20px' 
-        }}>
-          {filteredItems.length > 0 ? filteredItems.map((item) => (
-            <div key={item._id} style={itemCardStyle}>
-              <div style={{ display: 'flex', gap: '15px' }}>
-                <div style={imageThumbStyle}>
-                  <img 
-                    src={item.imageUrl || '/tyre-placeholder.png'} 
-                    alt="part" 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <span style={pnLabelStyle}>{item.partNumber}</span>
-                    <span style={statusBadgeStyle(item.stockStatus || 'AVAILABLE')}>
-                      {item.stockStatus || 'AVAILABLE'}
+      {/* 3. DATA TABLE */}
+      <main style={{ padding: '0 40px' }}>
+        <div style={tableContainer}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={thRowStyle}>
+                <th style={thStyle}>SELECT</th>
+                <th style={thStyle}>PART NUMBER</th>
+                <th style={thStyle}>DESCRIPTION</th>
+                <th style={thStyle}>CONDITION</th>
+                <th style={thStyle}>LOCATION</th>
+                <th style={thStyle}>QTY</th>
+                <th style={thStyle}>UNIT PRICE</th>
+                <th style={thStyle}>DOCS</th>
+                <th style={thStyle}>ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.map((item) => (
+                <tr key={item._id} style={trStyle}>
+                  <td style={tdStyle}>
+                    <input type="checkbox" checked={selectedItems.includes(item._id)} onChange={() => toggleSelect(item._id)} />
+                  </td>
+                  <td style={{...tdStyle, fontWeight: 'bold', color: '#001a35'}}>{item.partNumber}</td>
+                  <td style={tdStyle}>{item.description}</td>
+                  <td style={tdStyle}><span style={badgeStyle}>{item.condition}</span></td>
+                  <td style={tdStyle}>{item.location}</td>
+                  
+                  {/* LOW STOCK ALERT LOGIC */}
+                  <td style={tdStyle}>
+                    <span style={item.qtyAvailable <= 2 ? lowStockAlert : healthyStock}>
+                        {item.qtyAvailable} Units
                     </span>
-                  </div>
-                  <h3 style={descStyle}>{item.description}</h3>
-                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <span style={metaLabelStyle}>COND: <b style={{color: '#001a35'}}>{item.condition || 'NEW'}</b></span>
-                    <span style={metaLabelStyle}>LOC: <b style={{color: '#001a35'}}>{item.location || 'CHENNAI'}</b></span>
-                  </div>
-                </div>
-              </div>
-              <div style={cardFooterStyle}>
-                <span style={{ fontWeight: '800', color: '#001a35' }}>₹{item.price?.toLocaleString('en-IN') || '---'}</span>
-                <Link 
-                  href={`https://jedo-fleet-intel.vercel.app/studio/structure/part;${item._id}`}
-                  target="_blank"
-                  style={editButtonStyle}
-                >
-                  EDIT RECORD
-                </Link>
-              </div>
-            </div>
-          )) : (
-            <div style={{ textAlign: 'center', gridColumn: '1/-1', padding: '100px 0' }}>
-              <p style={{ color: '#64748b', fontSize: '1.1rem' }}>No stock items found.</p>
-            </div>
-          )}
+                  </td>
+                  
+                  <td style={tdStyle}>₹{item.price?.toLocaleString('en-IN')}</td>
+                  
+                  {/* CERTIFICATE PREVIEW */}
+                  <td style={tdStyle}>
+                    {item.certUrl ? (
+                        <a href={item.certUrl} target="_blank" style={certLink}>VIEW CERT</a>
+                    ) : <span style={{opacity: 0.3}}>NO DOC</span>}
+                  </td>
+                  
+                  <td style={tdStyle}>
+                    <Link href={`https://jedo-fleet-intel.vercel.app/studio/structure/part;${item._id}`} target="_blank" style={editLink}>EDIT</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </main>
     </div>
   )
 }
 
-// STYLES
-const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 25px', backgroundColor: '#001a35' };
-const dividerStyle = { color: 'rgba(255,255,255,0.2)', fontSize: '1.2rem' };
-const adminButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '8px 16px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.8rem' };
+// --- STYLES ---
+const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 40px', backgroundColor: '#001a35' };
+const dividerStyle = { color: 'rgba(255,255,255,0.2)' };
+const adminButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '6px 12px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.75rem' };
+const batchActionBtn = { backgroundColor: '#10b981', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold' as const, fontSize: '0.75rem', cursor: 'pointer' };
 
-const searchFieldStyle = { width: '100%', padding: '12px 20px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none', backgroundColor: '#f8fafc', boxSizing: 'border-box' as const };
+const headerStyle = { padding: '20px 40px', display: 'flex', alignItems: 'center', gap: '40px' };
+const searchFieldStyle = { width: '300px', padding: '8px 15px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.85rem' };
 
-const itemCardStyle = { backgroundColor: 'white', borderRadius: '12px', padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column' as const, gap: '15px' };
-const imageThumbStyle = { width: '70px', height: '70px', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#f1f5f9', flexShrink: 0 };
-const pnLabelStyle = { fontSize: '0.7rem', fontWeight: '900', color: '#ffb400', letterSpacing: '0.5px' };
-const descStyle = { fontSize: '1rem', fontWeight: '700', color: '#001a35', margin: '4px 0 0', lineHeight: '1.3' };
-const metaLabelStyle = { fontSize: '0.65rem', color: '#94a3b8', fontWeight: 'bold' as const };
+const tableContainer = { backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' };
+const thRowStyle = { backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0' };
+const thStyle = { padding: '12px 20px', textAlign: 'left' as const, fontSize: '0.7rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase' as const };
+const trStyle = { borderBottom: '1px solid #f1f5f9' };
+const tdStyle = { padding: '12px 20px', fontSize: '0.85rem', color: '#334155' };
 
-const statusBadgeStyle = (status: string) => ({
-  fontSize: '0.6rem',
-  fontWeight: '800' as const,
-  padding: '3px 8px',
-  borderRadius: '4px',
-  backgroundColor: status === 'OUT OF STOCK' ? '#fee2e2' : '#dcfce7',
-  color: status === 'OUT OF STOCK' ? '#ef4444' : '#10b981'
-});
-
-const cardFooterStyle = { borderTop: '1px solid #f1f5f9', paddingTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' };
-const editButtonStyle = { fontSize: '0.75rem', fontWeight: 'bold' as const, color: '#64748b', textDecoration: 'none', padding: '5px 10px', border: '1px solid #e2e8f0', borderRadius: '4px' };
+const lowStockAlert = { backgroundColor: '#fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' as const, fontSize: '0.75rem' };
+const healthyStock = { color: '#64748b', fontWeight: '600' as const };
+const badgeStyle = { fontSize: '0.7rem', fontWeight: 'bold' as const, color: '#001a35', background: '#e2e8f0', padding: '2px 6px', borderRadius: '4px' };
+const certLink = { color: '#2563eb', fontWeight: 'bold' as const, textDecoration: 'none', fontSize: '0.75rem' };
+const editLink = { color: '#64748b', textDecoration: 'none', fontSize: '0.75rem', border: '1px solid #e2e8f0', padding: '3px 8px', borderRadius: '4px' };
