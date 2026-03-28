@@ -17,6 +17,7 @@ interface InventoryPart {
   certUrl?: string; 
 }
 
+// UPDATED: Dataset changed to 'production'
 const client = createClient({
   projectId: 'm2pa474h',
   dataset: 'production',
@@ -34,7 +35,6 @@ export default function InventoryPage() {
 
   useEffect(() => {
     setMounted(true)
-    // Guard to ensure window is defined (prevents SSR errors)
     if (typeof window === 'undefined') return;
 
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -163,14 +163,13 @@ export default function InventoryPage() {
                     
                     <td style={tdStyle}>₹{item.price?.toLocaleString('en-IN') || '0'}</td>
                     
-                    {/* CERTIFICATE PREVIEW */}
                     <td style={tdStyle}>
                       {item.certUrl ? (
                           <a href={item.certUrl} target="_blank" rel="noopener noreferrer" style={certLink}>VIEW CERT</a>
                       ) : <span style={{opacity: 0.3}}>NO DOC</span>}
                     </td>
                     
-                    {/* FIXED ACTION LINK: Using Sanity Intent for robust editing */}
+                    {/* FIXED ACTION LINK: Using Intent for Sanity 404 Fix */}
                     <td style={tdStyle}>
                       <Link 
                         href={`https://jedo-fleet-intel.vercel.app/studio/intent/edit/id=${item._id}`} 

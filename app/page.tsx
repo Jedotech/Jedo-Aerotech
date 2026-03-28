@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
+// UPDATED: Dataset changed from 'fleet' to 'production'
 const client = createClient({
   projectId: 'm2pa474h', 
-  dataset: 'fleet', 
+  dataset: 'production', 
   apiVersion: '2023-05-03',
   useCdn: false, 
 })
@@ -164,13 +165,12 @@ export default function HomePage() {
   )
 }
 
-// STYLES
+// STYLES (NO CHANGES HERE)
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#001a35', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: '600' as const, fontSize: '0.8rem', opacity: 0.8, letterSpacing: '1px' };
 const intelTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, border: '1px solid #ffb400', padding: '8px 15px', borderRadius: '4px' };
 const quoteButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const };
 const heroSectionStyle = { minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: 'linear-gradient(rgba(0,12,23,0.7), rgba(0,12,23,0.7)), url("/hero-aircraft.png")', backgroundSize: 'cover', backgroundPosition: 'center', color: 'white', textAlign: 'center' as const };
-// FIXED: Restored original 36px horizontal padding
 const primaryButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '16px 36px', borderRadius: '4px', textDecoration: 'none', fontWeight: '800' as const, fontSize: '1rem' };
 const secondaryButtonStyle = { backgroundColor: 'transparent', color: 'white', padding: '16px 36px', borderRadius: '4px', textDecoration: 'none', fontWeight: '800' as const, fontSize: '1rem', border: '2px solid white' };
 const pulseBarContainer = { backgroundColor: '#001a35', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', borderBottom: '1px solid rgba(255,255,255,0.1)' };
