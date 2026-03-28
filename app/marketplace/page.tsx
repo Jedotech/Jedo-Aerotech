@@ -190,7 +190,8 @@ export default function Marketplace() {
         <div style={{ ...intelCapsule, padding: isMobile ? '8px 15px' : '8px 30px', flexWrap: 'wrap', justifyContent: 'center', borderRadius: isMobile ? '12px' : '50px' }}>
           <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
           <div style={intelDivider} className="mobile-hide" />
-          <div style={intelItem}>X-RATE: {exchangeRate.toFixed(2)} INR</div>
+          {/* UPDATED: Added $1 prefix to Exchange Rate */}
+          <div style={intelItem}>X-RATE: $1 = {exchangeRate.toFixed(2)} INR</div>
           <div style={intelDivider} className="mobile-hide" />
           <div style={intelItem}>DGCA / EASA / FAA</div>
         </div>
