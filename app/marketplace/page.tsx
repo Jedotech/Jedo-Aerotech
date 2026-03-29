@@ -190,7 +190,6 @@ export default function Marketplace() {
         <div style={{ ...intelCapsule, padding: isMobile ? '8px 15px' : '8px 30px', flexWrap: 'wrap', justifyContent: 'center', borderRadius: isMobile ? '12px' : '50px' }}>
           <div style={intelItem}><span style={pulseDot}></span> HUB: CHENNAI</div>
           <div style={intelDivider} className="mobile-hide" />
-          {/* UPDATED: Added $1 prefix to Exchange Rate */}
           <div style={intelItem}>X-RATE: $1 = {exchangeRate.toFixed(2)} INR</div>
           <div style={intelDivider} className="mobile-hide" />
           <div style={intelItem}>DGCA / EASA / FAA</div>
@@ -230,7 +229,8 @@ export default function Marketplace() {
                     <tr key={part._id} style={trStyle}>
                       <td style={tdStyle}><b>{part.aircraftType}</b></td>
                       <td style={tdStyle}>{part.tyreSize}</td>
-                      <td style={tdStyle}>{part.plyRating}P</td>
+                      {/* UPDATED: Removed the "P" suffix here */}
+                      <td style={tdStyle}>{part.plyRating}</td>
                       <td style={{ ...tdStyle, color: '#001a35', fontWeight: '700', fontFamily: 'monospace' }}>{part.partNumber}</td>
                       <td style={tdStyle}><span style={badgeStyle}>{part.condition}</span></td>
                       <td style={tdStyle}>
