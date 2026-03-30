@@ -45,6 +45,14 @@ export default function InventoryPage() {
     checkMobile()
     window.addEventListener('resize', checkMobile)
 
+    // NEW: QR CODE SEARCH DETECTION
+    // If the URL has ?search=... (from the QR scan), apply it to the filter instantly
+    const params = new URLSearchParams(window.location.search);
+    const querySearch = params.get('search');
+    if (querySearch) {
+      setSearchTerm(decodeURIComponent(querySearch));
+    }
+
     async function fetchData() {
       const query = `*[_type == "part"]{
         _id,
