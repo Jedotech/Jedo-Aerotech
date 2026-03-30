@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation' // Added for navigation
 import { createClient } from 'next-sanity'
 
 interface InventoryPart {
@@ -24,6 +25,7 @@ const client = createClient({
 })
 
 export default function InventoryPage() {
+  const router = useRouter(); // Initialized Router
   const [items, setItems] = useState<InventoryPart[]>([])
   const [filteredItems, setFilteredItems] = useState<InventoryPart[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -110,7 +112,12 @@ export default function InventoryPage() {
             <button onClick={() => setCurrency('INR')} style={currency === 'INR' ? activePillBtn : inactivePillBtn}>INR</button>
           </div>
           {selectedItems.length > 0 && (
-            <button style={batchActionBtn}>{selectedItems.length} SELECTED: GENERATE PACKING LIST</button>
+            <button 
+              onClick={() => router.push(`/inventory/manifest?ids=${selectedItems.join(',')}`)} 
+              style={batchActionBtn}
+            >
+              {selectedItems.length} SELECTED: GENERATE PACKING LIST
+            </button>
           )}
           <Link href="https://jedo-fleet-intel.vercel.app/studio" target="_blank" style={adminButtonStyle}>+ NEW ENTRY</Link>
         </div>
