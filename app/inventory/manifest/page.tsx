@@ -18,8 +18,16 @@ function ManifestContent() {
   
   const ids = searchParams.get('ids')?.split(',') || []
 
-  // STABLE REF NUMBER: Prevents the number from changing on every click
+  // STABLE REF NUMBER: Generated once per page load
   const shipmentRef = useMemo(() => `JEDO-SHP-${Math.floor(100000 + Math.random() * 900000)}`, []);
+
+  // QR CODE GENERATOR: Links to your marketplace search for these parts
+  const qrCodeUrl = useMemo(() => {
+    const baseUrl = "https://jedo-fleet-intel.vercel.app/marketplace";
+    const searchValues = shipmentItems.map(i => i.partNumber).join(',');
+    // Google Chart API for instant QR generation
+    return `https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=${encodeURIComponent(baseUrl + '?search=' + searchValues)}&choe=UTF-8`;
+  }, [shipmentItems]);
 
   useEffect(() => {
     async function fetchSelected() {
@@ -38,11 +46,10 @@ function ManifestContent() {
 
   return (
     <div style={manifestPageStyle}>
-      {/* CSS to hide the button during printing */}
       <style jsx>{`
         @media print {
           .no-print { display: none !important; }
-          textarea { border: none !important; resize: none !important; padding: 0 !important; }
+          textarea { border: none !important; resize: none !important; padding: 0 !important; background: transparent !important; }
         }
       `}</style>
 
@@ -54,7 +61,7 @@ function ManifestContent() {
           <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Ref: {shipmentRef}</p>
         </div>
         <div style={consigneeBox}>
-          <p style={label}>CONSIGNEE (EDITABLE):</p>
+          <p style={label}>CONSIGNEE:</p>
           <textarea 
             value={consignee}
             onChange={(e) => setConsignee(e.target.value)}
@@ -90,7 +97,7 @@ function ManifestContent() {
         </tbody>
       </table>
 
-      {/* UPDATED SAFETY BRIEF (Removed Gemini mention) */}
+      {/* SHIPMENT ADVISORY */}
       <div style={aiBriefBox}>
         <p style={{ ...label, color: '#ffb400' }}>JEDO INTEL: SHIPMENT ADVISORY</p>
         <p style={{ fontSize: '0.9rem', fontStyle: 'italic', color: '#1e293b' }}>
@@ -98,11 +105,20 @@ function ManifestContent() {
         </p>
       </div>
 
+      {/* FOOTER: Signature and QR Code */}
       <div style={footerFlex}>
         <div style={signatureBox}>
           <p style={label}>RELEASED BY (JEDO TECH):</p>
-          <div style={{ borderBottom: '1px solid #000', height: '40px', width: '250px' }}></div>
-          <p style={{ fontSize: '0.6rem', marginTop: '5px' }}>Date: {new Date().toLocaleDateString()}</p>
+          <div style={{ borderBottom: '1px solid #000', height: '40px', width: '250px', marginBottom: '10px' }}></div>
+          <p style={{ fontSize: '0.65rem', color: '#64748b' }}>Authorized Signature & Date: {new Date().toLocaleDateString()}</p>
+        </div>
+
+        <div style={qrBox}>
+          <p style={label}>DIGITAL TRACE:</p>
+          {shipmentItems.length > 0 && (
+            <img src={qrCodeUrl} alt="QR Code" style={{ width: '100px', height: '100px', border: '1px solid #f1f5f9' }} />
+          )}
+          <p style={{ fontSize: '0.5rem', color: '#94a3b8', marginTop: '4px' }}>SCAN FOR LIVE SPECS</p>
         </div>
       </div>
 
@@ -125,12 +141,13 @@ export default function ManifestPage() {
 const manifestPageStyle = { padding: '60px', maxWidth: '900px', margin: '0 auto', backgroundColor: '#fff', minHeight: '100vh', fontFamily: 'Inter, sans-serif' } as const;
 const headerFlex = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' } as const;
 const consigneeBox = { textAlign: 'right' as const, width: '300px' } as const;
-const consigneeInput = { width: '100%', padding: '10px', fontSize: '0.9rem', border: '1px dashed #cbd5e1', borderRadius: '4px', fontFamily: 'inherit', textAlign: 'right' as any } as const;
-const label = { fontSize: '0.65rem', fontWeight: '900', color: '#64748b', margin: '0 0 5px' } as const;
+const consigneeInput = { width: '100%', padding: '10px', fontSize: '0.9rem', border: '1px dashed #cbd5e1', borderRadius: '4px', fontFamily: 'inherit', textAlign: 'right' as any, backgroundColor: '#fcfcfc' } as const;
+const label = { fontSize: '0.65rem', fontWeight: '900', color: '#64748b', margin: '0 0 5px', letterSpacing: '0.5px' } as const;
 const manifestTable = { width: '100%', borderCollapse: 'collapse' as const, marginTop: '30px' } as const;
 const th = { padding: '12px', textAlign: 'left' as const, fontSize: '0.75rem', color: '#64748b', borderBottom: '2px solid #001a35' } as const;
 const td = { padding: '12px', fontSize: '0.85rem' } as const;
 const aiBriefBox = { marginTop: '40px', padding: '20px', backgroundColor: '#fdfaf2', borderLeft: '4px solid #ffb400', borderRadius: '4px' } as const;
 const footerFlex = { marginTop: '60px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' } as const;
 const signatureBox = { textAlign: 'left' as const } as const;
+const qrBox = { textAlign: 'center' as const } as const;
 const printBtn = { marginTop: '50px', backgroundColor: '#001a35', color: '#fff', padding: '12px 25px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' } as const;
