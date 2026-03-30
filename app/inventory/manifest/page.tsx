@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react' // 1. Added Suspense
 import { useSearchParams } from 'next/navigation'
 import { createClient } from 'next-sanity'
 
@@ -11,7 +11,8 @@ const client = createClient({
   useCdn: false,
 })
 
-export default function ManifestPage() {
+// 2. Move your main logic into a sub-component
+function ManifestContent() {
   const searchParams = useSearchParams()
   const [shipmentItems, setShipmentItems] = useState<any[]>([])
   const ids = searchParams.get('ids')?.split(',') || []
@@ -33,7 +34,6 @@ export default function ManifestPage() {
 
   return (
     <div style={manifestPageStyle}>
-      {/* HEADER SECTION */}
       <div style={headerFlex}>
         <div>
           <img src="/jedo-logo.png" alt="Jedo Logo" style={{ height: '50px' }} />
@@ -49,7 +49,6 @@ export default function ManifestPage() {
 
       <hr style={{ border: '1px solid #e2e8f0', margin: '30px 0' }} />
 
-      {/* TECHNICAL TABLE */}
       <table style={manifestTable}>
         <thead>
           <tr style={{ backgroundColor: '#f8fafc' }}>
@@ -73,13 +72,10 @@ export default function ManifestPage() {
         </tbody>
       </table>
 
-      {/* GEMINI AI SAFETY BRIEF SECTION */}
       <div style={aiBriefBox}>
         <p style={{ ...label, color: '#ffb400' }}>GEMINI AI SAFETY BRIEF:</p>
         <p style={{ fontSize: '0.9rem', fontStyle: 'italic', color: '#1e293b' }}>
-          "Verified {shipmentItems.length} assets for dispatch. Note: {shipmentItems[0]?.ply || 'Standard'} ply tyres detected. 
-          Ensure inflation pressures are set to aircraft POH specs for high-cycle training environments. 
-          Traceability documents verified for Chennai Hub release."
+          "Verified {shipmentItems.length} assets for dispatch. Inflation pressures must match aircraft POH specs for high-cycle training."
         </p>
       </div>
 
@@ -88,11 +84,6 @@ export default function ManifestPage() {
           <p style={label}>RELEASED BY (JEDO TECH):</p>
           <div style={{ borderBottom: '1px solid #000', height: '40px', width: '200px' }}></div>
         </div>
-        <div style={qrPlaceholder}>
-          <div style={{ width: '80px', height: '80px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', textAlign: 'center' }}>
-            INTEL QR<br/>SCAN
-          </div>
-        </div>
       </div>
 
       <button onClick={() => window.print()} style={printBtn}>PRINT MANIFEST</button>
@@ -100,7 +91,16 @@ export default function ManifestPage() {
   )
 }
 
-// STYLES
+// 3. The main export now wraps everything in Suspense
+export default function ManifestPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '60px', textAlign: 'center' }}>Loading Manifest Data...</div>}>
+      <ManifestContent />
+    </Suspense>
+  )
+}
+
+// --- KEEP ALL YOUR STYLES BELOW AS THEY WERE ---
 const manifestPageStyle = { padding: '60px', maxWidth: '900px', margin: '0 auto', backgroundColor: '#fff', minHeight: '100vh', fontFamily: 'Inter, sans-serif' } as const;
 const headerFlex = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' } as const;
 const consigneeBox = { textAlign: 'right' as const, border: '1px solid #e2e8f0', padding: '15px', borderRadius: '4px' } as const;
@@ -112,5 +112,4 @@ const td = { padding: '12px', fontSize: '0.85rem' } as const;
 const aiBriefBox = { marginTop: '40px', padding: '20px', backgroundColor: '#fffbeb', borderLeft: '4px solid #ffb400', borderRadius: '4px' } as const;
 const footerFlex = { marginTop: '60px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' } as const;
 const signatureBox = { textAlign: 'left' as const } as const;
-const qrPlaceholder = { textAlign: 'right' as const } as const;
 const printBtn = { marginTop: '50px', backgroundColor: '#001a35', color: '#fff', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'block' } as const;
