@@ -14,11 +14,6 @@ interface InventoryPart {
   condition?: string;
   location?: string;
   certUrl?: string;
-  // Fleet Intelligence Fields
-  manufacturer?: string;
-  totalLandings?: number;
-  maxDesignLife?: number;
-  dailyUtilization?: number;
 }
 
 const client = createClient({
@@ -65,10 +60,6 @@ export default function InventoryPage() {
         "qtyAvailable": quantity,
         condition,
         "location": warehouse,
-        manufacturer,
-        totalLandings,
-        maxDesignLife,
-        dailyUtilization,
         "certUrl": certificate.asset->url
       }`
       try {
@@ -90,30 +81,10 @@ export default function InventoryPage() {
   useEffect(() => {
     const results = items.filter((item) =>
       item.partNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase())
+      item.description?.toLowerCase().includes(searchTerm.toLowerCase())
     )
     setFilteredItems(results)
   }, [searchTerm, items])
-
-  // INTELLIGENCE CALCULATIONS
-  const calculateIntel = (item: InventoryPart) => {
-    const landingsRemaining = (item.maxDesignLife || 0) - (item.totalLandings || 0);
-    const daysLeft = item.dailyUtilization && item.dailyUtilization > 0 
-      ? Math.max(0, Math.floor(landingsRemaining / item.dailyUtilization)) 
-      : null;
-    
-    // Cost Per Landing (CPL) is Price / Max Design Cycles
-    const cpl = item.maxDesignLife && item.maxDesignLife > 0
-      ? (item.priceUSD / item.maxDesignLife).toFixed(2)
-      : '0.00';
-
-    const wearProgress = item.maxDesignLife 
-      ? Math.min(Math.round(((item.totalLandings || 0) / item.maxDesignLife) * 100), 100) 
-      : 0;
-
-    return { daysLeft, cpl, wearProgress };
-  }
 
   const formatPrice = (usdAmount: number = 0) => {
     if (currency === 'INR') {
@@ -136,7 +107,7 @@ export default function InventoryPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '25px' }} /></Link>
           <span style={dividerStyle}>|</span>
-          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '0.8rem', letterSpacing: '0.05em' }}>FLEET INTELLIGENCE TERMINAL</span>
+          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '0.8rem', letterSpacing: '0.05em' }}>LOGISTICS TERMINAL</span>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -145,7 +116,10 @@ export default function InventoryPage() {
             <button onClick={() => setCurrency('INR')} style={currency === 'INR' ? activePillBtn : inactivePillBtn}>INR</button>
           </div>
           {selectedItems.length > 0 && (
-            <button onClick={() => router.push(`/inventory/manifest?ids=${selectedItems.join(',')}`)} style={batchActionBtn}>
+            <button 
+              onClick={() => router.push(`/inventory/manifest?ids=${selectedItems.join(',')}`)} 
+              style={batchActionBtn}
+            >
               {selectedItems.length} SELECTED: GENERATE PACKING LIST
             </button>
           )}
@@ -156,12 +130,12 @@ export default function InventoryPage() {
       {/* 2. HEADER */}
       <header style={headerStyle}>
         <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#001a35', margin: 0 }}>Active Tyre Fleet</h1>
-            <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '4px' }}>Real-time Wear Analytics | $1 = {exchangeRate.toFixed(2)} INR</p>
+            <h1 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#001a35', margin: 0 }}>Warehouse Inventory</h1>
+            <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '4px' }}>Manage stock and dispatch | $1 = {exchangeRate.toFixed(2)} INR</p>
         </div>
         <input 
           type="text" 
-          placeholder="Filter P/N, Brand or Model..." 
+          placeholder="Filter P/N or Description..." 
           style={searchFieldStyle} 
           value={searchTerm} 
           onChange={(e) => setSearchTerm(e.target.value)} 
@@ -172,64 +146,52 @@ export default function InventoryPage() {
       <main style={{ padding: isMobile ? '0 10px' : '0 40px' }}>
         <div style={tableContainer}>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1100px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '950px' }}>
               <thead>
                 <tr style={thRowStyle}>
                   <th style={thStyle}>SELECT</th>
-                  <th style={thStyle}>PART / MANUFACTURER</th>
-                  <th style={thStyle}>WEAR STATUS</th>
-                  <th style={thStyle}>EST. REPLACEMENT</th>
-                  <th style={thStyle}>CPL (USD)</th>
+                  <th style={thStyle}>PART NUMBER</th>
+                  <th style={thStyle}>DESCRIPTION</th>
+                  <th style={thStyle}>CONDITION</th>
+                  <th style={thStyle}>LOCATION</th>
                   <th style={thStyle}>STOCK</th>
-                  <th style={thStyle}>UNIT PRICE</th>
+                  <th style={thStyle}>UNIT PRICE ({currency})</th>
                   <th style={thStyle}>ACTION</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredItems.map((item) => {
-                  const { daysLeft, cpl, wearProgress } = calculateIntel(item);
-                  
-                  return (
-                    <tr key={item._id} style={trStyle}>
-                      <td style={tdStyle}>
-                        <input type="checkbox" checked={selectedItems.includes(item._id)} onChange={() => toggleSelect(item._id)} />
-                      </td>
-                      <td style={tdStyle}>
-                        <div style={{ fontWeight: 'bold', color: '#001a35' }}>{item.partNumber}</div>
-                        <div style={{ fontSize: '0.7rem', color: '#64748b', textTransform: 'uppercase' }}>{item.manufacturer || 'OEM'}</div>
-                      </td>
-                      <td style={tdStyle}>
-                        <div style={{ width: '100px', height: '6px', backgroundColor: '#e2e8f0', borderRadius: '3px', marginBottom: '4px' }}>
-                          <div style={{ width: `${wearProgress}%`, height: '100%', backgroundColor: wearProgress > 85 ? '#ef4444' : '#10b981', borderRadius: '3px' }} />
-                        </div>
-                        <span style={{ fontSize: '0.7rem', fontWeight: '600' }}>{wearProgress}% ({item.totalLandings}/{item.maxDesignLife || '∞'})</span>
-                      </td>
-                      <td style={tdStyle}>
-                        {daysLeft !== null ? (
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <span style={{ color: daysLeft < 10 ? '#ef4444' : '#334155', fontWeight: 'bold' }}>
-                              {daysLeft} Days Left
-                            </span>
-                            <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>at {item.dailyUtilization} ldg/day</span>
-                          </div>
-                        ) : <span style={{ opacity: 0.5, fontSize: '0.75rem' }}>No util. data</span>}
-                      </td>
-                      <td style={tdStyle}>
-                        <span style={{fontWeight: '700', color: '#0f172a'}}>${cpl}</span>
-                        <div style={{ fontSize: '0.6rem', color: '#94a3b8' }}>PER LANDING</div>
-                      </td>
-                      <td style={tdStyle}>
-                        <span style={item.qtyAvailable <= 2 ? lowStockAlert : healthyStock}>
-                          {item.qtyAvailable || 0} Units
-                        </span>
-                      </td>
-                      <td style={{...tdStyle, fontWeight: '700'}}>{formatPrice(item.priceUSD)}</td>
-                      <td style={tdStyle}>
-                        <Link href={`https://jedo-fleet-intel.vercel.app/studio/intent/edit/id=${item._id}`} target="_blank" style={editLink}>LOG DATA</Link>
-                      </td>
-                    </tr>
-                  )
-                })}
+                {filteredItems.map((item) => (
+                  <tr key={item._id} style={trStyle}>
+                    <td style={tdStyle}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedItems.includes(item._id)} 
+                        onChange={() => toggleSelect(item._id)} 
+                      />
+                    </td>
+                    <td style={{...tdStyle, fontWeight: 'bold', color: '#001a35'}}>{item.partNumber}</td>
+                    <td style={tdStyle}>{item.description}</td>
+                    <td style={tdStyle}>
+                      <span style={badgeStyle}>{item.condition || 'New'}</span>
+                    </td>
+                    <td style={tdStyle}>{item.location || 'CHENNAI'}</td>
+                    <td style={tdStyle}>
+                      <span style={item.qtyAvailable <= 2 ? lowStockAlert : healthyStock}>
+                        {item.qtyAvailable || 0} Units
+                      </span>
+                    </td>
+                    <td style={{...tdStyle, fontWeight: '700'}}>{formatPrice(item.priceUSD)}</td>
+                    <td style={tdStyle}>
+                      <Link 
+                        href={`https://jedo-fleet-intel.vercel.app/studio/intent/edit/id=${item._id}`} 
+                        target="_blank" 
+                        style={editLink}
+                      >
+                        EDIT
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -238,13 +200,13 @@ export default function InventoryPage() {
 
       {/* 4. FOOTER */}
       <footer style={footerStyle}>
-        © 2026 Jedo Technologies Pvt. Ltd. | Aviation Supply Chain Intelligence | Chennai, India
+        © 2026 Jedo Technologies Pvt. Ltd. | Aviation Supply Chain | Chennai, India
       </footer>
     </div>
   )
 }
 
-// --- STYLES (Preserving your exact UI) ---
+// --- STYLES ---
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 40px', backgroundColor: '#001a35' };
 const dividerStyle = { color: 'rgba(255,255,255,0.2)', fontSize: '1.2rem', fontWeight: '300' };
 const adminButtonStyle = { backgroundColor: '#ffb400', color: '#001a35', padding: '6px 14px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold' as const, fontSize: '0.75rem' };
@@ -261,5 +223,6 @@ const trStyle = { borderBottom: '1px solid #f1f5f9' };
 const tdStyle = { padding: '16px 20px', fontSize: '0.85rem', color: '#334155' };
 const lowStockAlert = { backgroundColor: '#fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' as const, fontSize: '0.75rem' };
 const healthyStock = { color: '#64748b', fontWeight: '600' as const };
-const editLink = { color: '#64748b', textDecoration: 'none', fontSize: '0.7rem', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: '4px', fontWeight: '600' as const, transition: 'all 0.2s' };
+const badgeStyle = { fontSize: '0.7rem', fontWeight: 'bold' as const, color: '#001a35', background: '#e2e8f0', padding: '2px 6px', borderRadius: '4px' };
+const editLink = { color: '#64748b', textDecoration: 'none', fontSize: '0.7rem', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: '4px', fontWeight: '600' as const };
 const footerStyle = { textAlign: 'center' as const, padding: '30px', fontSize: '0.7rem', color: '#94a3b8', borderTop: '1px solid #e2e8f0' };
