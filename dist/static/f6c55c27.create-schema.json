@@ -1,0 +1,178 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., Cessna 172, Cessna 152",
+        "name": "aircraftType",
+        "type": "string",
+        "title": "Aircraft Model Compatibility"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "partNumber",
+        "type": "string",
+        "title": "Part Number (P/N)"
+      },
+      {
+        "options": {
+          "list": [
+            "Michelin",
+            "Goodyear",
+            "Dunlop",
+            "Condor",
+            "Specialty"
+          ]
+        },
+        "name": "manufacturer",
+        "type": "string"
+      },
+      {
+        "description": "e.g., Aviator, Flight Custom III",
+        "name": "tyreModel",
+        "type": "string",
+        "title": "Tyre Model/Line"
+      },
+      {
+        "name": "tyreSize",
+        "type": "string"
+      },
+      {
+        "name": "plyRating",
+        "type": "string"
+      },
+      {
+        "initialValue": "New",
+        "options": {
+          "list": [
+            "New",
+            "New Surplus",
+            "Overhauled",
+            "Serviceable"
+          ]
+        },
+        "name": "condition",
+        "type": "string"
+      },
+      {
+        "initialValue": 1,
+        "name": "quantity",
+        "type": "number",
+        "title": "Stock Quantity"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "priceUSD",
+        "type": "number",
+        "title": "Unit Price (USD)"
+      },
+      {
+        "initialValue": "Chennai Hub",
+        "options": {
+          "list": [
+            "Chennai Hub",
+            "Singapore Hub",
+            "USA Hub"
+          ]
+        },
+        "name": "warehouse",
+        "type": "string",
+        "title": "Warehouse Location"
+      },
+      {
+        "options": {
+          "list": [
+            "DGCA Form 1",
+            "8130-3",
+            "EASA Form 1",
+            "CoC"
+          ]
+        },
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "certificates",
+        "type": "array",
+        "title": "Certifications"
+      }
+    ],
+    "name": "part",
+    "type": "document",
+    "title": "Tyre Inventory"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            "Cessna 172",
+            "Cessna 152",
+            "Piper Archer",
+            "Beechcraft Baron"
+          ]
+        },
+        "name": "aircraftType",
+        "type": "string",
+        "title": "Aircraft Model"
+      },
+      {
+        "description": "The Serial or Part Number for the tracked component",
+        "name": "partNumber",
+        "type": "string"
+      },
+      {
+        "initialValue": 0,
+        "name": "totalLandings",
+        "type": "number",
+        "title": "Current Landings"
+      },
+      {
+        "initialValue": 350,
+        "name": "maxDesignLife",
+        "type": "number",
+        "title": "Max Design Life (Landings)"
+      },
+      {
+        "description": "Used for automated maintenance alerts",
+        "name": "ownerEmail",
+        "type": "string",
+        "title": "Owner / Operator Email"
+      }
+    ],
+    "name": "fleet",
+    "type": "document",
+    "title": "Fleet Management"
+  }
+]
