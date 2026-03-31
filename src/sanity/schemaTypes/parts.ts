@@ -3,7 +3,7 @@ import { PackageIcon } from '@sanity/icons'
 
 export default defineType({
   name: 'part',
-  title: 'Tyre Inventory',
+  title: 'Tyre Inventory & Fleet Intel',
   type: 'document',
   icon: PackageIcon,
   fields: [
@@ -20,6 +20,21 @@ export default defineType({
       type: 'string',
       description: 'The manufacturer part number',
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'manufacturer',
+      title: 'Manufacturer',
+      type: 'string',
+      description: 'Used to track wear-quality differences between brands',
+      options: {
+        list: [
+          { title: 'Michelin', value: 'Michelin' },
+          { title: 'Goodyear', value: 'Goodyear' },
+          { title: 'Dunlop', value: 'Dunlop' },
+          { title: 'Condor', value: 'Condor' },
+          { title: 'Specialty Tires (McCready)', value: 'Specialty' },
+        ],
+      },
     }),
     defineField({
       name: 'tyreSize',
@@ -47,6 +62,38 @@ export default defineType({
         ],
       },
     }),
+    
+    // --- FLEET INTELLIGENCE & LIFE CYCLE ---
+    defineField({
+      name: 'totalLandings',
+      title: 'Accumulated Landings (TSN)',
+      type: 'number',
+      description: 'Current landings recorded on the tyre',
+      initialValue: 0,
+      validation: (Rule) => Rule.min(0),
+    }),
+    defineField({
+      name: 'maxDesignLife',
+      title: 'Max Design Life (Cycles)',
+      type: 'number',
+      description: 'Maximum allowable landings before mandatory replacement',
+      validation: (Rule) => Rule.required().min(1),
+    }),
+    defineField({
+      name: 'dailyUtilization',
+      title: 'Daily Landings (Avg)',
+      type: 'number',
+      description: 'Average landings per day to calculate "Days Remaining"',
+      initialValue: 0,
+    }),
+    defineField({
+      name: 'installDate',
+      title: 'Installation Date',
+      type: 'date',
+      description: 'When was this tyre fitted to the aircraft?',
+    }),
+
+    // --- STOCK & CONDITION ---
     defineField({
       name: 'condition',
       title: 'Condition',
@@ -85,19 +132,6 @@ export default defineType({
       validation: (Rule) => Rule.min(0),
     }),
     defineField({
-      name: 'totalLandings',
-      title: 'Total Landings (TSN)',
-      type: 'number',
-      description: 'Total landings on the tyre',
-      initialValue: 0,
-    }),
-    defineField({
-      name: 'maxDesignLife',
-      title: 'Max Design Life',
-      type: 'number',
-      description: 'Maximum allowable landings or cycles',
-    }),
-    defineField({
       name: 'priceUSD',
       title: 'Unit Price (USD)',
       type: 'number',
@@ -112,7 +146,6 @@ export default defineType({
         list: ['Chennai Hub', 'Singapore Hub', 'USA Hub'],
       },
     }),
-    // NEWLY ADDED FIELDS TO RESOLVE UNKNOWN ERRORS
     defineField({
       name: 'description',
       title: 'Technical Description',
@@ -130,7 +163,7 @@ export default defineType({
   preview: {
     select: {
       title: 'partNumber',
-      subtitle: 'aircraftType',
+      subtitle: 'manufacturer',
     },
   },
 })
