@@ -146,7 +146,7 @@ export default function InventoryPage() {
       <main style={{ padding: isMobile ? '0 10px' : '0 40px' }}>
         <div style={tableContainer}>
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '950px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1000px' }}>
               <thead>
                 <tr style={thRowStyle}>
                   <th style={thStyle}>SELECT</th>
@@ -156,6 +156,7 @@ export default function InventoryPage() {
                   <th style={thStyle}>LOCATION</th>
                   <th style={thStyle}>STOCK</th>
                   <th style={thStyle}>UNIT PRICE ({currency})</th>
+                  <th style={thStyle}>DOCS</th>
                   <th style={thStyle}>ACTION</th>
                 </tr>
               </thead>
@@ -181,6 +182,11 @@ export default function InventoryPage() {
                       </span>
                     </td>
                     <td style={{...tdStyle, fontWeight: '700'}}>{formatPrice(item.priceUSD)}</td>
+                    <td style={tdStyle}>
+                      {item.certUrl ? (
+                        <a href={item.certUrl} target="_blank" rel="noopener noreferrer" style={certLink}>VIEW CERT</a>
+                      ) : <span style={{opacity: 0.3, fontSize: '0.7rem'}}>NO DOC</span>}
+                    </td>
                     <td style={tdStyle}>
                       <Link 
                         href={`https://jedo-fleet-intel.vercel.app/studio/intent/edit/id=${item._id}`} 
@@ -224,5 +230,6 @@ const tdStyle = { padding: '16px 20px', fontSize: '0.85rem', color: '#334155' };
 const lowStockAlert = { backgroundColor: '#fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' as const, fontSize: '0.75rem' };
 const healthyStock = { color: '#64748b', fontWeight: '600' as const };
 const badgeStyle = { fontSize: '0.7rem', fontWeight: 'bold' as const, color: '#001a35', background: '#e2e8f0', padding: '2px 6px', borderRadius: '4px' };
+const certLink = { color: '#2563eb', fontWeight: 'bold' as const, textDecoration: 'none', fontSize: '0.75rem' };
 const editLink = { color: '#64748b', textDecoration: 'none', fontSize: '0.7rem', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: '4px', fontWeight: '600' as const };
 const footerStyle = { textAlign: 'center' as const, padding: '30px', fontSize: '0.7rem', color: '#94a3b8', borderTop: '1px solid #e2e8f0' };
