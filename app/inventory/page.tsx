@@ -117,7 +117,7 @@ export default function InventoryPage() {
           </div>
           {selectedItems.length > 0 && (
             <button 
-              onClick={() => router.push(`/inventory/manifest?ids=${selectedItems.join(',')}`)} 
+              onClick={() => window.open(`/inventory/manifest?ids=${selectedItems.join(',')}`, '_blank')} 
               style={batchActionBtn}
             >
               {selectedItems.length} SELECTED: GENERATE PACKING LIST
