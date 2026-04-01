@@ -20,7 +20,9 @@ export default function LoginPage() {
     if (accessCode.trim().toUpperCase() === 'CFC2026' || accessCode.trim().toUpperCase() === 'JEDO99') {
       // Simulate session storage
       localStorage.setItem('fleet_access', 'true')
-      router.push('https://jedo-fleet-intel.vercel.app/dashboard')
+      
+      // UPDATED: Points to your actual folder /app/fleet-health
+      router.push('/fleet-health')
     } else {
       setError('Invalid Access Code. Please contact Jedo Logistics.')
       setLoading(false)
