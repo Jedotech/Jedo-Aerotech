@@ -1,7 +1,15 @@
-import { type SchemaTypeDefinition } from 'sanity'
-import part from './parts' // Added the 's' to match your filename parts.ts
-import fleet from './fleet' 
+import parts from './parts'           // Matches your 'parts.ts' file
+import fleetRecord from './fleetRecord' // Matches your 'fleetRecord.tsx' file
+import client from './client'
+import purchase from './purchase'
 
-export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [part, fleet],
-}
+/**
+ * The Master Schema List for Jedo Admin
+ * Consolidating Inventory and Fleet Intelligence
+ */
+export const schemaTypes = [
+  parts, 
+  fleetRecord, 
+  client, 
+  purchase
+]
