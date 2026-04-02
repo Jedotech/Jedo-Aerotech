@@ -13,13 +13,15 @@
     "@sanity/image-url": "^1.0.2",
     "@sanity/schema": "^3.99.0",
     "@sanity/vision": "^3.37.2",
+    "@tailwindcss/postcss": "^4.2.2",
     "next": "^15.1.0",
     "next-sanity": "^9.12.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-is": "^18.3.1",
     "sanity": "^3.37.2",
-    "styled-components": "^6.1.8"
+    "styled-components": "^6.1.8",
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
     "@types/node": "^20",
