@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
+  // Custom WhatsApp message for access requests
   const waMessage = encodeURIComponent(
     "Hello Jedo Logistics, I would like to request an Access Code for the Fleet Intelligence System.\n\nOrganization Name: \nContact Name: "
   );
@@ -19,6 +20,7 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
+    // Standardized Access Codes for Jedo Technologies
     if (accessCode.trim().toUpperCase() === 'CFC2026' || accessCode.trim().toUpperCase() === 'JEDO99') {
       localStorage.setItem('fleet_access', 'true')
       router.push('/fleet-health')
@@ -31,6 +33,7 @@ export default function LoginPage() {
   return (
     <div style={containerStyle}>
       <div style={loginCardStyle}>
+        {/* LOGO SECTION */}
         <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <Link href="/">
             <img src="/jedo-logo.png" alt="Jedo Technologies" style={{ height: '50px', width: 'auto' }} />
@@ -41,11 +44,12 @@ export default function LoginPage() {
           <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Enter your authorized access code</p>
         </div>
 
+        {/* LOGIN FORM */}
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>ACCESS CODE</label>
             <input 
-              type="password" // CHANGED: This masks the input with asterisks
+              type="password" // Masks input with asterisks/dots
               placeholder="••••••••" 
               value={accessCode}
               onChange={(e) => setAccessCode(e.target.value)}
@@ -65,10 +69,10 @@ export default function LoginPage() {
           </button>
         </form>
 
+        {/* SUPPORT FOOTER */}
         <div style={{ marginTop: '30px', textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '20px' }}>
           <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
             Don't have a code? <br />
-            {/* UPDATED: Opens in new tab with custom message */}
             <a 
               href={`https://wa.me/919600038089?text=${waMessage}`} 
               target="_blank" 
@@ -84,4 +88,64 @@ export default function LoginPage() {
   )
 }
 
-// ... Styles remain the same
+// --- STYLES (Required for TypeScript Build) ---
+const containerStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: '100vh',
+  backgroundColor: '#001a35',
+  backgroundImage: 'radial-gradient(circle at center, #002d5b 0%, #001a35 100%)',
+  padding: '20px'
+};
+
+const loginCardStyle: React.CSSProperties = {
+  backgroundColor: '#ffffff',
+  padding: '40px',
+  borderRadius: '16px',
+  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+  width: '100%',
+  maxWidth: '400px'
+};
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '0.7rem',
+  fontWeight: '800',
+  color: '#94a3b8',
+  marginBottom: '8px',
+  letterSpacing: '1px'
+};
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '14px 18px',
+  borderRadius: '8px',
+  border: '2px solid #f1f5f9',
+  fontSize: '1rem',
+  outline: 'none',
+  color: '#001a35',
+  boxSizing: 'border-box'
+};
+
+const buttonStyle: React.CSSProperties = {
+  width: '100%',
+  backgroundColor: '#ffb400',
+  color: '#001a35',
+  padding: '16px',
+  borderRadius: '8px',
+  border: 'none',
+  fontSize: '1rem',
+  fontWeight: '800',
+  cursor: 'pointer',
+  transition: 'transform 0.1s ease',
+  boxShadow: '0 4px 12px rgba(255, 180, 0, 0.3)'
+};
+
+const errorStyle: React.CSSProperties = {
+  color: '#ef4444',
+  fontSize: '0.8rem',
+  fontWeight: 'bold',
+  marginBottom: '15px',
+  textAlign: 'center'
+};
