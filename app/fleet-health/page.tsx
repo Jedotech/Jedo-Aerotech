@@ -1,22 +1,23 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. UPDATED INTERFACE (Aligned exactly with your new fleetRecord schema)
+// 1. DATA INTERFACE (Aligned with your fleetRecord schema)
 interface FleetAsset {
   _id: string;
-  tailNumber: string;      // Matches schema
-  aircraftModel: string;   // Matches schema
-  manufacturer?: string;   // Matches schema
-  tyreModel?: string;      // Matches schema
-  tyrePosition?: string;   // Matches schema
-  currentLandings: number; // Matches schema
-  maxDesignLife: number;   // Matches schema
-  purchasePrice?: number;  // Matches schema
-  dailyUtilization?: number; // Matches schema
-  operatorEmail: string;   // Matches schema
+  tailNumber: string;
+  aircraftModel: string;
+  manufacturer?: string;
+  tyreModel?: string;
+  tyrePosition?: string;
+  currentLandings: number;
+  maxDesignLife: number;
+  purchasePrice?: number;
+  dailyUtilization?: number;
+  operatorEmail: string;
 }
 
 const client = createClient({
@@ -30,12 +31,21 @@ export default function FleetHealth() {
   const [assets, setAssets] = useState<FleetAsset[]>([])
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const router = useRouter()
 
+  // --- SECURITY & DATA SYNC ---
   useEffect(() => {
     setMounted(true)
+
+    // Check Authorization
+    const isAuthorized = localStorage.getItem('fleet_access')
+    if (!isAuthorized) {
+      router.push('/login')
+      return
+    }
+
     async function fetchFleet() {
       try {
-        // Querying for 'fleetRecord' type
         const data = await client.fetch(`*[_type == "fleetRecord"] | order(tailNumber asc)`)
         setAssets(data || [])
       } catch (e) {
@@ -45,10 +55,15 @@ export default function FleetHealth() {
       }
     }
     fetchFleet()
-  }, [])
+  }, [router])
+
+  // --- LOGOUT LOGIC ---
+  const handleLogout = () => {
+    localStorage.removeItem('fleet_access')
+    router.push('/login')
+  }
 
   // --- INTELLIGENCE CALCULATIONS ---
-  
   const calculateCPL = (price: number | undefined, landings: number) => {
     if (!price || landings === 0) return "N/A";
     return `₹${(price / landings).toFixed(2)}`;
@@ -82,7 +97,7 @@ export default function FleetHealth() {
   return (
     <div style={{ backgroundColor: '#f4f7f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* NAVIGATION */}
+      {/* NAVIGATION BAR */}
       <nav style={navBarStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
@@ -91,11 +106,15 @@ export default function FleetHealth() {
             <Link href="/marketplace" style={navLinkStyle}>PROCUREMENT</Link>
           </div>
         </div>
-        <div style={statusBadge}>LIVE FLEET PULSE</div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={statusBadge}>LIVE FLEET PULSE</div>
+          <button onClick={handleLogout} style={logoutBtnStyle}>LOGOUT</button>
+        </div>
       </nav>
 
       {/* HEADER */}
-      <header style={{ padding: '60px 40px 30px', maxWidth: '1400px', margin: '0 auto' }}>
+      <header style={{ padding: '60px 40px 30px', maxWidth: '1440px', margin: '0 auto' }}>
         <h1 style={{ color: '#001a35', fontWeight: '900', fontSize: '2.2rem', margin: 0 }}>
           FLEET <span style={{ color: '#ffb400' }}>INTELLIGENCE</span>
         </h1>
@@ -106,7 +125,7 @@ export default function FleetHealth() {
       </header>
 
       {/* ASSET GRID */}
-      <main style={{ padding: '0 40px 80px', maxWidth: '1400px', margin: '0 auto' }}>
+      <main style={{ padding: '0 40px 80px', maxWidth: '1440px', margin: '0 auto' }}>
         <div style={gridStyle}>
           {assets.length > 0 ? assets.map((asset) => {
             const healthPercent = parseFloat(calculateHealth(asset.currentLandings, asset.maxDesignLife))
@@ -156,7 +175,11 @@ export default function FleetHealth() {
                     <span style={ownerEmail}>{asset.operatorEmail || 'Unassigned'}</span>
                   </div>
                   {healthPercent < 45 && (
-                    <Link href={`https://wa.me/919600038089?text=Jedo%20Intelligence%20Alert:%20Asset%20${asset.tailNumber}%20(${asset.tyrePosition})%20is%20at%20${healthPercent}%%20life.%20Requesting%20quote%20for%20replacement.`} style={orderBtn}>
+                    <Link 
+                      href={`https://wa.me/919600038089?text=Jedo%20Intelligence%20Alert:%20Asset%20${asset.tailNumber}%20(${asset.tyrePosition})%20is%20at%20${healthPercent}%%20life.%20Requesting%20quote%20for%20replacement.`} 
+                      target="_blank"
+                      style={orderBtn}
+                    >
                       ORDER NOW
                     </Link>
                   )}
@@ -175,10 +198,11 @@ export default function FleetHealth() {
   )
 }
 
-// --- WORLD CLASS STYLING ---
+// --- PROFESSIONAL STYLING ---
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#001a35', position: 'sticky' as const, top: 0, zIndex: 100 };
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 'bold' as const, letterSpacing: '1px' };
-const statusBadge = { color: '#ffb400', fontSize: '0.6rem', fontWeight: '900', border: '1px solid #ffb400', padding: '4px 10px', borderRadius: '4px' };
+const statusBadge = { color: '#ffb400', fontSize: '0.6rem', fontWeight: '900', border: '1px solid #ffb400', padding: '4px 12px', borderRadius: '4px' };
+const logoutBtnStyle = { backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 15px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' as const, cursor: 'pointer' };
 const summaryTag = { backgroundColor: 'white', padding: '6px 12px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 'bold' as const, color: '#64748b', border: '1px solid #e2e8f0' };
 const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '25px' };
 const cardStyle = { backgroundColor: 'white', borderRadius: '20px', padding: '30px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)', border: '1px solid #eef2f6' };
