@@ -59,9 +59,12 @@ export default function HomePage() {
         </div>
         <div style={{ display: 'flex', gap: isMobile ? '12px' : '25px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link href="/marketplace" style={navLinkStyle}>MARKETPLACE</Link>
-          <Link href="https://jedo-fleet-intel.vercel.app" target="_blank" style={{...intelTabStyle, fontSize: isMobile ? '0.7rem' : '0.85rem'}}>
+          
+          {/* UPDATED: Changed from external URL to local /login */}
+          <Link href="/login" style={{...intelTabStyle, fontSize: isMobile ? '0.7rem' : '0.85rem'}}>
             FLEET INTEL ↗
           </Link>
+          
           <Link href="/marketplace#rfq-section" style={{...quoteButtonStyle, padding: isMobile ? '8px 12px' : '12px 25px', fontSize: isMobile ? '0.7rem' : '0.85rem'}}>REQUEST SOURCING</Link>
         </div>
       </nav>
@@ -78,7 +81,10 @@ export default function HomePage() {
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', flexDirection: isMobile ? 'column' : 'row' }}>
             <Link href="/marketplace" style={primaryButtonStyle}>Browse Marketplace</Link>
-            <Link href="https://jedo-fleet-intel.vercel.app" target="_blank" style={secondaryButtonStyle}>Fleet Intel Login</Link>
+            
+            {/* UPDATED: Changed from external URL to local /login */}
+            <Link href="/login" style={secondaryButtonStyle}>Fleet Intel Login</Link>
+            
           </div>
         </div>
       </section>
