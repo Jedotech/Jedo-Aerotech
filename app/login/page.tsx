@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
+// Vercel-optimized Sanity connection
 const client = createClient({
   projectId: 'm2pa474h',
   dataset: 'production',
@@ -28,6 +29,7 @@ export default function LoginPage() {
     setError('')
 
     try {
+      // Queries Sanity for a 'fleetUser' document with a matching unique code
       const user = await client.fetch(
         `*[_type == "fleetUser" && accessCode == $code][0]`,
         { code: accessCode.trim() }
@@ -38,6 +40,7 @@ export default function LoginPage() {
         localStorage.setItem('fleet_user_org', user.organization || 'Authorized User')
         router.push('/fleet-health')
       } else {
+        // Fallback for original hardcoded codes
         if (accessCode.trim().toUpperCase() === 'CFC2026' || accessCode.trim().toUpperCase() === 'JEDO99') {
           localStorage.setItem('fleet_access', 'true')
           router.push('/fleet-health')
@@ -55,30 +58,32 @@ export default function LoginPage() {
 
   return (
     <div style={containerStyle}>
-      {/* 1. TOP-LEFT HOME LINK (OUTSIDE) */}
-      <div style={externalHomeNav}>
-        <Link href="/" style={externalHomeLink}>← HOME</Link>
-      </div>
+      
+      {/* 1. TOP NAVIGATION ROW */}
+      <nav style={topNavStyle}>
+        {/* Logo in top-left (same size as HomePage) */}
+        <Link href="/">
+          <img src="/jedo-logo.png" alt="Jedo Technologies" style={topLogoStyle} />
+        </Link>
+        
+        {/* Golden Home link in top-right (no arrow) */}
+        <Link href="/" style={topHomeLinkStyle}>
+          HOME
+        </Link>
+      </nav>
 
-      <div style={layoutWrapper}>
-        {/* 2. LOGO SECTION (LEFT SIDE) */}
-        <div style={logoSidebar}>
-          <img src="/jedo-logo.png" alt="Jedo" style={{ height: '70px', marginBottom: '20px' }} />
-          <div style={sidebarText}>
-            <h1 style={{ color: '#ffb400', fontSize: '1.5rem', fontWeight: '900', margin: 0 }}>JEDO TECH</h1>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', fontWeight: '600', marginTop: '5px' }}>
-              AVIATION FLEET INTELLIGENCE
-            </p>
-          </div>
-        </div>
-
-        {/* 3. LOGIN CARD (RIGHT SIDE) */}
+      {/* 2. CENTERED LOGIN CARD */}
+      <div style={centeredCardWrapper}>
         <div style={loginCardStyle}>
-          <div style={badgeStyle}>SECURE ACCESS</div>
-          <h2 style={{ color: '#001a35', margin: '15px 0 25px', fontWeight: '900' }}>OPERATOR LOGIN</h2>
           
+          <div style={cardHeaderStyle}>
+            {/* The exact title requested */}
+            <h2 style={cardTitleStyle}>FLEET INTEL LOGIN</h2>
+            <div style={statusBadgeStyle}>SECURE OPERATOR GATEWAY</div>
+          </div>
+
           <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: '20px' }}>
+            <div style={{ marginBottom: '24px' }}>
               <label style={labelStyle}>ACCESS CODE</label>
               <input 
                 type="password" 
@@ -95,22 +100,26 @@ export default function LoginPage() {
             <button 
               type="submit" 
               disabled={loading}
-              style={{ ...buttonStyle, opacity: loading ? 0.7 : 1 }}
+              style={{
+                ...buttonStyle,
+                opacity: loading ? 0.7 : 1,
+              }}
             >
-              {loading ? 'VERIFYING...' : 'AUTHORIZE SESSION'}
+              {loading ? 'VERIFYING...' : 'AUTHORIZE ACCESS'}
             </button>
           </form>
 
+          {/* SOURCING DESK LINK */}
           <div style={footerStyle}>
              <a 
               href={`https://wa.me/919600038089?text=${waMessage}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              style={whatsappLink}
+              style={whatsappLinkStyle}
             >
-              REQUEST ACCESS VIA SOURCING DESK
+              Contact Sourcing Desk
             </a>
-            <p style={copyright}>© 2026 JEDO TECHNOLOGIES PVT. LTD.</p>
+            <p style={copyrightStyle}>© 2026 JEDO TECHNOLOGIES PVT. LTD.</p>
           </div>
         </div>
       </div>
@@ -118,55 +127,52 @@ export default function LoginPage() {
   )
 }
 
-// --- UPDATED STYLES FOR SPLIT LAYOUT ---
+// --- PROFESSIONAL STYLING ---
 const containerStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
   minHeight: '100vh',
   backgroundColor: '#001a35',
   backgroundImage: 'radial-gradient(circle at center, #002d5b 0%, #001a35 100%)',
-  padding: '40px'
 };
 
-const externalHomeNav: React.CSSProperties = {
-  position: 'absolute',
-  top: '40px',
-  left: '40px'
+const topNavStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '30px 50px',
+    width: '100%',
+    boxSizing: 'border-box',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 10
 };
 
-const externalHomeLink: React.CSSProperties = {
-  color: 'white',
-  textDecoration: 'none',
-  fontSize: '0.75rem',
-  fontWeight: '900',
-  letterSpacing: '1px',
-  opacity: 0.6,
-  padding: '8px 16px',
-  border: '1px solid rgba(255,255,255,0.2)',
-  borderRadius: '4px'
+const topLogoStyle: React.CSSProperties = {
+    height: '40px', // Standardized for top bar navigation
+    width: 'auto',
 };
 
-const layoutWrapper: React.CSSProperties = {
+const topHomeLinkStyle: React.CSSProperties = {
+    color: '#ffb400', // Golden color
+    textDecoration: 'none',
+    fontSize: '0.75rem',
+    fontWeight: '900',
+    letterSpacing: '1px',
+    padding: '8px 16px',
+    border: '1px solid rgba(255,180,0,0.3)',
+    borderRadius: '4px',
+};
+
+const centeredCardWrapper: React.CSSProperties = {
   display: 'flex',
+  flexGrow: 1,
   alignItems: 'center',
-  gap: '80px', // Space between logo and card
-  maxWidth: '1000px',
-  width: '100%',
   justifyContent: 'center',
-  flexWrap: 'wrap' // Mobile friendly
-};
-
-const logoSidebar: React.CSSProperties = {
-  textAlign: 'center',
-  minWidth: '250px'
-};
-
-const sidebarText: React.CSSProperties = {
-  borderTop: '2px solid #ffb400',
-  paddingTop: '15px',
-  marginTop: '10px'
+  padding: '100px 20px 40px', // Top padding clears the absolute nav bar
+  width: '100%',
+  boxSizing: 'border-box',
 };
 
 const loginCardStyle: React.CSSProperties = {
@@ -175,10 +181,22 @@ const loginCardStyle: React.CSSProperties = {
   borderRadius: '24px',
   boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.5)',
   width: '100%',
-  maxWidth: '400px'
+  maxWidth: '400px',
+  textAlign: 'center'
 };
 
-const badgeStyle: React.CSSProperties = {
+const cardHeaderStyle: React.CSSProperties = {
+    marginBottom: '32px'
+};
+
+const cardTitleStyle: React.CSSProperties = {
+    color: '#001a35',
+    margin: '0 0 10px 0',
+    fontWeight: '900',
+    letterSpacing: '-0.5px'
+};
+
+const statusBadgeStyle: React.CSSProperties = {
   display: 'inline-block',
   backgroundColor: '#f1f5f9',
   color: '#64748b',
@@ -187,6 +205,16 @@ const badgeStyle: React.CSSProperties = {
   padding: '4px 10px',
   borderRadius: '4px',
   letterSpacing: '1px'
+};
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '0.65rem',
+  fontWeight: '900',
+  color: '#94a3b8',
+  marginBottom: '8px',
+  letterSpacing: '1px',
+  textAlign: 'left'
 };
 
 const inputStyle: React.CSSProperties = {
@@ -203,15 +231,6 @@ const inputStyle: React.CSSProperties = {
   backgroundColor: '#f8fafc'
 };
 
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: '0.65rem',
-  fontWeight: '900',
-  color: '#94a3b8',
-  marginBottom: '8px',
-  letterSpacing: '1px'
-};
-
 const buttonStyle: React.CSSProperties = {
   width: '100%',
   backgroundColor: '#ffb400',
@@ -222,7 +241,8 @@ const buttonStyle: React.CSSProperties = {
   fontSize: '0.9rem',
   fontWeight: '900',
   cursor: 'pointer',
-  boxShadow: '0 8px 16px rgba(255, 180, 0, 0.2)'
+  transition: 'all 0.1s ease',
+  boxShadow: '0 10px 15px -3px rgba(255, 180, 0, 0.2)'
 };
 
 const errorContainerStyle: React.CSSProperties = {
@@ -233,18 +253,19 @@ const errorContainerStyle: React.CSSProperties = {
   fontSize: '0.75rem',
   fontWeight: '700',
   marginBottom: '20px',
-  textAlign: 'center'
+  textAlign: 'center',
+  border: '1px solid #ffe4e6'
 };
 
 const footerStyle: React.CSSProperties = {
-  marginTop: '30px',
+  marginTop: '32px',
   textAlign: 'center',
   borderTop: '1px solid #f1f5f9',
-  paddingTop: '20px'
+  paddingTop: '24px'
 };
 
-const whatsappLink: React.CSSProperties = {
-  color: '#ffb400',
+const whatsappLinkStyle: React.CSSProperties = {
+  color: '#64748b',
   textDecoration: 'none',
   fontSize: '0.7rem',
   fontWeight: '800',
@@ -253,7 +274,7 @@ const whatsappLink: React.CSSProperties = {
   marginBottom: '10px'
 };
 
-const copyright: React.CSSProperties = {
+const copyrightStyle: React.CSSProperties = {
   fontSize: '0.6rem',
   color: '#94a3b8',
   fontWeight: '600'
