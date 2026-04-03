@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// Vercel-optimized Sanity connection
 const client = createClient({
   projectId: 'm2pa474h',
   dataset: 'production',
@@ -29,7 +28,6 @@ export default function LoginPage() {
     setError('')
 
     try {
-      // Queries Sanity for a 'fleetUser' document with a matching unique code
       const user = await client.fetch(
         `*[_type == "fleetUser" && accessCode == $code][0]`,
         { code: accessCode.trim() }
@@ -40,7 +38,6 @@ export default function LoginPage() {
         localStorage.setItem('fleet_user_org', user.organization || 'Authorized User')
         router.push('/fleet-health')
       } else {
-        // Fallback for original hardcoded codes
         if (accessCode.trim().toUpperCase() === 'CFC2026' || accessCode.trim().toUpperCase() === 'JEDO99') {
           localStorage.setItem('fleet_access', 'true')
           router.push('/fleet-health')
@@ -59,7 +56,7 @@ export default function LoginPage() {
   return (
     <div style={containerStyle}>
       
-      {/* 1. TOP NAVIGATION (Logo Left, Gold Home Right) */}
+      {/* 1. TOP NAVIGATION */}
       <nav style={topNavStyle}>
         <Link href="/">
           <img src="/jedo-logo.png" alt="Jedo Technologies" style={topLogoStyle} />
@@ -82,7 +79,7 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: '28px' }}>
+            <div style={{ marginBottom: '20px' }}> {/* Reduced margin */}
               <label style={labelStyle}>AUTHORIZED ACCESS CODE</label>
               <input 
                 type="password" 
@@ -127,21 +124,23 @@ export default function LoginPage() {
   )
 }
 
-// --- PROFESSIONAL STYLING ---
+// --- PROFESSIONAL STYLING (Optimized for Height) ---
 const containerStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  minHeight: '100vh',
+  height: '100vh', // Fixed height to prevent scrolling
+  width: '100vw',
   backgroundColor: '#001a35',
   backgroundImage: 'radial-gradient(circle at top right, #002d5b 0%, #001a35 100%)',
-  overflow: 'hidden'
+  overflow: 'hidden', // Disables scroll
+  position: 'relative'
 };
 
 const topNavStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: '30px 60px',
+  padding: '20px 40px', // Slightly reduced padding
   width: '100%',
   boxSizing: 'border-box',
   position: 'absolute',
@@ -151,7 +150,7 @@ const topNavStyle: React.CSSProperties = {
 };
 
 const topLogoStyle: React.CSSProperties = {
-  height: '42px', // Matches your home page logo scale
+  height: '38px', // Slightly smaller to save space
   width: 'auto',
   filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
 };
@@ -159,13 +158,12 @@ const topLogoStyle: React.CSSProperties = {
 const topHomeLinkStyle: React.CSSProperties = {
   color: '#ffb400',
   textDecoration: 'none',
-  fontSize: '0.7rem',
+  fontSize: '0.65rem',
   fontWeight: '900',
   letterSpacing: '1.5px',
-  padding: '10px 24px',
+  padding: '8px 20px',
   border: '1px solid rgba(255,180,0,0.4)',
   borderRadius: '6px',
-  transition: 'all 0.3s ease',
   backgroundColor: 'rgba(255,180,0,0.05)'
 };
 
@@ -174,23 +172,24 @@ const centeredCardWrapper: React.CSSProperties = {
   flexGrow: 1,
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '120px 20px 60px',
+  padding: '80px 20px 20px', // Reduced top padding
   width: '100%',
+  height: '100%',
   boxSizing: 'border-box',
 };
 
 const loginCardStyle: React.CSSProperties = {
   backgroundColor: '#ffffff',
-  padding: '60px 45px',
+  padding: '40px 45px', // Reduced vertical padding
   borderRadius: '28px',
   boxShadow: '0 40px 80px -15px rgba(0, 0, 0, 0.6)',
   width: '100%',
-  maxWidth: '440px',
+  maxWidth: '420px',
   textAlign: 'center',
 };
 
 const cardHeaderStyle: React.CSSProperties = {
-  marginBottom: '35px',
+  marginBottom: '25px', // Reduced margin
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center'
@@ -198,44 +197,44 @@ const cardHeaderStyle: React.CSSProperties = {
 
 const cardTitleStyle: React.CSSProperties = {
   color: '#001a35',
-  margin: '0 0 8px 0',
+  margin: '0 0 5px 0',
   fontWeight: '900',
-  fontSize: '1.6rem',
+  fontSize: '1.4rem', // Slightly smaller
   letterSpacing: '-0.5px'
 };
 
 const titleUnderline: React.CSSProperties = {
-  width: '40px',
+  width: '35px',
   height: '3px',
   backgroundColor: '#ffb400',
   borderRadius: '2px',
-  marginTop: '12px'
+  marginTop: '8px'
 };
 
 const statusBadgeStyle: React.CSSProperties = {
   color: '#94a3b8',
-  fontSize: '0.65rem',
+  fontSize: '0.6rem',
   fontWeight: '800',
-  letterSpacing: '1.5px',
+  letterSpacing: '1.2px',
   textTransform: 'uppercase'
 };
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
-  fontSize: '0.65rem',
+  fontSize: '0.6rem',
   fontWeight: '900',
   color: '#64748b',
-  marginBottom: '12px',
+  marginBottom: '8px',
   letterSpacing: '1px',
   textAlign: 'left'
 };
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  padding: '18px',
-  borderRadius: '14px',
+  padding: '14px', // Reduced padding
+  borderRadius: '12px',
   border: '2px solid #e2e8f0',
-  fontSize: '1.3rem',
+  fontSize: '1.2rem',
   outline: 'none',
   color: '#001a35',
   boxSizing: 'border-box',
@@ -248,47 +247,46 @@ const buttonStyle: React.CSSProperties = {
   width: '100%',
   backgroundColor: '#ffb400',
   color: '#001a35',
-  padding: '20px',
-  borderRadius: '14px',
+  padding: '16px', // Reduced padding
+  borderRadius: '12px',
   border: 'none',
-  fontSize: '0.95rem',
+  fontSize: '0.9rem',
   fontWeight: '900',
-  transition: 'all 0.2s ease',
-  boxShadow: '0 12px 20px -5px rgba(255, 180, 0, 0.4)',
+  boxShadow: '0 8px 16px -4px rgba(255, 180, 0, 0.4)',
   letterSpacing: '0.5px'
 };
 
 const errorContainerStyle: React.CSSProperties = {
   backgroundColor: '#fff1f2',
   color: '#e11d48',
-  padding: '12px',
+  padding: '8px',
   borderRadius: '10px',
-  fontSize: '0.75rem',
+  fontSize: '0.7rem',
   fontWeight: '700',
-  marginBottom: '25px',
+  marginBottom: '15px',
   textAlign: 'center',
   border: '1px solid #ffe4e6'
 };
 
 const footerStyle: React.CSSProperties = {
-  marginTop: '40px',
+  marginTop: '25px', // Reduced margin
   textAlign: 'center',
   borderTop: '1px solid #f1f5f9',
-  paddingTop: '30px'
+  paddingTop: '20px'
 };
 
 const whatsappLinkStyle: React.CSSProperties = {
   color: '#001a35',
   textDecoration: 'none',
-  fontSize: '0.75rem',
+  fontSize: '0.7rem',
   fontWeight: '800',
   letterSpacing: '0.3px',
   display: 'block',
-  marginBottom: '12px',
+  marginBottom: '8px',
 };
 
 const copyrightStyle: React.CSSProperties = {
-  fontSize: '0.6rem',
+  fontSize: '0.55rem',
   color: '#cbd5e1',
   fontWeight: '700',
   letterSpacing: '0.5px'
