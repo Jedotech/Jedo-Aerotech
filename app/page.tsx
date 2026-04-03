@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image' // Changed to Next.js Image for better performance
 import { createClient } from 'next-sanity'
 
 // UPDATED: Dataset changed from 'fleet' to 'production'
@@ -54,13 +55,19 @@ export default function HomePage() {
       <nav style={{...navStyle, padding: isMobile ? '15px 20px' : '20px 60px', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '15px' : '0'}}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Link href="/">
-            <img src="/jedo-logo.png" alt="Jedo Technologies" style={{ height: isMobile ? '35px' : '45px', width: 'auto' }} />
+            {/* Optimized Image Component */}
+            <Image 
+              src="/jedo-logo.png" 
+              alt="Jedo Technologies" 
+              height={45} 
+              width={180} 
+              style={{ height: isMobile ? '35px' : '45px', width: 'auto' }} 
+            />
           </Link>
         </div>
         <div style={{ display: 'flex', gap: isMobile ? '12px' : '25px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
           <Link href="/marketplace" style={navLinkStyle}>MARKETPLACE</Link>
           
-          {/* UPDATED: Changed from external URL to local /login */}
           <Link href="/login" style={{...intelTabStyle, fontSize: isMobile ? '0.7rem' : '0.85rem'}}>
             FLEET INTEL ↗
           </Link>
@@ -77,14 +84,11 @@ export default function HomePage() {
             <span style={{ color: '#ffb400' }}>TRAINING FLEETS.</span>
           </h1>
           <p style={{ fontSize: isMobile ? '1.1rem' : '1.4rem', fontWeight: '500', maxWidth: '800px', margin: '0 auto 40px', color: 'rgba(255,255,255,0.9)' }}>
-            Precision sourcing for Cessna & Piper. High-traceability certified aviation components for the Indian training sector.
+            Precision sourcing for Cessna &amp; Piper. High-traceability certified aviation components for the Indian training sector.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', flexDirection: isMobile ? 'column' : 'row' }}>
             <Link href="/marketplace" style={primaryButtonStyle}>Browse Marketplace</Link>
-            
-            {/* UPDATED: Changed from external URL to local /login */}
             <Link href="/login" style={secondaryButtonStyle}>Fleet Intel Login</Link>
-            
           </div>
         </div>
       </section>
@@ -133,7 +137,7 @@ export default function HomePage() {
       <section style={{ backgroundColor: '#001529', color: 'white', padding: isMobile ? '60px 20px' : '100px 20px', textAlign: 'center' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <h2 style={{ fontSize: isMobile ? '1.8rem' : '2.5rem', fontWeight: '800', marginBottom: '20px' }}>
-            URGENT SOURCING & AOG
+            URGENT SOURCING &amp; AOG
           </h2>
           <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginBottom: '40px' }}>
             Contact our Chennai logistics desk for immediate part verification and shipping quotes.
@@ -159,19 +163,24 @@ export default function HomePage() {
         rel="noopener noreferrer"
         style={whatsappFloatingStyle}
       >
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style={{ width: '28px', height: '28px' }} />
+        <Image 
+          src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+          alt="WhatsApp" 
+          width={28} 
+          height={28} 
+        />
         <span style={{ marginLeft: '12px', fontWeight: '700', fontSize: '0.9rem' }}>SEND RFQ / AOG</span>
       </a>
 
       {/* FOOTER */}
       <footer style={{ backgroundColor: '#000c17', color: 'rgba(255,255,255,0.3)', padding: '40px 20px', textAlign: 'center', fontSize: '0.75rem' }}>
-        <p>© 2026 Jedo Technologies Pvt. Ltd. | DGCA & International Standards Compliance</p>
+        <p>© 2026 Jedo Technologies Pvt. Ltd. | DGCA &amp; International Standards Compliance</p>
       </footer>
     </div>
   )
 }
 
-// STYLES (NO CHANGES HERE)
+// STYLES (UNCHANGED)
 const navStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#001a35', position: 'sticky' as const, top: 0, zIndex: 1000 };
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontWeight: '600' as const, fontSize: '0.8rem', opacity: 0.8, letterSpacing: '1px' };
 const intelTabStyle = { color: '#ffb400', textDecoration: 'none', fontWeight: 'bold' as const, border: '1px solid #ffb400', padding: '8px 15px', borderRadius: '4px' };
