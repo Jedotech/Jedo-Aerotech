@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// Connect to your production dataset
 const client = createClient({
   projectId: 'm2pa474h',
   dataset: 'production',
@@ -29,7 +28,6 @@ export default function LoginPage() {
     setError('')
 
     try {
-      // AJ: This queries Sanity for a 'fleetUser' document with a matching code
       const user = await client.fetch(
         `*[_type == "fleetUser" && accessCode == $code][0]`,
         { code: accessCode.trim() }
@@ -40,7 +38,6 @@ export default function LoginPage() {
         localStorage.setItem('fleet_user_org', user.organization || 'Authorized User')
         router.push('/fleet-health')
       } else {
-        // Fallback for your original codes if you haven't moved them to Sanity yet
         if (accessCode.trim().toUpperCase() === 'CFC2026' || accessCode.trim().toUpperCase() === 'JEDO99') {
           localStorage.setItem('fleet_access', 'true')
           router.push('/fleet-health')
@@ -60,19 +57,19 @@ export default function LoginPage() {
     <div style={containerStyle}>
       <div style={loginCardStyle}>
         {/* LOGO SECTION */}
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Link href="/">
-            <img src="/jedo-logo.png" alt="Jedo Technologies" style={{ height: '50px', width: 'auto' }} />
+            <img src="/jedo-logo.png" alt="Jedo Technologies" style={{ height: '52px', width: 'auto' }} />
           </Link>
-          <h2 style={{ color: '#001a35', marginTop: '20px', fontWeight: '800', letterSpacing: '-0.5px' }}>
-            FLEET INTELLIGENCE LOGIN
+          <div style={badgeStyle}>SECURE GATEWAY</div>
+          <h2 style={{ color: '#001a35', marginTop: '16px', fontWeight: '900', letterSpacing: '-0.5px', fontSize: '1.4rem' }}>
+            FLEET <span style={{ color: '#ffb400' }}>INTEL</span>
           </h2>
-          <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Enter your authorized access code</p>
         </div>
 
         {/* LOGIN FORM */}
         <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: '20px' }}>
+          <div style={{ marginBottom: '24px' }}>
             <label style={labelStyle}>ACCESS CODE</label>
             <input 
               type="password" 
@@ -84,29 +81,36 @@ export default function LoginPage() {
             />
           </div>
 
-          {error && <p style={errorStyle}>{error}</p>}
+          {error && <div style={errorContainerStyle}>{error}</div>}
 
           <button 
             type="submit" 
             disabled={loading}
-            style={buttonStyle}
+            style={{
+              ...buttonStyle,
+              opacity: loading ? 0.7 : 1,
+            }}
           >
-            {loading ? 'AUTHENTICATING...' : 'AUTHORIZE ACCESS'}
+            {loading ? 'VERIFYING...' : 'AUTHORIZE ACCESS'}
           </button>
         </form>
 
-        {/* SUPPORT FOOTER */}
-        <div style={{ marginTop: '30px', textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '20px' }}>
-          <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-            Don&apos;t have a code? <br />
+        {/* PROFESSIONAL FOOTER LINKS */}
+        <div style={footerStyle}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '15px' }}>
+            <Link href="/" style={footerNavLink}>HOME</Link>
+            <div style={{ width: '1px', backgroundColor: '#e2e8f0', height: '14px' }}></div>
             <a 
               href={`https://wa.me/919600038089?text=${waMessage}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              style={{ color: '#ffb400', fontWeight: 'bold', textDecoration: 'none' }}
+              style={footerNavLink}
             >
-              Contact Sourcing Desk
+              REQUEST ACCESS
             </a>
+          </div>
+          <p style={{ fontSize: '0.65rem', color: '#94a3b8', fontWeight: '600', letterSpacing: '0.5px' }}>
+            © 2026 JEDO TECHNOLOGIES PVT. LTD.
           </p>
         </div>
       </div>
@@ -127,17 +131,29 @@ const containerStyle: React.CSSProperties = {
 
 const loginCardStyle: React.CSSProperties = {
   backgroundColor: '#ffffff',
-  padding: '40px',
-  borderRadius: '16px',
+  padding: '48px 40px',
+  borderRadius: '20px',
   boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
   width: '100%',
   maxWidth: '400px'
 };
 
+const badgeStyle: React.CSSProperties = {
+  display: 'inline-block',
+  backgroundColor: '#f1f5f9',
+  color: '#64748b',
+  fontSize: '0.6rem',
+  fontWeight: '900',
+  padding: '4px 10px',
+  borderRadius: '4px',
+  marginTop: '15px',
+  letterSpacing: '1px'
+};
+
 const labelStyle: React.CSSProperties = {
   display: 'block',
-  fontSize: '0.7rem',
-  fontWeight: '800',
+  fontSize: '0.65rem',
+  fontWeight: '900',
   color: '#94a3b8',
   marginBottom: '8px',
   letterSpacing: '1px'
@@ -145,13 +161,16 @@ const labelStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  padding: '14px 18px',
+  padding: '16px',
   borderRadius: '8px',
   border: '2px solid #f1f5f9',
-  fontSize: '1rem',
+  fontSize: '1.2rem',
   outline: 'none',
   color: '#001a35',
-  boxSizing: 'border-box'
+  boxSizing: 'border-box',
+  textAlign: 'center',
+  letterSpacing: '4px',
+  backgroundColor: '#f8fafc'
 };
 
 const buttonStyle: React.CSSProperties = {
@@ -161,17 +180,37 @@ const buttonStyle: React.CSSProperties = {
   padding: '16px',
   borderRadius: '8px',
   border: 'none',
-  fontSize: '1rem',
-  fontWeight: '800',
+  fontSize: '0.9rem',
+  fontWeight: '900',
   cursor: 'pointer',
-  transition: 'transform 0.1s ease',
-  boxShadow: '0 4px 12px rgba(255, 180, 0, 0.3)'
+  transition: 'all 0.1s ease',
+  boxShadow: '0 8px 16px rgba(255, 180, 0, 0.2)',
+  letterSpacing: '0.5px'
 };
 
-const errorStyle: React.CSSProperties = {
-  color: '#ef4444',
-  fontSize: '0.8rem',
-  fontWeight: 'bold',
-  marginBottom: '15px',
-  textAlign: 'center'
+const errorContainerStyle: React.CSSProperties = {
+  backgroundColor: '#fff1f2',
+  color: '#e11d48',
+  padding: '10px',
+  borderRadius: '6px',
+  fontSize: '0.75rem',
+  fontWeight: '700',
+  marginBottom: '20px',
+  textAlign: 'center',
+  border: '1px solid #ffe4e6'
+};
+
+const footerStyle: React.CSSProperties = {
+  marginTop: '32px',
+  textAlign: 'center',
+  borderTop: '1px solid #f1f5f9',
+  paddingTop: '24px'
+};
+
+const footerNavLink: React.CSSProperties = {
+  color: '#64748b',
+  textDecoration: 'none',
+  fontSize: '0.7rem',
+  fontWeight: '800',
+  letterSpacing: '0.5px'
 };
