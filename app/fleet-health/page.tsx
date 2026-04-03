@@ -102,7 +102,7 @@ export default function FleetHealth() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
           <div style={{ display: 'flex', gap: '25px' }}>
-            <Link href="/" style={navLinkStyle}>DASHBOARD</Link>
+            {/* DASHBOARD LINK REMOVED PER AJ'S REQUEST */}
             <Link href="/marketplace" style={navLinkStyle}>PROCUREMENT</Link>
           </div>
         </div>
@@ -189,7 +189,7 @@ export default function FleetHealth() {
           }) : (
             <div style={emptyState}>
                <h3>No Fleet Records Found</h3>
-               <p>Create a "Fleet Management" record in Sanity Studio to see the intelligence engine in action.</p>
+               <p>Create a &quot;Fleet Management&quot; record in Sanity Studio to see the intelligence engine in action.</p>
             </div>
           )}
         </div>
