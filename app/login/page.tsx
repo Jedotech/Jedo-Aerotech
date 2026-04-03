@@ -59,32 +59,31 @@ export default function LoginPage() {
   return (
     <div style={containerStyle}>
       
-      {/* 1. TOP NAVIGATION ROW */}
+      {/* 1. TOP NAVIGATION (Logo Left, Gold Home Right) */}
       <nav style={topNavStyle}>
-        {/* Logo in top-left (same size as HomePage) */}
         <Link href="/">
           <img src="/jedo-logo.png" alt="Jedo Technologies" style={topLogoStyle} />
         </Link>
-        
-        {/* Golden Home link in top-right (no arrow) */}
         <Link href="/" style={topHomeLinkStyle}>
           HOME
         </Link>
       </nav>
 
-      {/* 2. CENTERED LOGIN CARD */}
+      {/* 2. CENTERED PREMIUM LOGIN CARD */}
       <div style={centeredCardWrapper}>
         <div style={loginCardStyle}>
           
           <div style={cardHeaderStyle}>
-            {/* The exact title requested */}
-            <h2 style={cardTitleStyle}>FLEET INTEL LOGIN</h2>
+            <h2 style={cardTitleStyle}>
+              FLEET <span style={{ color: '#ffb400' }}>INTEL</span> LOGIN
+            </h2>
             <div style={statusBadgeStyle}>SECURE OPERATOR GATEWAY</div>
+            <div style={titleUnderline}></div>
           </div>
 
           <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: '24px' }}>
-              <label style={labelStyle}>ACCESS CODE</label>
+            <div style={{ marginBottom: '28px' }}>
+              <label style={labelStyle}>AUTHORIZED ACCESS CODE</label>
               <input 
                 type="password" 
                 placeholder="••••••••" 
@@ -103,9 +102,10 @@ export default function LoginPage() {
               style={{
                 ...buttonStyle,
                 opacity: loading ? 0.7 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
-              {loading ? 'VERIFYING...' : 'AUTHORIZE ACCESS'}
+              {loading ? 'AUTHENTICATING...' : 'AUTHORIZE SESSION'}
             </button>
           </form>
 
@@ -117,7 +117,7 @@ export default function LoginPage() {
               rel="noopener noreferrer"
               style={whatsappLinkStyle}
             >
-              Contact Sourcing Desk
+              Request Access via Sourcing Desk
             </a>
             <p style={copyrightStyle}>© 2026 JEDO TECHNOLOGIES PVT. LTD.</p>
           </div>
@@ -133,36 +133,40 @@ const containerStyle: React.CSSProperties = {
   flexDirection: 'column',
   minHeight: '100vh',
   backgroundColor: '#001a35',
-  backgroundImage: 'radial-gradient(circle at center, #002d5b 0%, #001a35 100%)',
+  backgroundImage: 'radial-gradient(circle at top right, #002d5b 0%, #001a35 100%)',
+  overflow: 'hidden'
 };
 
 const topNavStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '30px 50px',
-    width: '100%',
-    boxSizing: 'border-box',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    zIndex: 10
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '30px 60px',
+  width: '100%',
+  boxSizing: 'border-box',
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  zIndex: 10
 };
 
 const topLogoStyle: React.CSSProperties = {
-    height: '40px', // Standardized for top bar navigation
-    width: 'auto',
+  height: '42px', // Matches your home page logo scale
+  width: 'auto',
+  filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
 };
 
 const topHomeLinkStyle: React.CSSProperties = {
-    color: '#ffb400', // Golden color
-    textDecoration: 'none',
-    fontSize: '0.75rem',
-    fontWeight: '900',
-    letterSpacing: '1px',
-    padding: '8px 16px',
-    border: '1px solid rgba(255,180,0,0.3)',
-    borderRadius: '4px',
+  color: '#ffb400',
+  textDecoration: 'none',
+  fontSize: '0.7rem',
+  fontWeight: '900',
+  letterSpacing: '1.5px',
+  padding: '10px 24px',
+  border: '1px solid rgba(255,180,0,0.4)',
+  borderRadius: '6px',
+  transition: 'all 0.3s ease',
+  backgroundColor: 'rgba(255,180,0,0.05)'
 };
 
 const centeredCardWrapper: React.CSSProperties = {
@@ -170,112 +174,122 @@ const centeredCardWrapper: React.CSSProperties = {
   flexGrow: 1,
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '100px 20px 40px', // Top padding clears the absolute nav bar
+  padding: '120px 20px 60px',
   width: '100%',
   boxSizing: 'border-box',
 };
 
 const loginCardStyle: React.CSSProperties = {
   backgroundColor: '#ffffff',
-  padding: '50px 40px',
-  borderRadius: '24px',
-  boxShadow: '0 30px 60px -12px rgba(0, 0, 0, 0.5)',
+  padding: '60px 45px',
+  borderRadius: '28px',
+  boxShadow: '0 40px 80px -15px rgba(0, 0, 0, 0.6)',
   width: '100%',
-  maxWidth: '400px',
-  textAlign: 'center'
+  maxWidth: '440px',
+  textAlign: 'center',
 };
 
 const cardHeaderStyle: React.CSSProperties = {
-    marginBottom: '32px'
+  marginBottom: '35px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center'
 };
 
 const cardTitleStyle: React.CSSProperties = {
-    color: '#001a35',
-    margin: '0 0 10px 0',
-    fontWeight: '900',
-    letterSpacing: '-0.5px'
+  color: '#001a35',
+  margin: '0 0 8px 0',
+  fontWeight: '900',
+  fontSize: '1.6rem',
+  letterSpacing: '-0.5px'
+};
+
+const titleUnderline: React.CSSProperties = {
+  width: '40px',
+  height: '3px',
+  backgroundColor: '#ffb400',
+  borderRadius: '2px',
+  marginTop: '12px'
 };
 
 const statusBadgeStyle: React.CSSProperties = {
-  display: 'inline-block',
-  backgroundColor: '#f1f5f9',
-  color: '#64748b',
-  fontSize: '0.6rem',
-  fontWeight: '900',
-  padding: '4px 10px',
-  borderRadius: '4px',
-  letterSpacing: '1px'
+  color: '#94a3b8',
+  fontSize: '0.65rem',
+  fontWeight: '800',
+  letterSpacing: '1.5px',
+  textTransform: 'uppercase'
 };
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
   fontSize: '0.65rem',
   fontWeight: '900',
-  color: '#94a3b8',
-  marginBottom: '8px',
+  color: '#64748b',
+  marginBottom: '12px',
   letterSpacing: '1px',
   textAlign: 'left'
 };
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  padding: '16px',
-  borderRadius: '12px',
-  border: '2px solid #f1f5f9',
-  fontSize: '1.2rem',
+  padding: '18px',
+  borderRadius: '14px',
+  border: '2px solid #e2e8f0',
+  fontSize: '1.3rem',
   outline: 'none',
   color: '#001a35',
   boxSizing: 'border-box',
   textAlign: 'center',
-  letterSpacing: '5px',
-  backgroundColor: '#f8fafc'
+  letterSpacing: '6px',
+  backgroundColor: '#f8fafc',
 };
 
 const buttonStyle: React.CSSProperties = {
   width: '100%',
   backgroundColor: '#ffb400',
   color: '#001a35',
-  padding: '18px',
-  borderRadius: '12px',
+  padding: '20px',
+  borderRadius: '14px',
   border: 'none',
-  fontSize: '0.9rem',
+  fontSize: '0.95rem',
   fontWeight: '900',
-  cursor: 'pointer',
-  transition: 'all 0.1s ease',
-  boxShadow: '0 10px 15px -3px rgba(255, 180, 0, 0.2)'
+  transition: 'all 0.2s ease',
+  boxShadow: '0 12px 20px -5px rgba(255, 180, 0, 0.4)',
+  letterSpacing: '0.5px'
 };
 
 const errorContainerStyle: React.CSSProperties = {
   backgroundColor: '#fff1f2',
   color: '#e11d48',
-  padding: '10px',
-  borderRadius: '8px',
+  padding: '12px',
+  borderRadius: '10px',
   fontSize: '0.75rem',
   fontWeight: '700',
-  marginBottom: '20px',
+  marginBottom: '25px',
   textAlign: 'center',
   border: '1px solid #ffe4e6'
 };
 
 const footerStyle: React.CSSProperties = {
-  marginTop: '32px',
+  marginTop: '40px',
   textAlign: 'center',
   borderTop: '1px solid #f1f5f9',
-  paddingTop: '24px'
+  paddingTop: '30px'
 };
 
 const whatsappLinkStyle: React.CSSProperties = {
-  color: '#64748b',
+  color: '#001a35',
   textDecoration: 'none',
-  fontSize: '0.7rem',
+  fontSize: '0.75rem',
   fontWeight: '800',
-  letterSpacing: '0.5px',
+  letterSpacing: '0.3px',
   display: 'block',
-  marginBottom: '10px'
+  marginBottom: '12px',
 };
 
 const copyrightStyle: React.CSSProperties = {
   fontSize: '0.6rem',
-  color: '#94a3b8',
-  fontWeight: '600'
+  color: '#cbd5e1',
+  fontWeight: '700',
+  letterSpacing: '0.5px'
 };
