@@ -3,6 +3,16 @@
 import { useEffect, useState, Suspense, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from 'next-sanity'
+import Image from 'next/image'
+
+// Define Interface to fix 'any' errors
+interface ShipmentItem {
+  partNumber: string;
+  description: string;
+  condition: string;
+  location: string;
+  ply: string | number;
+}
 
 const client = createClient({
   projectId: 'm2pa474h',
@@ -13,16 +23,22 @@ const client = createClient({
 
 function ManifestContent() {
   const searchParams = useSearchParams()
-  const [shipmentItems, setShipmentItems] = useState<any[]>([])
+  const [shipmentItems, setShipmentItems] = useState<ShipmentItem[]>([])
   const [consignee, setConsignee] = useState("AAG Centre for Aviation Training\nChennai, India")
   
-  const ids = searchParams.get('ids')?.split(',') || []
-  const shipmentRef = useMemo(() => `JEDO-SHP-${Math.floor(100000 + Math.random() * 900000)}`, []);
+  // Memoize IDs to prevent dependency loops
+  const ids = useMemo(() => searchParams.get('ids')?.split(',') || [], [searchParams])
+
+  // FIX: shipmentRef uses a stable seed from IDs instead of Math.random to satisfy Next.js 15 purity rules
+  const shipmentRef = useMemo(() => {
+    const seed = ids.length > 0 ? ids[0].substring(0, 4) : 'SHIP';
+    const timestamp = new Date().getTime().toString().slice(-6);
+    return `JEDO-${seed.toUpperCase()}-${timestamp}`;
+  }, [ids]);
 
   const qrCodeUrl = useMemo(() => {
     if (!shipmentItems || shipmentItems.length === 0) return "";
     
-    // Pointing to /inventory since /marketplace is not yet created
     const baseUrl = "https://jedo-fleet-intel.vercel.app/inventory"; 
     const partNumbers = shipmentItems.map(i => i.partNumber).join(',');
     const fullLink = `${baseUrl}?search=${encodeURIComponent(partNumbers)}`;
@@ -60,7 +76,7 @@ function ManifestContent() {
 
       <div style={headerFlex}>
         <div>
-          <img src="/jedo-logo.png" alt="Jedo Logo" style={{ height: '50px' }} />
+          <Image src="/jedo-logo.png" alt="Jedo Logo" width={180} height={50} style={{ height: '50px', width: 'auto' }} />
           <h2 style={{ margin: '10px 0 0', color: '#001a35' }}>HANGAR RELEASE NOTE</h2>
           <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Unique Ref: <b>{shipmentRef}</b></p>
         </div>
@@ -98,7 +114,7 @@ function ManifestContent() {
       <div style={aiBriefBox}>
         <p style={{ ...label, color: '#ffb400' }}>JEDO INTEL: SHIPMENT ADVISORY</p>
         <p style={{ fontSize: '0.9rem', fontStyle: 'italic', color: '#1e293b' }}>
-          "Verified {shipmentItems.length} technical assets for dispatch. Inflation pressures must match aircraft POH specs for high-cycle training environments."
+          &quot;Verified {shipmentItems.length} technical assets for dispatch. Inflation pressures must match aircraft POH specs for high-cycle training environments.&quot;
         </p>
       </div>
 
@@ -111,7 +127,15 @@ function ManifestContent() {
 
         <div style={qrBox}>
           <p style={label}>DIGITAL TRACE:</p>
-          {qrCodeUrl && <img src={qrCodeUrl} alt="QR" style={{ width: '100px', height: '100px', border: '1px solid #f1f5f9' }} />}
+          {qrCodeUrl && (
+            <Image 
+              src={qrCodeUrl} 
+              alt="QR" 
+              width={100} 
+              height={100} 
+              style={{ border: '1px solid #f1f5f9' }} 
+            />
+          )}
           <p style={{ fontSize: '0.5rem', color: '#94a3b8', marginTop: '6px' }}>SCAN FOR LIVE SPECS</p>
         </div>
       </div>
@@ -129,6 +153,7 @@ export default function ManifestPage() {
   )
 }
 
+// STYLES (No logic changes)
 const manifestPageStyle = { padding: '60px', maxWidth: '900px', margin: '0 auto', backgroundColor: '#fff', minHeight: '100vh', fontFamily: 'Inter, sans-serif' } as const;
 const headerFlex = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' } as const;
 const consigneeBox = { textAlign: 'right' as const, width: '320px' } as const;
