@@ -3,6 +3,15 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from 'next-sanity'
+
+// Connect to your production dataset
+const client = createClient({
+  projectId: 'm2pa474h',
+  dataset: 'production',
+  apiVersion: '2023-05-03',
+  useCdn: false,
+})
 
 export default function LoginPage() {
   const [accessCode, setAccessCode] = useState('')
@@ -10,7 +19,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  // Custom WhatsApp message for access requests
   const waMessage = encodeURIComponent(
     "Hello Jedo Logistics, I would like to request an Access Code for the Fleet Intelligence System.\n\nOrganization Name: \nContact Name: "
   );
@@ -20,12 +28,30 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    // Standardized Access Codes for Jedo Technologies
-    if (accessCode.trim().toUpperCase() === 'CFC2026' || accessCode.trim().toUpperCase() === 'JEDO99') {
-      localStorage.setItem('fleet_access', 'true')
-      router.push('/fleet-health')
-    } else {
-      setError('Invalid Access Code. Please contact Jedo Logistics.')
+    try {
+      // AJ: This queries Sanity for a 'fleetUser' document with a matching code
+      const user = await client.fetch(
+        `*[_type == "fleetUser" && accessCode == $code][0]`,
+        { code: accessCode.trim() }
+      )
+
+      if (user) {
+        localStorage.setItem('fleet_access', 'true')
+        localStorage.setItem('fleet_user_org', user.organization || 'Authorized User')
+        router.push('/fleet-health')
+      } else {
+        // Fallback for your original codes if you haven't moved them to Sanity yet
+        if (accessCode.trim().toUpperCase() === 'CFC2026' || accessCode.trim().toUpperCase() === 'JEDO99') {
+          localStorage.setItem('fleet_access', 'true')
+          router.push('/fleet-health')
+        } else {
+          setError('Invalid Access Code. Please contact Jedo Logistics.')
+        }
+      }
+    } catch (err) {
+      console.error("Login Error:", err)
+      setError('Connection error. Please check your network.')
+    } finally {
       setLoading(false)
     }
   }
@@ -49,7 +75,7 @@ export default function LoginPage() {
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>ACCESS CODE</label>
             <input 
-              type="password" // Masks input with asterisks/dots
+              type="password" 
               placeholder="••••••••" 
               value={accessCode}
               onChange={(e) => setAccessCode(e.target.value)}
@@ -65,14 +91,14 @@ export default function LoginPage() {
             disabled={loading}
             style={buttonStyle}
           >
-            {loading ? 'VERIFYING...' : 'AUTHORIZE ACCESS'}
+            {loading ? 'AUTHENTICATING...' : 'AUTHORIZE ACCESS'}
           </button>
         </form>
 
         {/* SUPPORT FOOTER */}
         <div style={{ marginTop: '30px', textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '20px' }}>
           <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-            Don't have a code? <br />
+            Don&apos;t have a code? <br />
             <a 
               href={`https://wa.me/919600038089?text=${waMessage}`} 
               target="_blank" 
@@ -88,7 +114,7 @@ export default function LoginPage() {
   )
 }
 
-// --- STYLES (Required for TypeScript Build) ---
+// --- STYLES ---
 const containerStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
