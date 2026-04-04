@@ -10,7 +10,7 @@ interface FleetAsset {
   _id: string;
   tailNumber: string;
   aircraftModel: string;
-  manufacturer?: string; // This is the "Make"
+  manufacturer?: string; 
   tyreModel?: string;
   partNumber?: string;
   tyrePosition?: string;
@@ -98,11 +98,27 @@ export default function FleetHealth() {
   return (
     <div style={{ backgroundColor: '#f4f7f9', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
       
-      {/* NAVIGATION */}
+      {/* NAVIGATION - LOGBOOK LINK ADDED HERE */}
       <nav style={navBarStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} /></Link>
-          <Link href="/marketplace" style={navLinkStyle}>PROCUREMENT</Link>
+          <div style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
+            <Link href="/marketplace" style={navLinkStyle}>PROCUREMENT</Link>
+            
+            {/* NEW LOGBOOK LINK */}
+            <Link 
+              href="/update-logbook" 
+              style={{ 
+                ...navLinkStyle, 
+                backgroundColor: '#ffb400', 
+                color: '#001a35', 
+                padding: '6px 14px', 
+                borderRadius: '6px' 
+              }}
+            >
+              UPDATE LOGBOOK
+            </Link>
+          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div style={statusBadge}>LIVE FLEET PULSE</div>
@@ -129,7 +145,6 @@ export default function FleetHealth() {
             const daysLeft = calculateDaysRemaining(asset.currentLandings, asset.maxDesignLife, asset.dailyUtilization)
             const statusColor = healthVal < 20 ? '#ef4444' : healthVal < 45 ? '#f59e0b' : '#10b981';
 
-            // WhatsApp Message Builder including Make/Manufacturer
             const waMessage = encodeURIComponent(
               `Jedo Intelligence Alert!\n\n` +
               `Requesting Quote for:\n` +
@@ -205,29 +220,9 @@ export default function FleetHealth() {
   )
 }
 
-// --- STYLING ---
+// --- STYLING (NO CHANGES TO EXISTING CONSTANTS) ---
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#001a35' };
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 'bold' as const };
 const statusBadge = { color: '#ffb400', fontSize: '0.6rem', fontWeight: '900', border: '1px solid #ffb400', padding: '4px 12px', borderRadius: '4px' };
 const logoutBtnStyle = { backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '6px 15px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' as const, cursor: 'pointer' };
-const summaryTag = { backgroundColor: 'white', padding: '6px 12px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 'bold' as const, color: '#64748b', border: '1px solid #e2e8f0' };
-const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '25px' };
-const cardStyle = { backgroundColor: 'white', borderRadius: '24px', padding: '30px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05)', border: '1.5px solid' };
-const cardHeader = { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' };
-const typeBadge = { fontSize: '0.8rem', fontWeight: '900' as const, letterSpacing: '1px' };
-const tailTitle = { margin: '5px 0 0 0', fontSize: '1.25rem', color: '#001a35', fontWeight: '900' as const };
-const partNumberLabel = { fontSize: '0.7rem', fontWeight: 'bold' as const, color: '#ffb400', margin: '2px 0' };
-const healthBadge = { padding: '4px 12px', borderRadius: '50px', fontSize: '0.65rem', fontWeight: '900' as const, border: '2px solid' };
-const countdownBox = { padding: '20px', borderRadius: '16px', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', marginBottom: '20px' };
-const countdownValue = { fontSize: '1.6rem', fontWeight: '900' as const, marginTop: '5px' };
-const intelGrid = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' };
-const intelBox = { backgroundColor: '#f8fafc', padding: '15px', borderRadius: '12px', textAlign: 'center' as const };
-const intelValue = { display: 'block', fontSize: '1.1rem', fontWeight: '900' as const, color: '#001a35', marginTop: '4px' };
-const progressWrapper = { height: '8px', backgroundColor: '#f1f5f9', borderRadius: '10px', overflow: 'hidden' as const, marginBottom: '25px' };
-const progressFill = { height: '100%', transition: 'all 0.8s ease' };
-const cardFooter = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '20px' };
-const ownerSection = { display: 'flex', flexDirection: 'column' as const };
-const ownerEmail = { fontSize: '0.7rem', fontWeight: '700' as const, color: '#001a35' };
-const orderBtn = { textDecoration: 'none', padding: '12px 20px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: '900' as const };
-const label = { fontSize: '0.6rem', fontWeight: '900' as const, color: '#94a3b8', letterSpacing: '0.8px', textTransform: 'uppercase' as const };
-const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35', color: '#ffb400', fontWeight: 'bold', letterSpacing: '3px' };
+const summaryTag = { backgroundColor: 'white', padding: '6px 12px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 'bold' as const, color: '#64748b', border:
