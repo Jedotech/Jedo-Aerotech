@@ -7,18 +7,15 @@ export default defineType({
   type: 'document',
   icon: ActivityIcon,
   fields: [
-    // --- MULTI-TENANCY / ORGANIZATION ---
+    // --- MULTI-TENANCY / ORGANIZATION (NOW DYNAMIC) ---
     defineField({
       name: 'schoolName',
       title: 'Aviation School / Organization',
-      type: 'string',
-      description: 'Assign this aircraft to a specific school (e.g., Fly High School)',
-      options: {
-        list: [
-          { title: 'Fly High School', value: 'Fly High School' },
-          { title: 'AAG Centre', value: 'AAG Centre' },
-        ],
-      },
+      type: 'reference', // Changed from 'string' to 'reference'
+      to: [{ type: 'fleetUser' }], // Points to your fleetUser schema
+      description: 'Select the school this aircraft belongs to (Dynamic list from Fleet Users)',
+      // We use weak: true so you can delete a user without breaking the aircraft record
+      weak: true, 
     }),
 
     // --- AIRCRAFT IDENTIFICATION ---
@@ -131,7 +128,7 @@ export default defineType({
   preview: {
     select: {
       title: 'tailNumber',
-      subtitle: 'schoolName', // Changed subtitle to show school in Studio preview
+      subtitle: 'schoolName.organization', // Drill down into the reference to show organization name
     },
   },
 })
