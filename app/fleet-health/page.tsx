@@ -48,7 +48,11 @@ export default function FleetHealth() {
 
     async function fetchFleet() {
       try {
-        const data = await client.fetch(`*[_type == "fleetRecord"] | order(tailNumber asc)`)
+        // FILTER LOGIC: Fetches only the records belonging to the logged-in school
+        const data = await client.fetch(
+          `*[_type == "fleetRecord" && schoolName == $org] | order(tailNumber asc)`,
+          { org: storedOrg || 'Authorized Operator' }
+        )
         setAssets(data || [])
       } catch (e) {
         console.error("Fleet Sync Error:", e)
@@ -220,7 +224,7 @@ export default function FleetHealth() {
   )
 }
 
-// --- STYLING (CORRECTED SYNTAX) ---
+// --- STYLING (UNCHANGED) ---
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#001a35' };
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 'bold' as const };
 const statusBadge = { color: '#ffb400', fontSize: '0.6rem', fontWeight: '900', border: '1px solid #ffb400', padding: '4px 12px', borderRadius: '4px' };
