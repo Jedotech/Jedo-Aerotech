@@ -7,6 +7,20 @@ export default defineType({
   type: 'document',
   icon: ActivityIcon,
   fields: [
+    // --- MULTI-TENANCY / ORGANIZATION ---
+    defineField({
+      name: 'schoolName',
+      title: 'Aviation School / Organization',
+      type: 'string',
+      description: 'Assign this aircraft to a specific school (e.g., Fly High School)',
+      options: {
+        list: [
+          { title: 'Fly High School', value: 'Fly High School' },
+          { title: 'AAG Centre', value: 'AAG Centre' },
+        ],
+      },
+    }),
+
     // --- AIRCRAFT IDENTIFICATION ---
     defineField({
       name: 'tailNumber',
@@ -117,7 +131,7 @@ export default defineType({
   preview: {
     select: {
       title: 'tailNumber',
-      subtitle: 'aircraftModel',
+      subtitle: 'schoolName', // Changed subtitle to show school in Studio preview
     },
   },
 })

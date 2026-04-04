@@ -1,17 +1,24 @@
-import parts from './parts'           // Matches your 'parts.ts' file
-import fleetRecord from './fleetRecord' // Matches your 'fleetRecord.tsx' file
+import parts from './parts'           
+import fleetRecord from './fleetRecord' 
 import client from './client'
 import purchase from './purchase'
-import fleetUser from './fleetUser'     // ADDED: For unique user access codes
+import fleetUser from './fleetUser'     
 
 /**
  * The Master Schema List for Jedo Admin
  * Consolidating Inventory and Fleet Intelligence
+ * * Note: fleetRecord now includes the 'schoolName' field for 
+ * FLY HIGH SCHOOL and other multi-tenant operators.
  */
 export const schemaTypes = [
   parts, 
   fleetRecord, 
   client, 
   purchase,
-  fleetUser // ADDED: Registering the User schema
+  fleetUser 
 ]
+
+// Default export for the Sanity Config
+export const schema = {
+  types: schemaTypes,
+}
