@@ -17,7 +17,7 @@ export default function UpdateLogbook() {
   const [foundTyres, setFoundTyres] = useState<any[]>([])
   const [selectedTyre, setSelectedTyre] = useState<any>(null)
   const [todaysActivity, setTodaysActivity] = useState('')
-  const [comments, setComments] = useState('') // New Comments State
+  const [comments, setComments] = useState('') 
   const [status, setStatus] = useState('Enter Tail Number...')
   const [loading, setLoading] = useState(false)
 
@@ -45,7 +45,6 @@ export default function UpdateLogbook() {
     setStatus('Syncing securely...')
 
     const newTotal = (selectedTyre.currentLandings || 0) + Number(todaysActivity)
-
     const result = await updateTyreLandings(selectedTyre._id, newTotal)
 
     if (result.success) {
@@ -54,7 +53,7 @@ export default function UpdateLogbook() {
       setTailNumber(''); 
       setSelectedTyre(null); 
       setFoundTyres([]);
-      setComments(''); // Clear comments on success
+      setComments(''); 
     } else {
       setStatus('❌ SYNC FAILED. Check Vercel Logs.')
     }
@@ -64,8 +63,7 @@ export default function UpdateLogbook() {
   return (
     <div style={containerStyle}>
       <nav style={navWrapper}>
-        <img src="/jedo-logo.png" alt="Jedo" style={{ height: '32px' }} />
-        {/* Added Highlight Color to Link */}
+        <img src="/jedo-logo.png" alt="Jedo" style={{ height: '28px' }} />
         <Link href="/fleet-health" style={topRightLink}>
           VIEW LIVE FLEET STATUS
         </Link>
@@ -94,7 +92,7 @@ export default function UpdateLogbook() {
               </select>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                 <div>
                   <label style={labelStyle}>PREVIOUS TOTAL</label>
                   <div style={readOnlyDisplay}>{selectedTyre?.currentLandings ?? '--'}</div>
@@ -105,19 +103,18 @@ export default function UpdateLogbook() {
                 </div>
             </div>
 
-            {/* New Comments Field */}
             <div style={inputGroup}>
-              <label style={labelStyle}>MAINTENANCE NOTES / COMMENTS (OPTIONAL)</label>
+              <label style={labelStyle}>COMMENTS (OPTIONAL)</label>
               <textarea 
-                placeholder="e.g. Flight 102: Slight wear noticed on outer tread." 
+                placeholder="Brief maintenance notes..." 
                 value={comments} 
                 onChange={(e) => setComments(e.target.value)} 
-                style={{ ...inputStyle, minHeight: '80px', fontFamily: 'inherit' }} 
+                style={{ ...inputStyle, minHeight: '45px', fontSize: '0.85rem' }} 
               />
             </div>
 
             <button type="submit" disabled={loading || !selectedTyre} style={btnStyle}>
-              {loading ? 'SYNCING TO CLOUD...' : 'UPDATE JEDO INTEL'}
+              {loading ? 'SYNCING...' : 'UPDATE JEDO INTEL'}
             </button>
           </form>
           {status && <p style={statusStyle(status)}>{status}</p>}
@@ -127,28 +124,27 @@ export default function UpdateLogbook() {
   )
 }
 
-// --- UPDATED STYLES ---
-const containerStyle: React.CSSProperties = { minHeight: '100vh', backgroundColor: '#020617', fontFamily: 'Inter, sans-serif' };
+// --- COMPACT STYLES ---
+const containerStyle: React.CSSProperties = { minHeight: '100vh', backgroundColor: '#020617', fontFamily: 'Inter, sans-serif', overflow: 'hidden' };
 
 const navWrapper: React.CSSProperties = { 
   display: 'flex', 
   justifyContent: 'space-between', 
   alignItems: 'center', 
-  padding: '25px 50px', 
+  padding: '15px 30px', 
   position: 'fixed', 
   top: 0, 
   width: '100%' 
 };
 
 const topRightLink: React.CSSProperties = { 
-  fontSize: '0.75rem', 
-  color: '#ffb400', // Jedo Gold Highlight
+  fontSize: '0.65rem', 
+  color: '#ffb400', 
   fontWeight: '900', 
   textDecoration: 'none',
-  letterSpacing: '0.5px',
   border: '1px solid #ffb400',
-  padding: '8px 16px',
-  borderRadius: '6px'
+  padding: '6px 12px',
+  borderRadius: '4px'
 };
 
 const cardFlexWrapper: React.CSSProperties = { 
@@ -156,55 +152,54 @@ const cardFlexWrapper: React.CSSProperties = {
   alignItems: 'center', 
   justifyContent: 'center', 
   minHeight: '100vh',
-  padding: '100px 20px' 
+  padding: '20px' 
 };
 
 const formCard: React.CSSProperties = { 
   backgroundColor: 'white', 
-  padding: '40px', // Increased Padding
-  borderRadius: '24px', 
-  boxShadow: '0 30px 60px rgba(0,0,0,0.6)', 
+  padding: '25px', 
+  borderRadius: '16px', 
+  boxShadow: '0 20px 40px rgba(0,0,0,0.6)', 
   width: '100%', 
-  maxWidth: '500px' // Increased Card Width
+  maxWidth: '420px' 
 };
 
 const titleStyle: React.CSSProperties = { 
   color: '#001a35', 
   fontWeight: '900', 
-  fontSize: '1.4rem', // Increased Font Size
-  marginBottom: '25px', 
-  textAlign: 'center',
-  letterSpacing: '-0.5px'
+  fontSize: '1rem', 
+  marginBottom: '15px', 
+  textAlign: 'center'
 };
 
-const inputGroup: React.CSSProperties = { textAlign: 'left', marginBottom: '20px' };
+const inputGroup: React.CSSProperties = { textAlign: 'left', marginBottom: '12px' };
 
 const labelStyle: React.CSSProperties = { 
   display: 'block', 
-  fontSize: '0.65rem', 
+  fontSize: '0.55rem', 
   fontWeight: '900', 
   color: '#94a3b8', 
-  marginBottom: '8px',
-  letterSpacing: '1px'
+  marginBottom: '4px',
+  letterSpacing: '0.5px'
 };
 
 const inputStyle: React.CSSProperties = { 
   width: '100%', 
-  padding: '12px 16px', 
-  borderRadius: '10px', 
+  padding: '8px 12px', 
+  borderRadius: '8px', 
   border: '1.5px solid #e2e8f0', 
-  fontSize: '1rem', 
+  fontSize: '0.85rem', 
   outline: 'none',
   color: '#001a35'
 };
 
 const readOnlyDisplay: React.CSSProperties = { 
   width: '100%', 
-  padding: '12px 16px', 
-  borderRadius: '10px', 
+  padding: '8px 12px', 
+  borderRadius: '8px', 
   backgroundColor: '#f8fafc', 
   fontWeight: '800', 
-  fontSize: '1.1rem', 
+  fontSize: '0.9rem', 
   color: '#334155', 
   border: '1.5px dashed #cbd5e1',
   textAlign: 'center'
@@ -212,25 +207,24 @@ const readOnlyDisplay: React.CSSProperties = {
 
 const btnStyle: React.CSSProperties = { 
   width: '100%', 
-  padding: '16px', 
+  padding: '12px', 
   backgroundColor: '#001a35', 
   color: 'white', 
   border: 'none', 
-  borderRadius: '10px', 
+  borderRadius: '8px', 
   fontWeight: '900', 
   cursor: 'pointer', 
-  fontSize: '0.9rem',
-  marginTop: '10px',
-  transition: 'transform 0.2s ease'
+  fontSize: '0.8rem',
+  marginTop: '5px'
 };
 
 const statusStyle = (msg: string): React.CSSProperties => ({ 
-  marginTop: '20px', 
-  fontSize: '0.8rem', 
+  marginTop: '12px', 
+  fontSize: '0.7rem', 
   fontWeight: 'bold', 
   color: msg.includes('✅') ? '#10b981' : '#f43f5e', 
   textAlign: 'center',
-  backgroundColor: msg.includes('✅') ? '#ecfdf5' : '#fff1f2',
-  padding: '10px',
-  borderRadius: '8px'
+  padding: '6px',
+  borderRadius: '6px',
+  backgroundColor: msg.includes('✅') ? '#ecfdf5' : 'transparent'
 });
