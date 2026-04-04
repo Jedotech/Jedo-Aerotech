@@ -27,7 +27,26 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
+    const code = accessCode.trim().toUpperCase()
+
     try {
+      // 1. Check for the new Fly High School static credential
+      if (code === 'AJ747') {
+        localStorage.setItem('fleet_access', 'true')
+        localStorage.setItem('fleet_user_org', 'Fly High School')
+        router.push('/fleet-health')
+        return
+      }
+
+      // 2. Check for the general master keys (Legacy)
+      if (code === 'CFC2026' || code === 'JEDO99') {
+        localStorage.setItem('fleet_access', 'true')
+        localStorage.setItem('fleet_user_org', 'Authorized Operator')
+        router.push('/fleet-health')
+        return
+      }
+
+      // 3. Check for dynamic users in Sanity database
       const user = await client.fetch(
         `*[_type == "fleetUser" && accessCode == $code][0]`,
         { code: accessCode.trim() }
@@ -38,12 +57,7 @@ export default function LoginPage() {
         localStorage.setItem('fleet_user_org', user.organization || 'Authorized User')
         router.push('/fleet-health')
       } else {
-        if (accessCode.trim().toUpperCase() === 'CFC2026' || accessCode.trim().toUpperCase() === 'JEDO99') {
-          localStorage.setItem('fleet_access', 'true')
-          router.push('/fleet-health')
-        } else {
-          setError('Invalid Access Code. Please contact Jedo Logistics.')
-        }
+        setError('Invalid Access Code. Please contact Jedo Logistics.')
       }
     } catch (err) {
       console.error("Login Error:", err)
@@ -79,7 +93,7 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: '20px' }}> {/* Reduced margin */}
+            <div style={{ marginBottom: '20px' }}>
               <label style={labelStyle}>AUTHORIZED ACCESS CODE</label>
               <input 
                 type="password" 
@@ -124,15 +138,15 @@ export default function LoginPage() {
   )
 }
 
-// --- PROFESSIONAL STYLING (Optimized for Height) ---
+// --- PROFESSIONAL STYLING ---
 const containerStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  height: '100vh', // Fixed height to prevent scrolling
+  height: '100vh',
   width: '100vw',
   backgroundColor: '#001a35',
   backgroundImage: 'radial-gradient(circle at top right, #002d5b 0%, #001a35 100%)',
-  overflow: 'hidden', // Disables scroll
+  overflow: 'hidden',
   position: 'relative'
 };
 
@@ -140,7 +154,7 @@ const topNavStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: '20px 40px', // Slightly reduced padding
+  padding: '20px 40px',
   width: '100%',
   boxSizing: 'border-box',
   position: 'absolute',
@@ -150,7 +164,7 @@ const topNavStyle: React.CSSProperties = {
 };
 
 const topLogoStyle: React.CSSProperties = {
-  height: '38px', // Slightly smaller to save space
+  height: '38px',
   width: 'auto',
   filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.2))'
 };
@@ -172,7 +186,7 @@ const centeredCardWrapper: React.CSSProperties = {
   flexGrow: 1,
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '80px 20px 20px', // Reduced top padding
+  padding: '80px 20px 20px',
   width: '100%',
   height: '100%',
   boxSizing: 'border-box',
@@ -180,7 +194,7 @@ const centeredCardWrapper: React.CSSProperties = {
 
 const loginCardStyle: React.CSSProperties = {
   backgroundColor: '#ffffff',
-  padding: '40px 45px', // Reduced vertical padding
+  padding: '40px 45px',
   borderRadius: '28px',
   boxShadow: '0 40px 80px -15px rgba(0, 0, 0, 0.6)',
   width: '100%',
@@ -189,7 +203,7 @@ const loginCardStyle: React.CSSProperties = {
 };
 
 const cardHeaderStyle: React.CSSProperties = {
-  marginBottom: '25px', // Reduced margin
+  marginBottom: '25px',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center'
@@ -199,7 +213,7 @@ const cardTitleStyle: React.CSSProperties = {
   color: '#001a35',
   margin: '0 0 5px 0',
   fontWeight: '900',
-  fontSize: '1.4rem', // Slightly smaller
+  fontSize: '1.4rem',
   letterSpacing: '-0.5px'
 };
 
@@ -231,7 +245,7 @@ const labelStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  padding: '14px', // Reduced padding
+  padding: '14px',
   borderRadius: '12px',
   border: '2px solid #e2e8f0',
   fontSize: '1.2rem',
@@ -247,7 +261,7 @@ const buttonStyle: React.CSSProperties = {
   width: '100%',
   backgroundColor: '#ffb400',
   color: '#001a35',
-  padding: '16px', // Reduced padding
+  padding: '16px',
   borderRadius: '12px',
   border: 'none',
   fontSize: '0.9rem',
@@ -269,7 +283,7 @@ const errorContainerStyle: React.CSSProperties = {
 };
 
 const footerStyle: React.CSSProperties = {
-  marginTop: '25px', // Reduced margin
+  marginTop: '25px',
   textAlign: 'center',
   borderTop: '1px solid #f1f5f9',
   paddingTop: '20px'
