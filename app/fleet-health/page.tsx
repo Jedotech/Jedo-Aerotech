@@ -68,21 +68,22 @@ export default function FleetHealth() {
 
   // --- INTELLIGENCE CALCULATIONS ---
   const calculateCPL = (price: number | undefined, maxLandings: number) => {
-    if (!price || !maxLandings || maxLandings === 0) return "N/A";
-    return `$${(price / maxLandings).toFixed(2)}`; // Set to USD as per your schema
+    const safeMax = maxLandings || 250;
+    if (!price || safeMax === 0) return "N/A";
+    return `$${(price / safeMax).toFixed(2)}`; 
   }
 
   const calculateDaysRemaining = (current: number, max: number, daily: number | undefined) => {
     const safeDaily = daily || 0;
     if (safeDaily <= 0) return "SET UTILIZATION";
-    const remaining = (max || 250) - current;
+    const remaining = (max || 250) - (current || 0);
     const days = Math.floor(remaining / safeDaily);
     return days <= 0 ? "REPLACE NOW" : `${days} DAYS`;
   }
 
   const calculateHealth = (current: number, max: number) => {
-    const totalMax = max || 250; // Fallback to 250 if empty
-    const percentage = ((totalMax - current) / totalMax) * 100;
+    const totalMax = max || 250;
+    const percentage = ((totalMax - (current || 0)) / totalMax) * 100;
     return Math.max(0, Math.min(100, percentage)).toFixed(1);
   }
 
@@ -133,7 +134,7 @@ export default function FleetHealth() {
           {assets.length > 0 ? assets.map((asset) => {
             const healthVal = parseFloat(calculateHealth(asset.currentLandings, asset.maxDesignLife))
             const daysLeft = calculateDaysRemaining(asset.currentLandings, asset.maxDesignLife, asset.dailyUtilization)
-            const cpl = calculateCPL(asset.purchasePrice, asset.maxDesignLife) // CPL based on Max Life
+            const cpl = calculateCPL(asset.purchasePrice, asset.maxDesignLife)
             
             const statusColor = healthVal < 20 ? '#ef4444' : healthVal < 45 ? '#f59e0b' : '#10b981';
 
@@ -166,7 +167,7 @@ export default function FleetHealth() {
                   </div>
                   <div style={intelBox}>
                     <span style={label}>TOTAL LANDINGS</span>
-                    <span style={intelValue}>{asset.currentLandings}</span>
+                    <span style={intelValue}>{asset.currentLandings || 0}</span>
                   </div>
                 </div>
 
@@ -183,9 +184,14 @@ export default function FleetHealth() {
                   <Link 
                     href={`https://wa.me/919600038089?text=Jedo%20Intelligence%20Alert:%20Asset%20${asset.tailNumber}%20(${asset.tyrePosition})%20is%20at%20${healthVal}%%20life.%20Requesting%20quote%20for%20replacement.`} 
                     target="_blank"
-                    style={{ ...orderBtn, opacity: healthVal < 45 ? 1 : 0.6 }}
+                    style={{ 
+                      ...orderBtn, 
+                      opacity: healthVal < 45 ? 1 : 0.6,
+                      backgroundColor: healthVal < 45 ? '#ffb400' : '#001a35',
+                      color: healthVal < 45 ? '#001a35' : '#ffffff'
+                    }}
                   >
-                    {healthVal < 45 ? 'ORDER NOW' : 'MONITOR'}
+                    {healthVal < 45 ? 'ORDER NOW' : 'MONITORING'}
                   </Link>
                 </div>
               </div>
@@ -225,7 +231,7 @@ const progressFill = { height: '100%', transition: 'all 0.8s cubic-bezier(0.4, 0
 const cardFooter = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '20px' };
 const ownerSection = { display: 'flex', flexDirection: 'column' as const };
 const ownerEmail = { fontSize: '0.7rem', fontWeight: '700' as const, color: '#001a35' };
-const orderBtn = { backgroundColor: '#ffb400', color: '#001a35', textDecoration: 'none', padding: '12px 20px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: '900' as const };
+const orderBtn = { textDecoration: 'none', padding: '12px 20px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: '900' as const, transition: 'all 0.2s ease' };
 const label = { fontSize: '0.6rem', fontWeight: '900' as const, color: '#94a3b8', letterSpacing: '0.8px', textTransform: 'uppercase' as const };
 const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#001a35' };
 const emptyState = { gridColumn: '1 / -1', padding: '100px', textAlign: 'center' as const, backgroundColor: 'white', borderRadius: '30px', border: '2px dashed #e2e8f0', color: '#64748b' };
