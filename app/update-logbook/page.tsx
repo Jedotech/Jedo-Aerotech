@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react'
 import { createClient } from 'next-sanity'
 import Link from 'next/link'
 
-// 1. PROJECT CREDENTIALS & WRITE TOKEN
 const client = createClient({
   projectId: 'm2pa474h',
   dataset: 'production',
   apiVersion: '2023-05-03',
   useCdn: false,
-  // SECURITY: Replace with your actual Write Token from manage.sanity.io
   token: 'YOUR_SANITY_WRITE_TOKEN_HERE', 
 })
 
@@ -19,106 +17,81 @@ export default function UpdateLogbook() {
   const [todaysActivity, setTodaysActivity] = useState('')
   const [accumulatedLandings, setAccumulatedLandings] = useState<number | null>(null)
   const [comments, setComments] = useState('')
-  
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
-  const [fetching, setFetching] = useState(false)
 
-  // 2. LIVE FETCH FUNCTION (As soon as Tail is recognized)
+  // 1. IMPROVED FETCHING (Handles Case Sensitivity)
   useEffect(() => {
-    if (tailNumber.length > 4) { // Basic VT-JEDO length check
-      setFetching(true)
-      setStatus('Fetching current airframe status...')
-      
-      client.fetch(`*[_type == "fleetRecord" && tailNumber == $tail][0].currentLandings`, { 
-        tail: tailNumber.toUpperCase() 
-      })
-      .then(data => {
-        setAccumulatedLandings(data ?? 0)
-        setStatus('Ready for logbook update.')
-      })
-      .catch(() => {
-        setStatus('❌ AIRCRAFT NOT FOUND. CHECK TAIL.')
+    const fetchCurrentStatus = async () => {
+      if (tailNumber.trim().length >= 4) {
+        try {
+          const data = await client.fetch(
+            `*[_type == "fleetRecord" && tailNumber match $tail][0].currentLandings`, 
+            { tail: tailNumber.trim() }
+          )
+          if (data !== null && data !== undefined) {
+            setAccumulatedLandings(data)
+            setStatus('Aircraft recognized.')
+          } else {
+            setAccumulatedLandings(null)
+            setStatus('❌ Aircraft not found.')
+          }
+        } catch (err) {
+          setAccumulatedLandings(null)
+        }
+      } else {
         setAccumulatedLandings(null)
-      })
-      .finally(() => setFetching(false))
-    } else {
-        setAccumulatedLandings(null)
+        setStatus('')
+      }
     }
+    fetchCurrentStatus()
   }, [tailNumber])
 
-  // 3. LOGIC FOR INCREMENTAL UPDATE
-  const handleIncrementalUpdate = async (e: React.FormEvent) => {
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setStatus('VALIDATING & SYNCING LOGBOOK...')
-
-    const activityNumber = Number(todaysActivity)
-    if (activityNumber <= 0 || !accumulatedLandings === null) {
-      setStatus('❌ Enter valid positive activity number.')
-      setLoading(false)
-      return
-    }
-
     try {
-      // Find the document ID
-      const query = `*[_type == "fleetRecord" && tailNumber == $tail][0]._id`
-      const docId = await client.fetch(query, { tail: tailNumber.toUpperCase() })
+      const query = `*[_type == "fleetRecord" && tailNumber match $tail][0]._id`
+      const docId = await client.fetch(query, { tail: tailNumber.trim() })
 
       if (!docId) {
-        setStatus('❌ AIRCRAFT NOT FOUND IN DATABASE')
+        setStatus('❌ Error: Could not verify airframe ID.')
         setLoading(false)
         return
       }
 
-      // Calculate the new TOTAL and Append Comment
-      const newTotal = (accumulatedLandings || 0) + activityNumber
-      // Simple log entry style: [Date] Notes
-      const newCommentLog = comments ? `[${new Date().toLocaleDateString()}] ${comments}` : ''
+      const newTotal = (accumulatedLandings || 0) + Number(todaysActivity)
 
-      // 4. PATCH SANITY WITH NEW TOTAL (Keep comments separate or ignore if not in schema)
-      await client
-        .patch(docId)
-        .set({ currentLandings: newTotal })
-        // If you add a "maintenanceLog" string field in schema, you can enable this:
-        // .append({ maintenanceLog: [newCommentLog] }) 
-        .commit()
+      await client.patch(docId).set({ currentLandings: newTotal }).commit()
 
-      setStatus(`✅ SUCCESS! New Total: ${newTotal}. Syncing Dashboard...`)
+      setStatus(`✅ SUCCESS: Total is now ${newTotal}`)
+      setAccumulatedLandings(newTotal)
       setTodaysActivity('')
       setComments('')
-      // Refresh local display value
-      setAccumulatedLandings(newTotal)
-
     } catch (err) {
-      console.error(err)
-      setStatus('❌ UPDATE FAILED. CHECK TOKEN OR SCHEMA.')
+      setStatus('❌ Update failed. Check connection.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    // Updated Background Color to distinguish the page
     <div style={containerStyle}>
-      
-      {/* 5. LOGO MOVED TO TOP LEFT (Homepage size) */}
       <nav style={logoNavStyle}>
-        <img src="/jedo-logo.png" alt="Jedo Technologies" style={{ height: '35px' }} />
+        <img src="/jedo-logo.png" alt="Jedo" style={{ height: '35px' }} />
       </nav>
 
       <main style={cardFlexWrapper}>
         <div style={formCard}>
-          <h2 style={{ color: '#001a35', fontWeight: '900', fontSize: '1.4rem' }}>DAILY LOGBOOK ENTRY</h2>
-          <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Authenticate airframe and input today's activity.</p>
+          <h2 style={{ color: '#001a35', fontWeight: '900', fontSize: '1.2rem', marginBottom: '5px' }}>DAILY LOGBOOK ENTRY</h2>
+          <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '20px' }}>Input today's activity for VT-JEDO Intel Sync.</p>
           
-          <form onSubmit={handleIncrementalUpdate} style={{ marginTop: '30px' }}>
-            
-            <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+          <form onSubmit={handleUpdate}>
+            <div style={inputGroup}>
               <label style={labelStyle}>REGISTRATION / TAIL NUMBER</label>
               <input 
                 type="text" 
-                placeholder="e.g. VT-JEDO" 
+                placeholder="VT-JEDO" 
                 value={tailNumber}
                 onChange={(e) => setTailNumber(e.target.value)}
                 style={inputStyle}
@@ -126,50 +99,51 @@ export default function UpdateLogbook() {
               />
             </div>
 
-            {/* 6. READ-ONLY PREVIOUS TOTAL (Autofilled on Tail Match) */}
-            <div style={{ textAlign: 'left', marginBottom: '25px', opacity: accumulatedLandings === null ? 0.3 : 1 }}>
-                <label style={labelStyle}>ACCUMULATED AIRFRAME LANDINGS (READ-ONLY)</label>
-                <div style={readOnlyDisplay}>
-                    {fetching ? 'FETCHING...' : accumulatedLandings ?? 'Enter Valid Tail'}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
+                <div>
+                    <label style={labelStyle}>PREVIOUS TOTAL</label>
+                    <div style={readOnlyDisplay}>{accumulatedLandings ?? '--'}</div>
+                </div>
+                <div>
+                    <label style={{ ...labelStyle, color: '#ffb400' }}>TODAY'S LANDINGS</label>
+                    <input 
+                        type="number" 
+                        value={todaysActivity}
+                        onChange={(e) => setTodaysActivity(e.target.value)}
+                        style={{ ...inputStyle, borderColor: '#ffb400' }}
+                        disabled={accumulatedLandings === null}
+                        required 
+                    />
                 </div>
             </div>
 
-            {/* 7. ACTIVITY-ONLY INPUT */}
-            <div style={{ textAlign: 'left', marginBottom: '25px', opacity: accumulatedLandings === null ? 0.3 : 1 }}>
-              <label style={{ ...labelStyle, color: '#ffb400' }}>LANDINGS CONDUCTED TODAY</label>
-              <input 
-                type="number" 
-                placeholder="e.g. 15 (Added to total)" 
-                value={todaysActivity}
-                onChange={(e) => setTodaysActivity(e.target.value)}
-                style={{ ...inputStyle, borderColor: '#ffb400', borderStyle: 'solid' }}
-                required 
-                disabled={accumulatedLandings === null}
-              />
+            {/* NEW NON-EDITABLE FIELD FOR NEW TOTAL */}
+            <div style={inputGroup}>
+              <label style={labelStyle}>CALCULATED NEW TOTAL (AUTO-SYNC)</label>
+              <div style={{ ...readOnlyDisplay, backgroundColor: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0' }}>
+                {accumulatedLandings !== null && todaysActivity ? (accumulatedLandings + Number(todaysActivity)) : '--'}
+              </div>
             </div>
 
-            {/* 8. OPTIONAL COMMENTS SECTION */}
-            <div style={{ textAlign: 'left', marginBottom: '25px' }}>
-                <label style={labelStyle}>JOURNEY LOG / MAINTENANCE NOTES (OPTIONAL)</label>
+            <div style={inputGroup}>
+                <label style={labelStyle}>MAINTENANCE NOTES (OPTIONAL)</label>
                 <textarea 
-                    placeholder="e.g. Flight 14 pilot noted slight vibration on right main gear."
                     value={comments}
                     onChange={(e) => setComments(e.target.value)}
-                    style={{ ...inputStyle, minHeight: '80px', fontFamily: 'Inter, sans-serif' }}
+                    style={{ ...inputStyle, minHeight: '50px' }}
                     disabled={accumulatedLandings === null}
                 />
             </div>
 
-            <button type="submit" disabled={loading || accumulatedLandings === null} style={btnStyle}>
-              {loading ? 'SYNCING...' : 'UPDATE JEDO INTEL'}
+            <button type="submit" disabled={loading || !todaysActivity} style={btnStyle}>
+              {loading ? 'SYNCING...' : 'CONFIRM & UPDATE'}
             </button>
           </form>
 
           {status && <p style={statusStyle(status)}>{status}</p>}
           
-          <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '20px' }}>
-             {/* 9. REMOVED ARROW, ADDED LINK TEXT */}
-             <Link href="/fleet-health" style={{ fontSize: '0.75rem', color: '#001a35', fontWeight: '800', textDecoration: 'none' }}>
+          <div style={{ marginTop: '20px', borderTop: '1px solid #f1f5f9', paddingTop: '15px' }}>
+             <Link href="/fleet-health" style={{ fontSize: '0.7rem', color: '#001a35', fontWeight: '800', textDecoration: 'none' }}>
                VIEW LIVE FLEET STATUS
              </Link>
           </div>
@@ -179,17 +153,14 @@ export default function UpdateLogbook() {
   )
 }
 
-// --- CSS-IN-JS STYLES (Adjusted for requirements) ---
-// Distinguishes the main page background
-const containerStyle: React.CSSProperties = { minHeight: '100vh', backgroundColor: '#e2e8f0' }; 
-// Logo nav like homepage
-const logoNavStyle: React.CSSProperties = { display: 'flex', justifyContent: 'flex-start', padding: '20px 40px', position: 'fixed', top: 0, left: 0, width: '100%' };
-const cardFlexWrapper: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '100px 20px 20px' };
-// Distinct form card background
-const formCard: React.CSSProperties = { backgroundColor: 'white', padding: '40px', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', maxWidth: '480px', width: '100%', textAlign: 'center' };
-const labelStyle: React.CSSProperties = { display: 'block', fontSize: '0.65rem', fontWeight: '900', color: '#94a3b8', marginBottom: '8px', letterSpacing: '1px' };
-const inputStyle: React.CSSProperties = { width: '100%', padding: '15px', borderRadius: '12px', border: '1.5px solid #eef2f6', fontSize: '1rem', outline: 'none' };
-// For read-only number display
-const readOnlyDisplay: React.CSSProperties = { ...inputStyle, backgroundColor: '#f8fafc', fontWeight: '900', color: '#001a35', borderStyle: 'dotted' }; 
-const btnStyle: React.CSSProperties = { width: '100%', padding: '15px', backgroundColor: '#001a35', color: 'white', border: 'none', borderRadius: '12px', fontWeight: '900', cursor: 'pointer', letterSpacing: '1px' };
-const statusStyle = (msg: string): React.CSSProperties => ({ marginTop: '20px', fontSize: '0.85rem', fontWeight: 'bold', color: msg.includes('✅') ? '#10b981' : (msg.includes('Fetching') ? '#64748b' : '#ef4444') });
+// --- UPDATED STYLES ---
+const containerStyle: React.CSSProperties = { minHeight: '100vh', backgroundColor: '#0f172a' }; // Darker Background
+const logoNavStyle: React.CSSProperties = { padding: '20px 40px', position: 'fixed', top: 0, left: 0 };
+const cardFlexWrapper: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px' };
+const formCard: React.CSSProperties = { backgroundColor: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', maxWidth: '440px', width: '100%' };
+const inputGroup: React.CSSProperties = { textAlign: 'left', marginBottom: '15px' };
+const labelStyle: React.CSSProperties = { display: 'block', fontSize: '0.6rem', fontWeight: '900', color: '#94a3b8', marginBottom: '5px', letterSpacing: '0.5px' };
+const inputStyle: React.CSSProperties = { width: '100%', padding: '10px 15px', borderRadius: '8px', border: '1.5px solid #e2e8f0', fontSize: '0.9rem', outline: 'none' };
+const readOnlyDisplay: React.CSSProperties = { width: '100%', padding: '10px 15px', borderRadius: '8px', backgroundColor: '#f8fafc', fontWeight: '800', fontSize: '0.9rem', color: '#64748b', border: '1.5px dashed #e2e8f0' };
+const btnStyle: React.CSSProperties = { width: '100%', padding: '12px', backgroundColor: '#001a35', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '900', cursor: 'pointer', fontSize: '0.8rem' };
+const statusStyle = (msg: string): React.CSSProperties => ({ marginTop: '15px', fontSize: '0.75rem', fontWeight: 'bold', color: msg.includes('✅') ? '#10b981' : '#ef4444' });
