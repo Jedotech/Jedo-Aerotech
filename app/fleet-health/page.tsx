@@ -48,9 +48,10 @@ export default function FleetHealth() {
 
     async function fetchFleet() {
       try {
-        // FILTER LOGIC: Fetches only the records belonging to the logged-in school
+        // DYNAMIC REFERENCE QUERY: 
+        // We use schoolName->organization to follow the link from the aircraft to the User document
         const data = await client.fetch(
-          `*[_type == "fleetRecord" && schoolName == $org] | order(tailNumber asc)`,
+          `*[_type == "fleetRecord" && schoolName->organization == $org] | order(tailNumber asc)`,
           { org: storedOrg || 'Authorized Operator' }
         )
         setAssets(data || [])
@@ -109,7 +110,6 @@ export default function FleetHealth() {
           <div style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
             <Link href="/marketplace" style={navLinkStyle}>PROCUREMENT</Link>
             
-            {/* UPDATE LOGBOOK LINK */}
             <Link 
               href="/update-logbook" 
               style={{ 
@@ -224,7 +224,7 @@ export default function FleetHealth() {
   )
 }
 
-// --- STYLING (UNCHANGED) ---
+// --- STYLING (RETAINED) ---
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#001a35' };
 const navLinkStyle = { color: 'white', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 'bold' as const };
 const statusBadge = { color: '#ffb400', fontSize: '0.6rem', fontWeight: '900', border: '1px solid #ffb400', padding: '4px 12px', borderRadius: '4px' };
