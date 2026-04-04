@@ -70,7 +70,7 @@ export default defineType({
       title: 'Accumulated Landings (Current)',
       type: 'number',
       initialValue: 0,
-      description: 'Manually update this from the aircraft logbook.',
+      description: 'System automatically increments this via the Logbook Entry page.',
     }),
     defineField({
       name: 'maxDesignLife',
@@ -95,6 +95,15 @@ export default defineType({
       title: 'Tyre Purchase Price (USD)',
       type: 'number',
       description: 'Input the cost paid to calculate Cost Per Landing (CPL).',
+    }),
+
+    // --- LOGS & AUDIT TRAIL ---
+    defineField({
+      name: 'maintenanceLog',
+      title: 'Maintenance / Journey Log Notes',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'History of comments and notes added during daily logbook updates.',
     }),
 
     // --- AUTOMATION CONTACT ---
