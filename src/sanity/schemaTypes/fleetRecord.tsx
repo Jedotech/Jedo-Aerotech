@@ -27,7 +27,7 @@ export default defineType({
     // --- TYRE SPECIFICATIONS ---
     defineField({
       name: 'manufacturer',
-      title: 'Tyre Brand',
+      title: 'Tyre Brand (Make)',
       type: 'string',
       options: {
         list: [
@@ -37,6 +37,18 @@ export default defineType({
           { title: 'Condor', value: 'Condor' },
         ],
       },
+    }),
+    defineField({
+      name: 'tyreModel',
+      title: 'Tyre Model',
+      type: 'string',
+      description: 'e.g., Pilot, Flight Custom III',
+    }),
+    defineField({
+      name: 'partNumber',
+      title: 'Part Number (P/N)',
+      type: 'string',
+      description: 'Specific manufacturer part number for procurement',
     }),
     defineField({
       name: 'tyrePosition',
