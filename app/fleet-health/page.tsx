@@ -99,7 +99,7 @@ export default function FleetHealth() {
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '30px' }} /></Link>
           <div>
             <h1 style={{ fontSize: '1.1rem', fontWeight: '900', margin: 0, letterSpacing: '1px' }}>
-              <span style={{ color: '#ffb400' }}>{orgName.toUpperCase()}</span> 
+              <span style={{ color: '#22d3ee' }}>{orgName.toUpperCase()}</span> 
               <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 12px' }}>|</span> 
               <span style={{ color: '#ffffff' }}>FLEET COMMAND</span>
             </h1>
