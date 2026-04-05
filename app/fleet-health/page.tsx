@@ -93,27 +93,29 @@ export default function FleetHealth() {
   return (
     <div style={{ backgroundColor: '#020617', minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: 'white' }}>
       
-      {/* 1. WHO: THE HEADER (TOP LEVEL) */}
+      {/* 1. WHO: THE HEADER (CENTERED NAVIGATION) */}
       <nav style={navBarStyle}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+        {/* Left Section: Logo */}
+        <div style={{ width: '250px' }}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '30px' }} /></Link>
-          <div>
-            <h1 style={{ fontSize: '1.2rem', fontWeight: '900', margin: 0, letterSpacing: '1.5px' }}>
-              <span style={{ 
-                color: '#06b6d4', 
-                textShadow: '0 0 12px rgba(6, 182, 212, 0.4)' 
-              }}>
-                {orgName.toUpperCase()}
-              </span> 
-              <span style={{ color: '#475569', margin: '0 15px', fontWeight: '300' }}>/</span> 
-              <span style={{ color: '#f8fafc', opacity: 0.9 }}>FLEET COMMAND</span>
-            </h1>
-            <p style={{ fontSize: '0.6rem', color: '#10b981', fontWeight: '800', margin: '2px 0 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={pulseDot}></span> LIVE TELEMETRY SYNC: {lastSync}
-            </p>
-          </div>
         </div>
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+
+        {/* Center Section: Centered Title */}
+        <div style={{ textAlign: 'center', flexGrow: 1 }}>
+          <h1 style={{ fontSize: '1.2rem', fontWeight: '900', margin: 0, letterSpacing: '2px' }}>
+            <span style={{ color: '#06b6d4', textShadow: '0 0 12px rgba(6, 182, 212, 0.4)' }}>
+              {orgName.toUpperCase()}
+            </span> 
+            <span style={{ color: '#475569', margin: '0 15px', fontWeight: '300' }}>/</span> 
+            <span style={{ color: '#f8fafc', opacity: 0.9 }}>FLEET COMMAND</span>
+          </h1>
+          <p style={{ fontSize: '0.6rem', color: '#10b981', fontWeight: '800', margin: '2px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+            <span style={pulseDot}></span> LIVE TELEMETRY SYNC: {lastSync}
+          </p>
+        </div>
+
+        {/* Right Section: Actions */}
+        <div style={{ display: 'flex', gap: '15px', alignItems: 'center', justifyContent: 'flex-end', width: '300px' }}>
           <Link href="/update-logbook" style={navActionBtn}>+ UPDATE LOGBOOK</Link>
           <button onClick={() => { localStorage.clear(); router.push('/login'); }} style={logoutBtn}>LOGOUT</button>
         </div>
@@ -207,14 +209,14 @@ export default function FleetHealth() {
 
 // --- STYLES ---
 const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 40px', backgroundColor: '#020617' };
-const navActionBtn = { backgroundColor: '#ffb400', color: '#020617', textDecoration: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: '900', fontSize: '0.75rem' };
+const navActionBtn = { backgroundColor: '#ffb400', color: '#020617', textDecoration: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: '900', fontSize: '0.75rem', whiteSpace: 'nowrap' as const };
 const logoutBtn = { background: 'none', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '700' };
 const pulseDot = { width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 8px #10b981' };
 const summaryPanel = { backgroundColor: '#0b0f1a', padding: '45px 40px', borderBottom: '1px solid #1e293b' };
 const summaryCard = { backgroundColor: '#161d2f', padding: '24px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.03)' };
 const summaryLabel = { fontSize: '0.65rem', fontWeight: '900', color: '#64748b', letterSpacing: '1.5px' };
 const fleetGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: '25px' };
-const aircraftCard = { backgroundColor: '#0b0f1a', borderRadius: '18px', padding: '28px', border: '1px solid #1e293b', transition: 'all 0.3s ease' };
+const aircraftCard = { backgroundColor: '#0b0f1a', borderRadius: '18px', padding: '28px', border: '1px solid #1e293b' };
 const aircraftHeader = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' };
 const tailText = { fontSize: '1.6rem', fontWeight: '900', margin: 0, color: '#ffb400', letterSpacing: '1px' };
 const modelText = { margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: '800', letterSpacing: '1px' };
