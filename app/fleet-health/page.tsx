@@ -99,7 +99,9 @@ export default function FleetHealth() {
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '30px' }} /></Link>
           <div>
             <h1 style={{ fontSize: '1.1rem', fontWeight: '900', margin: 0, letterSpacing: '1px' }}>
-              {orgName.toUpperCase()} <span style={{ color: '#ffb400', margin: '0 10px' }}>|</span> FLEET COMMAND
+              <span style={{ color: '#ffb400' }}>{orgName.toUpperCase()}</span> 
+              <span style={{ color: 'rgba(255,255,255,0.4)', margin: '0 12px' }}>|</span> 
+              <span style={{ color: '#ffffff' }}>FLEET COMMAND</span>
             </h1>
             <p style={{ fontSize: '0.55rem', color: '#10b981', fontWeight: '800', margin: 0 }}>
               LIVE TELEMETRY SYNC: {lastSync}
