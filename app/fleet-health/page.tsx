@@ -117,7 +117,8 @@ export default function FleetHealth() {
         {/* Right Section: Compact Actions */}
         <div style={navActionSection}>
           <Link href="/update-logbook" style={navActionBtn}>+ LOGBOOK</Link>
-          <button onClick={() => { localStorage.clear(); router.push('/login'); }} style={logoutBtn}>OUT</button>
+          {/* FIXED TEXT: Changed 'OUT' to 'LOGOUT' */}
+          <button onClick={() => { localStorage.clear(); router.push('/login'); }} style={logoutBtn}>LOGOUT</button>
         </div>
       </nav>
 
@@ -207,7 +208,7 @@ export default function FleetHealth() {
 
 // --- STYLES (REFINED & RESPONSIVE) ---
 const navBarStyle: any = { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', padding: '18px 40px', backgroundColor: '#020617' };
-const navLogoSection = { flex: '0 0 200px' };
+const navLogoSection = { flex: '0 0 150px' }; // Slightly reduced logo container
 const navTitleSection: any = { flex: '1', textAlign: 'center', minWidth: '300px' };
 const navActionSection = { flex: '0 0 250px', display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' };
 
@@ -216,7 +217,7 @@ const telemetryText = { fontSize: '0.6rem', color: '#10b981', fontWeight: '800',
 const pulseDot = { width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 8px #10b981' };
 
 const navActionBtn = { backgroundColor: '#ffb400', color: '#020617', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: '900', fontSize: '0.65rem', whiteSpace: 'nowrap' as const, letterSpacing: '0.5px' };
-const logoutBtn = { background: 'none', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '5px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '700' };
+const logoutBtn = { background: 'none', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '700' };
 
 const summaryPanel = { backgroundColor: '#0b0f1a', padding: '40px', borderBottom: '1px solid #1e293b' };
 const summaryGrid = { maxWidth: '1440px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' };
