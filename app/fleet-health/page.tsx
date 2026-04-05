@@ -93,62 +93,75 @@ export default function FleetHealth() {
   return (
     <div style={{ backgroundColor: '#020617', minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: 'white' }}>
       
-      {/* 1. WHO: RESPONSIVE HEADER */}
+      {/* 1. WHO: THE HEADER (CENTERED NAVIGATION & MOBILE READY) */}
       <nav style={navBarStyle}>
+        {/* Left Section: Logo */}
         <div style={navLogoSection}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '28px' }} /></Link>
         </div>
 
+        {/* Center Section: Centered Title with Glow */}
         <div style={navTitleSection}>
           <h1 style={responsiveMainTitle}>
-            <span style={{ color: '#06b6d4', textShadow: '0 0 12px rgba(6, 182, 212, 0.4)' }}>{orgName.toUpperCase()}</span> 
-            <span style={{ color: '#475569', margin: '0 10px' }}>/</span> 
-            <span style={{ color: '#f8fafc' }}>FLEET COMMAND</span>
+            <span style={{ color: '#06b6d4', textShadow: '0 0 12px rgba(6, 182, 212, 0.4)' }}>
+              {orgName.toUpperCase()}
+            </span> 
+            <span style={{ color: '#475569', margin: '0 12px', fontWeight: '300' }}>/</span> 
+            <span style={{ color: '#f8fafc', opacity: 0.9 }}>FLEET COMMAND</span>
           </h1>
           <p style={telemetryText}>
-            <span style={pulseDot}></span> LIVE TELEMETRY: {lastSync}
+            <span style={pulseDot}></span> LIVE TELEMETRY SYNC: {lastSync}
           </p>
         </div>
 
+        {/* Right Section: Compact Actions */}
         <div style={navActionSection}>
-          <Link href="/update-logbook" style={navActionBtn}>+ LOG</Link>
+          <Link href="/update-logbook" style={navActionBtn}>+ LOGBOOK</Link>
           <button onClick={() => { localStorage.clear(); router.push('/login'); }} style={logoutBtn}>OUT</button>
         </div>
       </nav>
 
-      {/* 2. WHAT: RESPONSIVE SUMMARY PANEL */}
+      <div style={{ height: '1px', backgroundColor: 'rgba(255,180,0,0.15)', width: '100%' }} />
+
+      {/* 2. WHAT'S HAPPENING: EXECUTIVE SUMMARY PANEL */}
       <section style={summaryPanel}>
         <div style={summaryGrid}>
           <div style={summaryCard}>
-            <span style={summaryLabel}>HEALTH INDEX</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px' }}>
+            <span style={summaryLabel}>FLEET HEALTH INDEX</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px' }}>
                <h2 style={summaryValue}>{avgFleetHealth}%</h2>
                <div style={progressBase}>
-                  <div style={{ height: '100%', width: `${avgFleetHealth}%`, backgroundColor: '#10b981', borderRadius: '10px' }} />
+                  <div style={{ height: '100%', width: `${avgFleetHealth}%`, backgroundColor: '#10b981', borderRadius: '10px', boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)' }} />
                </div>
             </div>
           </div>
           
           <div style={{ ...summaryCard, borderLeft: '4px solid #ef4444' }}>
-            <span style={summaryLabel}>CRITICAL (AOG)</span>
+            <span style={summaryLabel}>CRITICAL (AOG RISK)</span>
             <h2 style={{ ...summaryValue, color: '#ef4444' }}>{criticalTyres}</h2>
+            <p style={summarySubLabel}>TYRES BELOW 20% LIFE</p>
           </div>
 
           <div style={{ ...summaryCard, borderLeft: '4px solid #f59e0b' }}>
-            <span style={summaryLabel}>PENDING</span>
+            <span style={summaryLabel}>MAINTENANCE PENDING</span>
             <h2 style={{ ...summaryValue, color: '#f59e0b' }}>{warningTyres}</h2>
+            <p style={summarySubLabel}>TYRES BELOW 50% LIFE</p>
           </div>
 
           <div style={summaryCard}>
-            <span style={summaryLabel}>ASSETS</span>
+            <span style={summaryLabel}>OPERATIONAL ASSETS</span>
             <h2 style={summaryValue}>{Object.keys(groupedFleet).length}</h2>
+            <p style={summarySubLabel}>TOTAL AIRCRAFT IN HUB</p>
           </div>
         </div>
       </section>
 
       {/* 3. DETAILS: FLEET GRID */}
-      <main style={mainContentStyle}>
+      <header style={inventoryHeader}>
         <h3 style={inventoryTitle}>ASSET INVENTORY</h3>
+      </header>
+
+      <main style={mainContentStyle}>
         <div style={fleetGrid}>
           {Object.entries(groupedFleet).map(([tail, data]) => (
             <div key={tail} style={aircraftCard}>
@@ -157,7 +170,7 @@ export default function FleetHealth() {
                   <h2 style={tailText}>{tail}</h2>
                   <p style={modelText}>{data.model.toUpperCase()}</p>
                 </div>
-                <div style={activeBadge}>LIVE</div>
+                <div style={activeBadge}>MONITORING</div>
               </div>
 
               <div style={tyreContainer}>
@@ -168,19 +181,21 @@ export default function FleetHealth() {
                   return (
                     <div key={tyre._id} style={tyreRow}>
                       <div style={tyreInfo}>
-                        <span style={posLabel}>{tyre.tyrePosition?.slice(0,4).toUpperCase()}</span>
+                        <span style={posLabel}>{tyre.tyrePosition?.toUpperCase().slice(0,4)}</span>
                         <span style={makeLabel}>{tyre.manufacturer}</span>
                       </div>
-                      <div style={assetProgressBase}>
+                      <div style={assetProgressWrapper}>
                         <div style={{ height: '100%', width: `${health}%`, backgroundColor: color, borderRadius: '10px' }} />
                       </div>
-                      <div style={healthPercentText(color)}>{health.toFixed(0)}%</div>
+                      <div style={{ textAlign: 'right', minWidth: '45px' }}>
+                        <span style={{ fontSize: '0.8rem', fontWeight: '900', color }}>{health.toFixed(0)}%</span>
+                      </div>
                     </div>
                   );
                 })}
               </div>
-              <Link href={`https://wa.me/919600038089?text=Jedo%20Order:%20${tail}`} target="_blank" style={orderBtn}>
-                PROCURE FOR {tail}
+              <Link href={`https://wa.me/919600038089?text=Quote%20Request%20for%20${tail}`} target="_blank" style={orderBtn}>
+                ORDER SPARES FOR {tail}
               </Link>
             </div>
           ))}
@@ -190,43 +205,44 @@ export default function FleetHealth() {
   )
 }
 
-// --- STYLES (MOBILE ENHANCED) ---
-const navBarStyle: any = { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px', backgroundColor: '#020617', borderBottom: '1px solid #1e293b' };
-const navLogoSection = { flex: '0 0 auto' };
-const navTitleSection: any = { flex: '1 1 100%', order: 3, textAlign: 'center', marginTop: '10px', '@media (min-width: 768px)': { flex: '1', order: 2, marginTop: 0 } };
-const navActionSection = { flex: '0 0 auto', display: 'flex', gap: '8px', order: 2 };
+// --- STYLES (REFINED & RESPONSIVE) ---
+const navBarStyle: any = { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', padding: '18px 40px', backgroundColor: '#020617' };
+const navLogoSection = { flex: '0 0 200px' };
+const navTitleSection: any = { flex: '1', textAlign: 'center', minWidth: '300px' };
+const navActionSection = { flex: '0 0 250px', display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' };
 
-const responsiveMainTitle: any = { fontSize: '1rem', fontWeight: '900', margin: 0, letterSpacing: '1px' };
-const telemetryText = { fontSize: '0.55rem', color: '#10b981', fontWeight: '800', margin: 0, justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '4px' };
-const pulseDot = { width: '5px', height: '5px', backgroundColor: '#10b981', borderRadius: '50%', boxShadow: '0 0 5px #10b981' };
+const responsiveMainTitle = { fontSize: '1.2rem', fontWeight: '900', margin: 0, letterSpacing: '1.5px' };
+const telemetryText = { fontSize: '0.6rem', color: '#10b981', fontWeight: '800', margin: '2px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' };
+const pulseDot = { width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 8px #10b981' };
 
-const navActionBtn = { backgroundColor: '#ffb400', color: '#020617', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: '900', fontSize: '0.65rem' };
-const logoutBtn = { background: 'none', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', padding: '5px 10px', borderRadius: '6px', fontSize: '0.6rem', fontWeight: '700' };
+const navActionBtn = { backgroundColor: '#ffb400', color: '#020617', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: '900', fontSize: '0.65rem', whiteSpace: 'nowrap' as const, letterSpacing: '0.5px' };
+const logoutBtn = { background: 'none', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '5px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '700' };
 
-const summaryPanel = { backgroundColor: '#0b0f1a', padding: '20px', borderBottom: '1px solid #1e293b' };
-const summaryGrid = { maxWidth: '1440px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' };
-const summaryCard = { backgroundColor: '#161d2f', padding: '15px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.03)' };
-const summaryLabel = { fontSize: '0.55rem', fontWeight: '900', color: '#64748b', letterSpacing: '1px' };
-const summaryValue = { fontSize: '1.5rem', margin: '4px 0 0', fontWeight: '900' };
-const progressBase = { flexGrow: 1, height: '6px', backgroundColor: '#0f172a', borderRadius: '10px' };
+const summaryPanel = { backgroundColor: '#0b0f1a', padding: '40px', borderBottom: '1px solid #1e293b' };
+const summaryGrid = { maxWidth: '1440px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' };
+const summaryCard = { backgroundColor: '#161d2f', padding: '24px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.03)' };
+const summaryLabel = { fontSize: '0.65rem', fontWeight: '900', color: '#64748b', letterSpacing: '1.5px' };
+const summaryValue = { fontSize: '2.5rem', margin: '10px 0 0', fontWeight: '900' };
+const summarySubLabel = { fontSize: '0.6rem', color: '#94a3b8', margin: 0 };
+const progressBase = { flexGrow: 1, height: '8px', backgroundColor: '#0f172a', borderRadius: '10px' };
 
-const mainContentStyle = { padding: '20px', maxWidth: '1440px', margin: '0 auto' };
-const inventoryTitle = { fontSize: '0.7rem', color: '#64748b', fontWeight: '900', letterSpacing: '2px', marginBottom: '15px' };
-const fleetGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' };
+const inventoryHeader = { padding: '40px 40px 0', maxWidth: '1440px', margin: '0 auto' };
+const inventoryTitle = { fontSize: '0.75rem', color: '#64748b', fontWeight: '900', letterSpacing: '3px' };
+const mainContentStyle = { padding: '20px 40px 100px', maxWidth: '1440px', margin: '0 auto' };
+const fleetGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '25px' };
 
-const aircraftCard = { backgroundColor: '#0b0f1a', borderRadius: '16px', padding: '20px', border: '1px solid #1e293b' };
-const aircraftHeader = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' };
-const tailText = { fontSize: '1.3rem', fontWeight: '900', margin: 0, color: '#ffb400' };
-const modelText = { margin: 0, fontSize: '0.6rem', color: '#64748b', fontWeight: '800' };
-const activeBadge = { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '3px 8px', borderRadius: '4px', fontSize: '0.5rem', fontWeight: '900' };
+const aircraftCard = { backgroundColor: '#0b0f1a', borderRadius: '18px', padding: '28px', border: '1px solid #1e293b' };
+const aircraftHeader = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' };
+const tailText = { fontSize: '1.6rem', fontWeight: '900', margin: 0, color: '#ffb400', letterSpacing: '1px' };
+const modelText = { margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: '800', letterSpacing: '1px' };
+const activeBadge = { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '5px 12px', borderRadius: '6px', fontSize: '0.55rem', fontWeight: '900', letterSpacing: '1px' };
 
-const tyreContainer = { display: 'flex', flexDirection: 'column' as const, gap: '12px' };
+const tyreContainer = { display: 'flex', flexDirection: 'column' as const, gap: '18px' };
 const tyreRow = { display: 'flex', alignItems: 'center' };
-const tyreInfo = { minWidth: '80px' };
-const posLabel = { display: 'block', fontSize: '0.5rem', color: '#475569', fontWeight: '900' };
-const makeLabel = { fontSize: '0.7rem', fontWeight: '700', color: '#cbd5e1' };
-const assetProgressBase = { flexGrow: 1, height: '4px', backgroundColor: '#1e293b', borderRadius: '10px', margin: '0 10px' };
-const healthPercentText = (color: string) => ({ fontSize: '0.7rem', fontWeight: '900' as const, color, minWidth: '35px', textAlign: 'right' as const });
+const tyreInfo = { minWidth: '90px' };
+const posLabel = { display: 'block', fontSize: '0.55rem', color: '#475569', fontWeight: '900' };
+const makeLabel = { fontSize: '0.8rem', fontWeight: '700', color: '#cbd5e1' };
+const assetProgressWrapper = { flexGrow: 1, height: '4px', backgroundColor: '#1e293b', borderRadius: '10px', margin: '0 15px' };
 
-const orderBtn = { display: 'block', textAlign: 'center' as const, backgroundColor: 'transparent', color: '#cbd5e1', textDecoration: 'none', padding: '10px', borderRadius: '8px', fontWeight: '800', fontSize: '0.65rem', marginTop: '15px', border: '1px solid #1e293b' };
-const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#020617', color: '#ffb400', fontWeight: '900', fontSize: '1rem' };
+const orderBtn = { display: 'block', textAlign: 'center' as const, backgroundColor: 'transparent', color: '#cbd5e1', textDecoration: 'none', padding: '12px', borderRadius: '10px', fontWeight: '800', fontSize: '0.7rem', marginTop: '24px', border: '1px solid #1e293b' };
+const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#020617', color: '#ffb400', fontWeight: '900', fontSize: '1.2rem', letterSpacing: '4px' };
