@@ -33,6 +33,7 @@ export default function FleetHealth() {
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
   const [orgName, setOrgName] = useState('')
+  const [lastSync, setLastSync] = useState('')
   const router = useRouter()
 
   useEffect(() => {
@@ -53,6 +54,7 @@ export default function FleetHealth() {
           { org: storedOrg }
         )
         setAssets(data || [])
+        setLastSync(new Date().toLocaleTimeString())
       } catch (e) {
         console.error("Fleet Sync Error:", e)
       } finally {
@@ -62,13 +64,11 @@ export default function FleetHealth() {
     fetchFleet()
   }, [router])
 
-  // --- ANALYTICS LOGIC ---
   const calculateHealth = (current: number, max: number) => {
     const percentage = ((max - (current || 0)) / max) * 100;
     return Math.max(0, Math.min(100, percentage));
   }
 
-  // --- GROUPING & SUMMARY LOGIC ---
   const groupedFleet = assets.reduce((acc, asset) => {
     if (!acc[asset.tailNumber]) {
       acc[asset.tailNumber] = { model: asset.aircraftModel, tyres: [] };
@@ -77,7 +77,6 @@ export default function FleetHealth() {
     return acc;
   }, {} as Record<string, { model: string, tyres: FleetAsset[] }>);
 
-  // Calculate Critical Metrics for Summary
   const criticalTyres = assets.filter(a => calculateHealth(a.currentLandings, a.maxDesignLife) < 20).length;
   const warningTyres = assets.filter(a => {
     const h = calculateHealth(a.currentLandings, a.maxDesignLife);
@@ -94,19 +93,28 @@ export default function FleetHealth() {
   return (
     <div style={{ backgroundColor: '#020617', minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: 'white' }}>
       
-      {/* NAVIGATION */}
+      {/* 1. WHO: THE HEADER (TOP LEVEL) */}
       <nav style={navBarStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '30px' }} /></Link>
-          <Link href="/update-logbook" style={navActionBtn}>+ UPDATE LOGBOOK</Link>
+          <div>
+            <h1 style={{ fontSize: '1.1rem', fontWeight: '900', margin: 0, letterSpacing: '1px' }}>
+              {orgName.toUpperCase()} <span style={{ color: '#ffb400', margin: '0 10px' }}>|</span> FLEET COMMAND
+            </h1>
+            <p style={{ fontSize: '0.55rem', color: '#10b981', fontWeight: '800', margin: 0 }}>
+              LIVE TELEMETRY SYNC: {lastSync}
+            </p>
+          </div>
         </div>
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-          <div style={pulseBadge}>LIVE TELEMETRY</div>
+          <Link href="/update-logbook" style={navActionBtn}>+ UPDATE LOGBOOK</Link>
           <button onClick={() => { localStorage.clear(); router.push('/login'); }} style={logoutBtn}>LOGOUT</button>
         </div>
       </nav>
 
-      {/* EXECUTIVE SUMMARY PANEL */}
+      <div style={{ height: '1px', backgroundColor: 'rgba(255,180,0,0.2)', width: '100%' }} />
+
+      {/* 2. WHAT'S HAPPENING: EXECUTIVE SUMMARY PANEL */}
       <section style={summaryPanel}>
         <div style={{ maxWidth: '1440px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
           <div style={summaryCard}>
@@ -139,12 +147,11 @@ export default function FleetHealth() {
         </div>
       </section>
 
-      {/* HEADER */}
+      {/* 3. DETAILS: FLEET GRID */}
       <header style={{ padding: '40px 40px 20px', maxWidth: '1440px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: '900' }}>{orgName.toUpperCase()} <span style={{ color: '#94a3b8' }}>| ASSET INVENTORY</span></h1>
+        <h3 style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '900', letterSpacing: '2px' }}>ASSET INVENTORY</h3>
       </header>
 
-      {/* FLEET GRID */}
       <main style={{ padding: '0 40px 100px', maxWidth: '1440px', margin: '0 auto' }}>
         <div style={fleetGrid}>
           {Object.entries(groupedFleet).map(([tail, data]) => (
@@ -192,9 +199,8 @@ export default function FleetHealth() {
 }
 
 // --- STYLES ---
-const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px', backgroundColor: '#020617' };
+const navBarStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: '#020617' };
 const navActionBtn = { backgroundColor: '#ffb400', color: '#020617', textDecoration: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: '800', fontSize: '0.7rem' };
-const pulseBadge = { color: '#10b981', border: '1px solid #10b981', padding: '4px 10px', borderRadius: '4px', fontSize: '0.6rem', fontWeight: '900' };
 const logoutBtn = { background: 'none', border: '1px solid #ef4444', color: '#ef4444', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.6rem' };
 const summaryPanel = { backgroundColor: '#0f172a', padding: '40px', borderBottom: '1px solid #1e293b' };
 const summaryCard = { backgroundColor: '#1e293b', padding: '20px', borderRadius: '12px' };
