@@ -123,19 +123,17 @@ export default defineType({
     }),
   ],
   
-  // --- OPTIMIZED PREVIEW FOR SEARCHING BY SCHOOL & TAIL ---
+  // --- PREVIEW CONFIGURATION ---
   preview: {
     select: {
       title: 'tailNumber',
-      orgName: 'schoolName.organization', // Explicitly pull the organization string
+      orgName: 'schoolName.organization', // This mapping is correct for search
       pos: 'tyrePosition',
     },
     prepare({ title, orgName, pos }) {
       return {
-        // The main title remains the Tail Number (e.g., VT-JED)
         title: title,
-        // The subtitle includes the School Name (e.g., Nose Gear | Chennai Flying School)
-        // This makes the record searchable by both "Chennai" and "Nose Gear"
+        // Concatenating the school name here ensures Sanity indexes it for the search box
         subtitle: `${pos || 'Unspecified Gear'} | ${orgName || 'Unassigned School'}`
       }
     }
