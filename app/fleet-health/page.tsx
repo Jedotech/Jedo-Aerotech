@@ -95,12 +95,10 @@ export default function FleetHealth() {
       
       {/* 1. WHO: THE HEADER (CENTERED NAVIGATION & MOBILE READY) */}
       <nav style={navBarStyle}>
-        {/* Left Section: Logo */}
         <div style={navLogoSection}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '28px' }} /></Link>
         </div>
 
-        {/* Center Section: Centered Title with Glow */}
         <div style={navTitleSection}>
           <h1 style={responsiveMainTitle}>
             <span style={{ color: '#06b6d4', textShadow: '0 0 12px rgba(6, 182, 212, 0.4)' }}>
@@ -114,10 +112,8 @@ export default function FleetHealth() {
           </p>
         </div>
 
-        {/* Right Section: Compact Actions */}
         <div style={navActionSection}>
           <Link href="/update-logbook" style={navActionBtn}>+ LOGBOOK</Link>
-          {/* FIXED TEXT: Changed 'OUT' to 'LOGOUT' */}
           <button onClick={() => { localStorage.clear(); router.push('/login'); }} style={logoutBtn}>LOGOUT</button>
         </div>
       </nav>
@@ -178,18 +174,43 @@ export default function FleetHealth() {
                 {data.tyres.map((tyre) => {
                   const health = calculateHealth(tyre.currentLandings, tyre.maxDesignLife);
                   const color = health < 20 ? '#ef4444' : health < 50 ? '#f59e0b' : '#10b981';
+                  const remaining = Math.max(0, tyre.maxDesignLife - tyre.currentLandings);
                   
+                  // Position Technical Mapping
+                  const posCodeMap: Record<string, string> = {
+                    'Nose Gear': 'N',
+                    'Main Left': 'ML',
+                    'Main Right': 'MR'
+                  };
+                  const posCode = posCodeMap[tyre.tyrePosition || ''] || '??';
+
                   return (
-                    <div key={tyre._id} style={tyreRow}>
-                      <div style={tyreInfo}>
-                        <span style={posLabel}>{tyre.tyrePosition?.toUpperCase().slice(0,4)}</span>
-                        <span style={makeLabel}>{tyre.manufacturer}</span>
+                    <div key={tyre._id} style={technicalRow}>
+                      {/* TECHNICAL IDENTIFIER BOX */}
+                      <div style={posCodeBox}>
+                        <span style={{ fontSize: '0.7rem', fontWeight: '900', color: '#ffb400' }}>{posCode}</span>
                       </div>
-                      <div style={assetProgressWrapper}>
-                        <div style={{ height: '100%', width: `${health}%`, backgroundColor: color, borderRadius: '10px' }} />
+                      
+                      <div style={{ flexGrow: 1, minWidth: '120px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4px' }}>
+                           <span style={makeLabel}>{tyre.manufacturer}</span>
+                           <span style={pnLabel}>P/N: {tyre.partNumber || 'TBD'}</span>
+                        </div>
+                        <div style={assetProgressWrapper}>
+                          <div style={{ height: '100%', width: `${health}%`, backgroundColor: color, borderRadius: '10px' }} />
+                        </div>
                       </div>
-                      <div style={{ textAlign: 'right', minWidth: '45px' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: '900', color }}>{health.toFixed(0)}%</span>
+
+                      {/* MASTER TECH RATIO */}
+                      <div style={techDataColumn}>
+                        <span style={columnHeader}>ACCUMULATED</span>
+                        <span style={{ ...columnValue, color }}>{tyre.currentLandings} / {tyre.maxDesignLife}</span>
+                      </div>
+
+                      {/* CEO GROUNDING METRIC */}
+                      <div style={techDataColumn}>
+                        <span style={columnHeader}>REMAINING</span>
+                        <span style={{ ...columnValue, color }}>{remaining} LNDG</span>
                       </div>
                     </div>
                   );
@@ -206,9 +227,9 @@ export default function FleetHealth() {
   )
 }
 
-// --- STYLES (REFINED & RESPONSIVE) ---
+// --- STYLES (ENHANCED WITH MRO DATA) ---
 const navBarStyle: any = { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', padding: '18px 40px', backgroundColor: '#020617' };
-const navLogoSection = { flex: '0 0 150px' }; // Slightly reduced logo container
+const navLogoSection = { flex: '0 0 150px' };
 const navTitleSection: any = { flex: '1', textAlign: 'center', minWidth: '300px' };
 const navActionSection = { flex: '0 0 250px', display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' };
 
@@ -230,7 +251,7 @@ const progressBase = { flexGrow: 1, height: '8px', backgroundColor: '#0f172a', b
 const inventoryHeader = { padding: '40px 40px 0', maxWidth: '1440px', margin: '0 auto' };
 const inventoryTitle = { fontSize: '0.75rem', color: '#64748b', fontWeight: '900', letterSpacing: '3px' };
 const mainContentStyle = { padding: '20px 40px 100px', maxWidth: '1440px', margin: '0 auto' };
-const fleetGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '25px' };
+const fleetGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(480px, 1fr))', gap: '25px' };
 
 const aircraftCard = { backgroundColor: '#0b0f1a', borderRadius: '18px', padding: '28px', border: '1px solid #1e293b' };
 const aircraftHeader = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' };
@@ -238,12 +259,16 @@ const tailText = { fontSize: '1.6rem', fontWeight: '900', margin: 0, color: '#ff
 const modelText = { margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: '800', letterSpacing: '1px' };
 const activeBadge = { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '5px 12px', borderRadius: '6px', fontSize: '0.55rem', fontWeight: '900', letterSpacing: '1px' };
 
-const tyreContainer = { display: 'flex', flexDirection: 'column' as const, gap: '18px' };
-const tyreRow = { display: 'flex', alignItems: 'center' };
-const tyreInfo = { minWidth: '90px' };
-const posLabel = { display: 'block', fontSize: '0.55rem', color: '#475569', fontWeight: '900' };
-const makeLabel = { fontSize: '0.8rem', fontWeight: '700', color: '#cbd5e1' };
-const assetProgressWrapper = { flexGrow: 1, height: '4px', backgroundColor: '#1e293b', borderRadius: '10px', margin: '0 15px' };
+const tyreContainer = { display: 'flex', flexDirection: 'column' as const, gap: '15px' };
+const technicalRow = { display: 'flex', alignItems: 'center', gap: '15px', padding: '12px', backgroundColor: '#161d2f', borderRadius: '10px' };
+const posCodeBox = { width: '32px', height: '32px', backgroundColor: '#020617', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #1e293b' };
+const makeLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' };
+const pnLabel = { fontSize: '0.55rem', fontWeight: '600', color: '#64748b' };
+const assetProgressWrapper = { flexGrow: 1, height: '4px', backgroundColor: '#1e293b', borderRadius: '10px' };
+
+const techDataColumn = { display: 'flex', flexDirection: 'column' as const, textAlign: 'right' as const, minWidth: '85px' };
+const columnHeader = { fontSize: '0.45rem', fontWeight: '900', color: '#64748b', letterSpacing: '0.5px' };
+const columnValue = { fontSize: '0.75rem', fontWeight: '900' };
 
 const orderBtn = { display: 'block', textAlign: 'center' as const, backgroundColor: 'transparent', color: '#cbd5e1', textDecoration: 'none', padding: '12px', borderRadius: '10px', fontWeight: '800', fontSize: '0.7rem', marginTop: '24px', border: '1px solid #1e293b' };
 const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#020617', color: '#ffb400', fontWeight: '900', fontSize: '1.2rem', letterSpacing: '4px' };
