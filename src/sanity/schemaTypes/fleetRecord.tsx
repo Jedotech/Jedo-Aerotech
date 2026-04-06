@@ -73,7 +73,7 @@ export default defineType({
       },
     }),
 
-    // --- LIFE METRICS (THE INPUTS) ---
+    // --- LIFE METRICS ---
     defineField({
       name: 'installDate',
       title: 'Installation Date',
@@ -84,31 +84,27 @@ export default defineType({
       title: 'Accumulated Landings (Current)',
       type: 'number',
       initialValue: 0,
-      description: 'System automatically increments this via the Logbook Entry page.',
     }),
     defineField({
       name: 'maxDesignLife',
       title: 'Max Design Life (Rated Landings)',
       type: 'number',
       initialValue: 250,
-      description: 'The total landings the tyre is rated for by the manufacturer.',
     }),
 
-    // --- PREDICTIVE ANALYTICS (DAILY UTILIZATION) ---
+    // --- PREDICTIVE ANALYTICS ---
     defineField({
       name: 'dailyUtilization',
       title: 'Daily Utilization (Avg Landings/Day)',
       type: 'number',
       initialValue: 5,
-      description: 'Used to calculate the "Countdown" to replacement.',
     }),
 
-    // --- FINANCIAL INTELLIGENCE (CPL) ---
+    // --- FINANCIAL INTELLIGENCE ---
     defineField({
       name: 'purchasePrice',
       title: 'Tyre Purchase Price (USD)',
       type: 'number',
-      description: 'Input the cost paid to calculate Cost Per Landing (CPL).',
     }),
 
     // --- LOGS & AUDIT TRAIL ---
@@ -117,7 +113,6 @@ export default defineType({
       title: 'Maintenance / Journey Log Notes',
       type: 'array',
       of: [{ type: 'string' }],
-      description: 'History of comments and notes added during daily logbook updates.',
     }),
 
     // --- AUTOMATION CONTACT ---
@@ -125,23 +120,23 @@ export default defineType({
       name: 'operatorEmail',
       title: 'Owner / Maintenance Email',
       type: 'string',
-      description: 'Used for automated alerts when the countdown reaches zero.',
     }),
   ],
   
-  // --- CLEAN PREVIEW WITH MULTI-SEARCH CAPABILITY ---
+  // --- OPTIMIZED PREVIEW FOR SEARCHING BY SCHOOL & TAIL ---
   preview: {
     select: {
       title: 'tailNumber',
-      org: 'schoolName.organization', // Pulls school name for search indexing
+      orgName: 'schoolName.organization', // Explicitly pull the organization string
       pos: 'tyrePosition',
     },
-    prepare({ title, org, pos }) {
+    prepare({ title, orgName, pos }) {
       return {
-        // Keeps the list clean: VT-JED
+        // The main title remains the Tail Number (e.g., VT-JED)
         title: title,
-        // Shows just: Nose Gear | Fly High School
-        subtitle: `${pos || 'Unspecified Position'} | ${org || 'No School Assigned'}`
+        // The subtitle includes the School Name (e.g., Nose Gear | Chennai Flying School)
+        // This makes the record searchable by both "Chennai" and "Nose Gear"
+        subtitle: `${pos || 'Unspecified Gear'} | ${orgName || 'Unassigned School'}`
       }
     }
   },
