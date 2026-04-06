@@ -33,7 +33,6 @@ export default defineType({
       },
     }),
 
-    // --- RE-ADDED MISSING FIELD: tyreModel ---
     defineField({
       name: 'tyreModel',
       title: 'Tyre Model',
@@ -63,7 +62,6 @@ export default defineType({
       },
     }),
 
-    // --- RE-ADDED MISSING FIELD: installDate ---
     defineField({
       name: 'installDate',
       title: 'Installation Date',
@@ -84,7 +82,6 @@ export default defineType({
       initialValue: 250,
     }),
 
-    // --- RE-ADDED MISSING FIELD: dailyUtilization ---
     defineField({
       name: 'dailyUtilization',
       title: 'Daily Utilization (Avg Landings/Day)',
@@ -97,7 +94,6 @@ export default defineType({
       type: 'string',
     }),
 
-    // --- RE-ADDED MISSING FIELD: maintenanceLog ---
     defineField({
       name: 'maintenanceLog',
       title: 'Maintenance / Journey Log Notes',
@@ -110,6 +106,24 @@ export default defineType({
       title: 'Owner / Maintenance Email',
       type: 'string',
     }),
+  ],
+
+  // --- ADDED SORTING CONFIGURATION ---
+  orderings: [
+    {
+      title: 'Aviation School (A-Z)',
+      name: 'schoolNameAsc',
+      by: [
+        { field: 'schoolName.organization', direction: 'asc' }
+      ]
+    },
+    {
+      title: 'Aviation School (Z-A)',
+      name: 'schoolNameDesc',
+      by: [
+        { field: 'schoolName.organization', direction: 'desc' }
+      ]
+    }
   ],
 
   preview: {
