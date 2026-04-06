@@ -129,7 +129,7 @@ export default defineType({
     }),
   ],
   
-  // --- UPDATED PREVIEW FOR CEO & MASTER TECH VIEW ---
+  // --- UPDATED PREVIEW FOR ALL-IN-ONE SEARCH ---
   preview: {
     select: {
       tail: 'tailNumber',
@@ -137,23 +137,24 @@ export default defineType({
       current: 'currentLandings',
       max: 'maxDesignLife',
       pn: 'partNumber',
-      org: 'schoolName.organization'
+      manufacturer: 'manufacturer', // Added for search indexing
+      org: 'schoolName.organization' // Referential Mapping for search indexing
     },
-    prepare({ tail, pos, current, max, pn, org }) {
-      // Technical Indicator Mapping (N, ML, MR)
+    prepare({ tail, pos, current, max, pn, manufacturer, org }) {
+      // Technical Indicator Mapping
       const posCode = pos === 'Nose Gear' ? 'N' : pos === 'Main Left' ? 'ML' : pos === 'Main Right' ? 'MR' : '??';
       
       // Maintenance Ratio Calculation
       const ratio = `${current || 0} / ${max || 250}`;
       
-      // Remaining Landings (Grounding Metric)
+      // Remaining Landings
       const remaining = (max || 250) - (current || 0);
       
       return {
-        // Example Title: VT-ACC [ML] - P/N: 505C86-10
+        // Title includes Tail, Pos, and P/N (Indexed for search)
         title: `${tail} [${posCode}] - P/N: ${pn || 'TBD'}`,
-        // Example Subtitle: 10 / 250 LNDG (240 Left) | Fly High School
-        subtitle: `${ratio} LNDG (${remaining} LEFT) | ${org || 'No School'}`
+        // Subtitle includes Ratios, Manufacturer, and School Name (Indexed for search)
+        subtitle: `${ratio} LNDG (${remaining} LEFT) | ${manufacturer || 'TBD'} | ${org || 'No School'}`
       }
     }
   },
