@@ -129,31 +129,19 @@ export default defineType({
     }),
   ],
   
-  // --- UPDATED PREVIEW FOR CEO & MASTER TECH VIEW ---
+  // --- CLEAN PREVIEW WITH MULTI-SEARCH CAPABILITY ---
   preview: {
     select: {
-      tail: 'tailNumber',
+      title: 'tailNumber',
+      org: 'schoolName.organization', // Pulls school name for search indexing
       pos: 'tyrePosition',
-      current: 'currentLandings',
-      max: 'maxDesignLife',
-      pn: 'partNumber',
-      org: 'schoolName.organization'
     },
-    prepare({ tail, pos, current, max, pn, org }) {
-      // Technical Indicator Mapping (N, ML, MR)
-      const posCode = pos === 'Nose Gear' ? 'N' : pos === 'Main Left' ? 'ML' : pos === 'Main Right' ? 'MR' : '??';
-      
-      // Maintenance Ratio Calculation
-      const ratio = `${current || 0} / ${max || 250}`;
-      
-      // Remaining Landings (Grounding Metric)
-      const remaining = (max || 250) - (current || 0);
-      
+    prepare({ title, org, pos }) {
       return {
-        // Example Title: VT-ACC [ML] - P/N: 505C86-10
-        title: `${tail} [${posCode}] - P/N: ${pn || 'TBD'}`,
-        // Example Subtitle: 10 / 250 LNDG (240 Left) | Fly High School
-        subtitle: `${ratio} LNDG (${remaining} LEFT) | ${org || 'No School'}`
+        // Keeps the list clean: VT-JED
+        title: title,
+        // Shows just: Nose Gear | Fly High School
+        subtitle: `${pos || 'Unspecified Position'} | ${org || 'No School Assigned'}`
       }
     }
   },
