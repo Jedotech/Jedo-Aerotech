@@ -7,15 +7,21 @@ export default defineType({
   type: 'document',
   icon: ActivityIcon,
   fields: [
-    // --- MULTI-TENANCY / ORGANIZATION (NOW DYNAMIC) ---
+    // --- MULTI-TENANCY / ORGANIZATION ---
     defineField({
       name: 'schoolName',
       title: 'Aviation School / Organization',
-      type: 'reference', // Changed from 'string' to 'reference'
-      to: [{ type: 'fleetUser' }], // Points to your fleetUser schema
+      type: 'reference',
+      to: [{ type: 'fleetUser' }],
       description: 'Select the school this aircraft belongs to (Dynamic list from Fleet Users)',
-      // We use weak: true so you can delete a user without breaking the aircraft record
-      weak: true, 
+      // Weak: true allows deleting a school without breaking this record
+      weak: true,
+      // Validation ensures the dropdown is used and not left empty
+      validation: (Rule) => Rule.required().error('You must assign this aircraft to a school.'),
+      options: {
+        // This ensures the dropdown stays searchable and functional even after publishing
+        disableNew: false, 
+      }
     }),
 
     // --- AIRCRAFT IDENTIFICATION ---
@@ -128,7 +134,7 @@ export default defineType({
   preview: {
     select: {
       title: 'tailNumber',
-      subtitle: 'schoolName.organization', // Drill down into the reference to show organization name
+      subtitle: 'schoolName.organization', 
     },
   },
 })
