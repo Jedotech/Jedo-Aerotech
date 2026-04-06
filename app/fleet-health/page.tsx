@@ -250,11 +250,30 @@ export default function FleetHealth() {
                 })}
               </div>
 
-              {/* EXPERT BRANDING FOOTER - UPDATED TO JEDO TECH VERIFIED */}
-              <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '6px', opacity: 0.8 }}>
-                <div style={{ width: '6px', height: '6px', backgroundColor: '#06b6d4', borderRadius: '50%', boxShadow: '0 0 8px #06b6d4' }}></div>
-                <span style={{ fontSize: '0.6rem', fontWeight: '900', color: '#94a3b8', letterSpacing: '1px' }}>
-                   JEDO TECH VERIFIED
+              {/* SMARTER MICRO-DATA BADGE */}
+              <div style={{ 
+                marginTop: '20px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px', 
+                opacity: 0.6 
+              }}>
+                <div style={{ 
+                  width: '4px', 
+                  height: '4px', 
+                  backgroundColor: '#06b6d4', 
+                  borderRadius: '50%', 
+                  boxShadow: '0 0 8px rgba(6, 182, 212, 0.6)' 
+                }}></div>
+                <span style={{ 
+                  fontSize: '0.55rem', 
+                  fontWeight: '500', 
+                  color: '#94a3b8', 
+                  letterSpacing: '1.5px', 
+                  fontFamily: 'monospace',
+                  textTransform: 'uppercase'
+                }}>
+                   JEDO TECH <span style={{ color: '#334155', margin: '0 4px' }}>|</span> VERIFIED
                 </span>
               </div>
 
