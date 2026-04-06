@@ -9,45 +9,47 @@ export default defineType({
   fields: [
     defineField({
       name: 'schoolName',
-      title: 'Aviation School / Organization',
+      title: 'Aviation School',
       type: 'reference',
       to: [{ type: 'fleetUser' }],
-      weak: true,
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'tailNumber',
       title: 'Registration / Tail Number',
       type: 'string',
-      validation: (Rule) => Rule.required(),
     }),
-    // ... Keep all other fields exactly as they are ...
+    // ENSURE THIS FIELD EXISTS IF YOU WANT TO SORT BY IT
+    defineField({
+      name: 'aircraftModel',
+      title: 'Aircraft Model',
+      type: 'string',
+    }),
   ],
 
-  // THIS IS THE SECRET TO FIXING THAT SPECIFIC SEARCH BAR
+  // Update orderings to ONLY target existing fields
+  orderings: [
+    {
+      title: 'Tail Number, A-Z',
+      name: 'tailNumberAsc',
+      by: [{ field: 'tailNumber', direction: 'asc' }]
+    },
+    {
+      title: 'School Name, A-Z',
+      name: 'schoolNameAsc',
+      by: [{ field: 'schoolName.organization', direction: 'asc' }]
+    }
+  ],
+
   preview: {
     select: {
       title: 'tailNumber',
       orgName: 'schoolName.organization',
-      pos: 'tyrePosition',
     },
-    prepare({ title, orgName, pos }) {
+    prepare({ title, orgName }) {
       return {
         title: title,
-        // We include the orgName in the subtitle. 
-        // Sanity indexes the subtitle for the document list search bar.
-        subtitle: `${pos || 'Gear'} | ${orgName || 'Unassigned'}`
+        subtitle: orgName || 'Unassigned'
       }
     }
-  },
-
-  // ADD THIS BLOCK: It forces the search engine to look at the organization field 
-  // even if it's inside a reference.
-  orderings: [
-    {
-      title: 'Organization',
-      name: 'orgAsc',
-      by: [{ field: 'schoolName.organization', direction: 'asc' }]
-    }
-  ]
+  }
 })
