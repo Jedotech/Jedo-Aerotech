@@ -53,13 +53,13 @@ export default defineType({
       },
     }),
 
-    // --- VENDOR & SOURCING DETAILS ---
+    // --- SOURCING & COMPLIANCE AUTHORITY (REBRANDED) ---
     defineField({
       name: 'vendorName',
-      title: 'Sourcing Vendor',
+      title: 'Sourcing & Compliance Authority',
       type: 'string',
       initialValue: 'Jedo Technologies Pvt. Ltd.',
-      description: 'The agency responsible for sourcing this asset.',
+      description: 'The certified authority responsible for sourcing and verifying this asset.',
       readOnly: true, 
     }),
 
@@ -98,10 +98,10 @@ export default defineType({
       type: 'number',
     }),
 
-    // --- ADDED: purchasePrice (To fix "Unknown Field" error) ---
+    // --- PURCHASE DETAILS ---
     defineField({
       name: 'purchasePrice',
-      title: 'Purchase Price (USD)',
+      title: 'Acquisition Cost (USD)',
       type: 'number',
     }),
 
@@ -129,12 +129,13 @@ export default defineType({
       name: 'serialNumber',
       title: 'Tyre Serial Number (S/N)',
       type: 'string',
-      description: 'Unique manufacturer ID for individual tracking.',
+      description: 'Unique manufacturer ID for individual airworthiness tracking.',
+      validation: (Rule) => Rule.required().error('S/N is required for compliance tracking.'),
     }),
 
     defineField({
       name: 'retreadStatus',
-      title: 'Retread Level',
+      title: 'Retread / Condition Level',
       type: 'string',
       options: {
         list: [
@@ -149,7 +150,7 @@ export default defineType({
 
     defineField({
       name: 'status',
-      title: 'Asset Status',
+      title: 'Asset Service Status',
       type: 'string',
       initialValue: 'active',
       options: {
@@ -163,7 +164,7 @@ export default defineType({
 
     defineField({
       name: 'removalReason',
-      title: 'Reason for Removal',
+      title: 'Technical Reason for Removal',
       type: 'string',
       hidden: ({ document }) => document?.status === 'active',
       options: {
@@ -199,11 +200,13 @@ export default defineType({
       orgName: 'schoolName.organization',
       pos: 'tyrePosition',
       status: 'status',
+      sn: 'serialNumber',
     },
-    prepare({ title, orgName, pos, status }) {
+    prepare({ title, orgName, pos, status, sn }) {
       const statusIcon = status === 'retired' ? '📁 [ARCHIVED] ' : '';
+      const serialLabel = sn ? ` | S/N: ${sn}` : '';
       return {
-        title: `${statusIcon}${title}`,
+        title: `${statusIcon}${title}${serialLabel}`,
         subtitle: `${pos || 'Gear'} | ${orgName || 'Loading School...'}`
       }
     }
