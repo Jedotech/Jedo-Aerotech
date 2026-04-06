@@ -33,6 +33,13 @@ export default defineType({
       },
     }),
 
+    // --- RE-ADDED MISSING FIELD: tyreModel ---
+    defineField({
+      name: 'tyreModel',
+      title: 'Tyre Model',
+      type: 'string',
+    }),
+
     defineField({
       name: 'manufacturer',
       title: 'Tyre Brand (Make)',
@@ -56,6 +63,13 @@ export default defineType({
       },
     }),
 
+    // --- RE-ADDED MISSING FIELD: installDate ---
+    defineField({
+      name: 'installDate',
+      title: 'Installation Date',
+      type: 'date',
+    }),
+
     defineField({
       name: 'currentLandings',
       title: 'Accumulated Landings',
@@ -70,10 +84,25 @@ export default defineType({
       initialValue: 250,
     }),
 
+    // --- RE-ADDED MISSING FIELD: dailyUtilization ---
+    defineField({
+      name: 'dailyUtilization',
+      title: 'Daily Utilization (Avg Landings/Day)',
+      type: 'number',
+    }),
+
     defineField({
       name: 'partNumber',
       title: 'Part Number (P/N)',
       type: 'string',
+    }),
+
+    // --- RE-ADDED MISSING FIELD: maintenanceLog ---
+    defineField({
+      name: 'maintenanceLog',
+      title: 'Maintenance / Journey Log Notes',
+      type: 'array',
+      of: [{ type: 'string' }],
     }),
 
     defineField({
