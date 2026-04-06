@@ -177,6 +177,15 @@ export default defineType({
         ],
       },
     }),
+
+    // --- AUTOMATION MEMORY FIELD ---
+    defineField({
+      name: 'lastAlertMilestone',
+      title: 'Last Alert Milestone',
+      type: 'number',
+      description: 'The last health percentage (20, 10, 5, 0) for which an email alert was triggered.',
+      readOnly: true,
+    }),
   ],
 
   // --- SORTING CONFIGURATION ---

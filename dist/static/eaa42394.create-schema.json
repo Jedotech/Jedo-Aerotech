@@ -1,0 +1,662 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., Cessna 172, Cessna 152",
+        "name": "aircraftType",
+        "type": "string",
+        "title": "Aircraft Model Compatibility"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "partNumber",
+        "type": "string",
+        "title": "Part Number (P/N)"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Michelin",
+              "value": "Michelin"
+            },
+            {
+              "title": "Goodyear",
+              "value": "Goodyear"
+            },
+            {
+              "title": "Dunlop",
+              "value": "Dunlop"
+            },
+            {
+              "title": "Condor",
+              "value": "Condor"
+            },
+            {
+              "title": "Specialty Tires (McCready)",
+              "value": "Specialty"
+            }
+          ]
+        },
+        "name": "manufacturer",
+        "type": "string"
+      },
+      {
+        "description": "e.g., Aviator, Flight Custom III",
+        "name": "tyreModel",
+        "type": "string",
+        "title": "Tyre Model/Line"
+      },
+      {
+        "description": "e.g., 6.00-6",
+        "name": "tyreSize",
+        "type": "string"
+      },
+      {
+        "description": "e.g., 4, 6, 8",
+        "name": "plyRating",
+        "type": "string"
+      },
+      {
+        "initialValue": "New",
+        "options": {
+          "list": [
+            {
+              "title": "New / Factory New (FN)",
+              "value": "New"
+            },
+            {
+              "title": "New Surplus (NS)",
+              "value": "New Surplus"
+            },
+            {
+              "title": "Overhauled (OH)",
+              "value": "Overhauled"
+            },
+            {
+              "title": "Serviceable (SV)",
+              "value": "Serviceable"
+            }
+          ]
+        },
+        "name": "condition",
+        "type": "string"
+      },
+      {
+        "initialValue": 1,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "quantity",
+        "type": "number",
+        "title": "Stock Quantity"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "priceUSD",
+        "type": "number",
+        "title": "Unit Price (USD)"
+      },
+      {
+        "initialValue": "Chennai Hub",
+        "options": {
+          "list": [
+            "Chennai Hub",
+            "Singapore Hub",
+            "USA Hub"
+          ]
+        },
+        "name": "warehouse",
+        "type": "string",
+        "title": "Warehouse Location"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "DGCA Form 1",
+              "value": "DGCA"
+            },
+            {
+              "title": "FAA 8130-3",
+              "value": "8130-3"
+            },
+            {
+              "title": "EASA Form 1",
+              "value": "EASA"
+            },
+            {
+              "title": "CoC (Certificate of Conformance)",
+              "value": "CoC"
+            }
+          ]
+        },
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "certificates",
+        "type": "array",
+        "title": "Certifications"
+      },
+      {
+        "description": "Additional technical remarks or specifications (e.g., shelf life, storage notes)",
+        "name": "description",
+        "type": "text",
+        "title": "Technical Description"
+      }
+    ],
+    "name": "part",
+    "type": "document",
+    "title": "Tyre Inventory"
+  },
+  {
+    "fields": [
+      {
+        "weak": true,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "to": [
+          {
+            "type": "fleetUser"
+          }
+        ],
+        "name": "schoolName",
+        "type": "reference",
+        "title": "Aviation School / Organization"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "tailNumber",
+        "type": "string",
+        "title": "Registration / Tail Number"
+      },
+      {
+        "options": {
+          "list": [
+            "Cessna 172",
+            "Cessna 152",
+            "Piper Archer",
+            "Beechcraft Baron"
+          ]
+        },
+        "name": "aircraftModel",
+        "type": "string"
+      },
+      {
+        "name": "tyreModel",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Michelin",
+              "value": "Michelin"
+            },
+            {
+              "title": "Goodyear",
+              "value": "Goodyear"
+            },
+            {
+              "title": "Dunlop",
+              "value": "Dunlop"
+            },
+            {
+              "title": "Condor",
+              "value": "Condor"
+            }
+          ]
+        },
+        "name": "manufacturer",
+        "type": "string",
+        "title": "Tyre Brand (Make)"
+      },
+      {
+        "initialValue": "Jedo Technologies Pvt. Ltd.",
+        "description": "The certified authority responsible for sourcing and verifying this asset.",
+        "readOnly": true,
+        "name": "vendorName",
+        "type": "string",
+        "title": "Sourcing & Compliance Authority"
+      },
+      {
+        "options": {
+          "list": [
+            "Nose Gear",
+            "Main Left",
+            "Main Right"
+          ]
+        },
+        "name": "tyrePosition",
+        "type": "string",
+        "title": "Installation Position"
+      },
+      {
+        "name": "installDate",
+        "type": "date",
+        "title": "Installation Date"
+      },
+      {
+        "initialValue": 0,
+        "name": "currentLandings",
+        "type": "number",
+        "title": "Accumulated Landings"
+      },
+      {
+        "initialValue": 250,
+        "name": "maxDesignLife",
+        "type": "number"
+      },
+      {
+        "name": "dailyUtilization",
+        "type": "number",
+        "title": "Daily Utilization (Avg Landings/Day)"
+      },
+      {
+        "name": "purchasePrice",
+        "type": "number",
+        "title": "Acquisition Cost (USD)"
+      },
+      {
+        "name": "partNumber",
+        "type": "string",
+        "title": "Part Number (P/N)"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "maintenanceLog",
+        "type": "array",
+        "title": "Maintenance / Journey Log Notes"
+      },
+      {
+        "name": "operatorEmail",
+        "type": "string",
+        "title": "Owner / Maintenance Email"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error",
+            "message": "S/N is required for compliance tracking."
+          }
+        ],
+        "description": "Unique manufacturer ID for individual airworthiness tracking.",
+        "name": "serialNumber",
+        "type": "string",
+        "title": "Tyre Serial Number (S/N)"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "New (Virgin)",
+              "value": "New"
+            },
+            {
+              "title": "R1 (1st Retread)",
+              "value": "R1"
+            },
+            {
+              "title": "R2 (2nd Retread)",
+              "value": "R2"
+            },
+            {
+              "title": "R3 (3rd Retread)",
+              "value": "R3"
+            },
+            {
+              "title": "R4 (4th Retread)",
+              "value": "R4"
+            }
+          ]
+        },
+        "name": "retreadStatus",
+        "type": "string",
+        "title": "Retread / Condition Level"
+      },
+      {
+        "initialValue": "active",
+        "options": {
+          "list": [
+            {
+              "title": "Active (In Service)",
+              "value": "active"
+            },
+            {
+              "title": "Retired (Replaced)",
+              "value": "retired"
+            }
+          ],
+          "layout": "radio"
+        },
+        "name": "status",
+        "type": "string",
+        "title": "Asset Service Status"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Normal Wear (Limit Reached)",
+              "value": "Normal Wear"
+            },
+            {
+              "title": "FOD (Foreign Object Damage)",
+              "value": "FOD"
+            },
+            {
+              "title": "Flat Spot (Braking)",
+              "value": "Flat Spot"
+            },
+            {
+              "title": "Sidewall Cut",
+              "value": "Sidewall Cut"
+            },
+            {
+              "title": "Casing Failure",
+              "value": "Casing Failure"
+            }
+          ]
+        },
+        "hidden": "conditional",
+        "name": "removalReason",
+        "type": "string",
+        "title": "Technical Reason for Removal"
+      },
+      {
+        "description": "The last health percentage (20, 10, 5, 0) for which an email alert was triggered.",
+        "readOnly": true,
+        "name": "lastAlertMilestone",
+        "type": "number"
+      }
+    ],
+    "name": "fleetRecord",
+    "type": "document",
+    "title": "Fleet Management"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string",
+        "title": "Organization Name"
+      },
+      {
+        "name": "contactPerson",
+        "type": "string",
+        "title": "Primary Contact Person"
+      },
+      {
+        "name": "email",
+        "type": "string",
+        "title": "Contact Email"
+      },
+      {
+        "name": "phone",
+        "type": "string",
+        "title": "Phone Number"
+      },
+      {
+        "description": "e.g., Chennai, Pondicherry, Hyderabad",
+        "name": "location",
+        "type": "string",
+        "title": "Base Location"
+      },
+      {
+        "description": "Link this client to the aircraft they operate",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "fleetRecord"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to fleet management"
+          }
+        ],
+        "name": "assignedAircraft",
+        "type": "array",
+        "title": "Managed Fleet"
+      },
+      {
+        "name": "notes",
+        "type": "text",
+        "title": "Internal Notes"
+      }
+    ],
+    "name": "client",
+    "type": "document",
+    "title": "Flight Schools & Operators"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "orderNumber",
+        "type": "string",
+        "title": "Order / Invoice Number"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "purchaseDate",
+        "type": "date"
+      },
+      {
+        "to": [
+          {
+            "type": "client"
+          }
+        ],
+        "name": "buyer",
+        "type": "reference",
+        "title": "Buyer (Client)"
+      },
+      {
+        "description": "Which aircraft is this part for?",
+        "to": [
+          {
+            "type": "fleetRecord"
+          }
+        ],
+        "name": "aircraft",
+        "type": "reference",
+        "title": "Associated Aircraft"
+      },
+      {
+        "description": "e.g., Nose Tyre - Michelin Air",
+        "name": "itemDescription",
+        "type": "string"
+      },
+      {
+        "name": "unitPrice",
+        "type": "number",
+        "title": "Unit Price (USD)"
+      },
+      {
+        "initialValue": 1,
+        "name": "quantity",
+        "type": "number"
+      },
+      {
+        "description": "Price x Quantity",
+        "name": "totalAmount",
+        "type": "number",
+        "title": "Total Amount (Calculated)"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Pending",
+              "value": "pending"
+            },
+            {
+              "title": "Shipped",
+              "value": "shipped"
+            },
+            {
+              "title": "Delivered",
+              "value": "delivered"
+            },
+            {
+              "title": "Cancelled",
+              "value": "cancelled"
+            }
+          ]
+        },
+        "name": "status",
+        "type": "string",
+        "title": "Order Status"
+      }
+    ],
+    "name": "purchase",
+    "type": "document",
+    "title": "Purchase Records"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "organization",
+        "type": "string",
+        "title": "Organization Name"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The password assigned to this organization",
+        "name": "accessCode",
+        "type": "string",
+        "title": "Unique Access Code"
+      }
+    ],
+    "name": "fleetUser",
+    "type": "document",
+    "title": "Fleet Users"
+  }
+]
