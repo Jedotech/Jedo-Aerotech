@@ -54,7 +54,6 @@ export default function FleetHealth() {
 
     async function fetchFleet() {
       try {
-        // --- UPDATED QUERY (Added new fields & active status filter) ---
         const data = await client.fetch(
           `*[_type == "fleetRecord" && schoolName->organization == $org && status == "active"] | order(tailNumber asc) {
             ...,
@@ -119,7 +118,7 @@ export default function FleetHealth() {
       const statusLabel = health < 20 ? `🚨 *AOG RISK*` : `✅ *MONITORING*`;
       
       msg += `${statusLabel}\n`;
-      msg += `Pos: [${pos}] | S/N: ${t.serialNumber || 'TBD'}\n`; // Added S/N to WhatsApp
+      msg += `Pos: [${pos}] | S/N: ${t.serialNumber || 'TBD'}\n`; 
       msg += `Cond: ${t.retreadStatus || 'New'}\n`;
       msg += `Rem: ${remaining} Landings\n\n`;
     });
@@ -166,7 +165,7 @@ export default function FleetHealth() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px' }}>
                 <h2 style={summaryValue}>{avgFleetHealth}%</h2>
                 <div style={progressBase}>
-                   <div style={{ height: '100%', width: `${avgFleetHealth}%`, backgroundColor: '#10b981', borderRadius: '10px', boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)' }} />
+                    <div style={{ height: '100%', width: `${avgFleetHealth}%`, backgroundColor: '#10b981', borderRadius: '10px', boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)' }} />
                 </div>
             </div>
           </div>
@@ -251,11 +250,11 @@ export default function FleetHealth() {
                 })}
               </div>
 
-              {/* EXPERT BRANDING FOOTER */}
-              <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.7 }}>
-                <div style={{ width: '8px', height: '8px', backgroundColor: '#06b6d4', borderRadius: '50%', boxShadow: '0 0 6px #06b6d4' }}></div>
-                <span style={{ fontSize: '0.55rem', fontWeight: '800', color: '#94a3b8', letterSpacing: '0.5px' }}>
-                   SOURCING & COMPLIANCE AUTHORITY: {data.tyres[0]?.vendorName?.toUpperCase() || 'JEDO TECHNOLOGIES'}
+              {/* EXPERT BRANDING FOOTER - UPDATED TO JEDO TECH VERIFIED */}
+              <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '6px', opacity: 0.8 }}>
+                <div style={{ width: '6px', height: '6px', backgroundColor: '#06b6d4', borderRadius: '50%', boxShadow: '0 0 8px #06b6d4' }}></div>
+                <span style={{ fontSize: '0.6rem', fontWeight: '900', color: '#94a3b8', letterSpacing: '1px' }}>
+                   JEDO TECH VERIFIED
                 </span>
               </div>
 
