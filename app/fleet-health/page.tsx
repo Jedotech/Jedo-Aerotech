@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. DATA INTERFACE
+// 1. UPDATED DATA INTERFACE
 interface FleetAsset {
   _id: string;
   tailNumber: string;
@@ -19,6 +19,11 @@ interface FleetAsset {
   purchasePrice?: number;
   dailyUtilization?: number;
   operatorEmail: string;
+  // --- NEW FIELDS ---
+  serialNumber?: string;
+  retreadStatus?: string;
+  vendorName?: string;
+  status?: string;
 }
 
 const client = createClient({
@@ -49,8 +54,14 @@ export default function FleetHealth() {
 
     async function fetchFleet() {
       try {
+        // --- UPDATED QUERY (Added new fields & active status filter) ---
         const data = await client.fetch(
-          `*[_type == "fleetRecord" && schoolName->organization == $org] | order(tailNumber asc)`,
+          `*[_type == "fleetRecord" && schoolName->organization == $org && status == "active"] | order(tailNumber asc) {
+            ...,
+            "vendorName": vendorName,
+            "serialNumber": serialNumber,
+            "retreadStatus": retreadStatus
+          }`,
           { org: storedOrg }
         )
         setAssets(data || [])
@@ -87,21 +98,18 @@ export default function FleetHealth() {
     ? (assets.reduce((sum, a) => sum + calculateHealth(a.currentLandings, a.maxDesignLife), 0) / assets.length).toFixed(0)
     : 0;
 
-  // --- WHATSAPP MESSAGE GENERATOR ---
   const generateWaMessage = (tail: string, tyres: FleetAsset[]) => {
-    // Technical Mapping
     const posCodeMap: Record<string, string> = {
       'Nose Gear': 'N',
       'Main Left': 'ML',
       'Main Right': 'MR'
     };
 
-    // Sort tyres by remaining landings (lowest first = priority)
     const sortedTyres = [...tyres].sort((a, b) => 
       (a.maxDesignLife - a.currentLandings) - (b.maxDesignLife - b.currentLandings)
     );
 
-    let msg = `*SPARES ORDER*\n*AIRCRAFT:* ${tail}\n\n`;
+    let msg = `*COMPLIANCE & SPARES ORDER*\n*AIRCRAFT:* ${tail}\n\n`;
 
     sortedTyres.forEach(t => {
       const remaining = Math.max(0, t.maxDesignLife - t.currentLandings);
@@ -111,8 +119,8 @@ export default function FleetHealth() {
       const statusLabel = health < 20 ? `🚨 *AOG RISK*` : `✅ *MONITORING*`;
       
       msg += `${statusLabel}\n`;
-      msg += `Pos: [${pos}] | ${t.manufacturer || 'TBD'}\n`;
-      msg += `P/N: ${t.partNumber || 'TBD'}\n`;
+      msg += `Pos: [${pos}] | S/N: ${t.serialNumber || 'TBD'}\n`; // Added S/N to WhatsApp
+      msg += `Cond: ${t.retreadStatus || 'New'}\n`;
       msg += `Rem: ${remaining} Landings\n\n`;
     });
 
@@ -125,7 +133,6 @@ export default function FleetHealth() {
   return (
     <div style={{ backgroundColor: '#020617', minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: 'white' }}>
       
-      {/* 1. WHO: THE HEADER (CENTERED NAVIGATION & MOBILE READY) */}
       <nav style={navBarStyle}>
         <div style={navLogoSection}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '28px' }} /></Link>
@@ -152,16 +159,15 @@ export default function FleetHealth() {
 
       <div style={{ height: '1px', backgroundColor: 'rgba(255,180,0,0.15)', width: '100%' }} />
 
-      {/* 2. WHAT'S HAPPENING: EXECUTIVE SUMMARY PANEL */}
       <section style={summaryPanel}>
         <div style={summaryGrid}>
           <div style={summaryCard}>
             <span style={summaryLabel}>FLEET HEALTH INDEX</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px' }}>
-               <h2 style={summaryValue}>{avgFleetHealth}%</h2>
-               <div style={progressBase}>
-                  <div style={{ height: '100%', width: `${avgFleetHealth}%`, backgroundColor: '#10b981', borderRadius: '10px', boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)' }} />
-               </div>
+                <h2 style={summaryValue}>{avgFleetHealth}%</h2>
+                <div style={progressBase}>
+                   <div style={{ height: '100%', width: `${avgFleetHealth}%`, backgroundColor: '#10b981', borderRadius: '10px', boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)' }} />
+                </div>
             </div>
           </div>
           
@@ -185,7 +191,6 @@ export default function FleetHealth() {
         </div>
       </section>
 
-      {/* 3. DETAILS: FLEET GRID */}
       <header style={inventoryHeader}>
         <h3 style={inventoryTitle}>ASSET INVENTORY</h3>
       </header>
@@ -223,12 +228,13 @@ export default function FleetHealth() {
                       
                       <div style={{ flexGrow: 1, minWidth: '120px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4px' }}>
-                           <span style={makeLabel}>{tyre.manufacturer}</span>
-                           <span style={pnLabel}>P/N: {tyre.partNumber || 'TBD'}</span>
+                            <span style={makeLabel}>{tyre.manufacturer} ({tyre.retreadStatus || 'New'})</span>
+                            <span style={pnLabel}>S/N: {tyre.serialNumber || 'TBD'}</span>
                         </div>
                         <div style={assetProgressWrapper}>
                           <div style={{ height: '100%', width: `${health}%`, backgroundColor: color, borderRadius: '10px' }} />
                         </div>
+                        <p style={{ margin: '4px 0 0', fontSize: '0.5rem', color: '#64748b' }}>P/N: {tyre.partNumber || 'TBD'}</p>
                       </div>
 
                       <div style={techDataColumn}>
@@ -244,6 +250,15 @@ export default function FleetHealth() {
                   );
                 })}
               </div>
+
+              {/* EXPERT BRANDING FOOTER */}
+              <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.7 }}>
+                <div style={{ width: '8px', height: '8px', backgroundColor: '#06b6d4', borderRadius: '50%', boxShadow: '0 0 6px #06b6d4' }}></div>
+                <span style={{ fontSize: '0.55rem', fontWeight: '800', color: '#94a3b8', letterSpacing: '0.5px' }}>
+                   SOURCING & COMPLIANCE AUTHORITY: {data.tyres[0]?.vendorName?.toUpperCase() || 'JEDO TECHNOLOGIES'}
+                </span>
+              </div>
+
               <Link 
                 href={`https://wa.me/919600038089?text=${generateWaMessage(tail, data.tyres)}`} 
                 target="_blank" 
@@ -259,7 +274,7 @@ export default function FleetHealth() {
   )
 }
 
-// --- STYLES (NO CHANGES TO LAYOUT) ---
+// --- STYLES (PRESERVED) ---
 const navBarStyle: any = { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', padding: '18px 40px', backgroundColor: '#020617' };
 const navLogoSection = { flex: '0 0 150px' };
 const navTitleSection: any = { flex: '1', textAlign: 'center', minWidth: '300px' };
