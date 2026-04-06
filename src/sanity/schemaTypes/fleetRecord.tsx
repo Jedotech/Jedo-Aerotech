@@ -14,12 +14,9 @@ export default defineType({
       type: 'reference',
       to: [{ type: 'fleetUser' }],
       description: 'Select the school this aircraft belongs to (Dynamic list from Fleet Users)',
-      // Weak: true allows deleting a school without breaking this record
       weak: true,
-      // Validation ensures the dropdown is used and not left empty
       validation: (Rule) => Rule.required().error('You must assign this aircraft to a school.'),
       options: {
-        // This ensures the dropdown stays searchable and functional even after publishing
         disableNew: false, 
       }
     }),
@@ -131,10 +128,33 @@ export default defineType({
       description: 'Used for automated alerts when the countdown reaches zero.',
     }),
   ],
+  
+  // --- UPDATED PREVIEW FOR CEO & MASTER TECH VIEW ---
   preview: {
     select: {
-      title: 'tailNumber',
-      subtitle: 'schoolName.organization', 
+      tail: 'tailNumber',
+      pos: 'tyrePosition',
+      current: 'currentLandings',
+      max: 'maxDesignLife',
+      pn: 'partNumber',
+      org: 'schoolName.organization'
     },
+    prepare({ tail, pos, current, max, pn, org }) {
+      // Technical Indicator Mapping (N, ML, MR)
+      const posCode = pos === 'Nose Gear' ? 'N' : pos === 'Main Left' ? 'ML' : pos === 'Main Right' ? 'MR' : '??';
+      
+      // Maintenance Ratio Calculation
+      const ratio = `${current || 0} / ${max || 250}`;
+      
+      // Remaining Landings (Grounding Metric)
+      const remaining = (max || 250) - (current || 0);
+      
+      return {
+        // Example Title: VT-ACC [ML] - P/N: 505C86-10
+        title: `${tail} [${posCode}] - P/N: ${pn || 'TBD'}`,
+        // Example Subtitle: 10 / 250 LNDG (240 Left) | Fly High School
+        subtitle: `${ratio} LNDG (${remaining} LEFT) | ${org || 'No School'}`
+      }
+    }
   },
 })
