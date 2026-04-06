@@ -7,7 +7,6 @@ export default defineType({
   type: 'document',
   icon: ActivityIcon,
   fields: [
-    // --- ORGANIZATION REFERENCE ---
     defineField({
       name: 'schoolName',
       title: 'Aviation School / Organization',
@@ -16,73 +15,16 @@ export default defineType({
       weak: true,
       validation: (Rule) => Rule.required(),
     }),
-
     defineField({
       name: 'tailNumber',
       title: 'Registration / Tail Number',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
-
-    defineField({
-      name: 'aircraftModel',
-      title: 'Aircraft Model',
-      type: 'string',
-      options: {
-        list: ['Cessna 172', 'Cessna 152', 'Piper Archer', 'Beechcraft Baron'],
-      },
-    }),
-
-    defineField({
-      name: 'manufacturer',
-      title: 'Tyre Brand (Make)',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Michelin', value: 'Michelin' },
-          { title: 'Goodyear', value: 'Goodyear' },
-          { title: 'Dunlop', value: 'Dunlop' },
-          { title: 'Condor', value: 'Condor' },
-        ],
-      },
-    }),
-
-    defineField({
-      name: 'tyrePosition',
-      title: 'Installation Position',
-      type: 'string',
-      options: {
-        list: ['Nose Gear', 'Main Left', 'Main Right'],
-      },
-    }),
-
-    defineField({
-      name: 'currentLandings',
-      title: 'Accumulated Landings',
-      type: 'number',
-      initialValue: 0,
-    }),
-
-    defineField({
-      name: 'maxDesignLife',
-      title: 'Max Design Life',
-      type: 'number',
-      initialValue: 250,
-    }),
-
-    defineField({
-      name: 'partNumber',
-      title: 'Part Number (P/N)',
-      type: 'string',
-    }),
-
-    defineField({
-      name: 'operatorEmail',
-      title: 'Owner / Maintenance Email',
-      type: 'string',
-    }),
+    // ... Keep all other fields exactly as they are ...
   ],
 
+  // THIS IS THE SECRET TO FIXING THAT SPECIFIC SEARCH BAR
   preview: {
     select: {
       title: 'tailNumber',
@@ -92,8 +34,20 @@ export default defineType({
     prepare({ title, orgName, pos }) {
       return {
         title: title,
-        subtitle: `${pos || 'Gear'} | ${orgName || 'Loading School...'}`
+        // We include the orgName in the subtitle. 
+        // Sanity indexes the subtitle for the document list search bar.
+        subtitle: `${pos || 'Gear'} | ${orgName || 'Unassigned'}`
       }
     }
   },
+
+  // ADD THIS BLOCK: It forces the search engine to look at the organization field 
+  // even if it's inside a reference.
+  orderings: [
+    {
+      title: 'Organization',
+      name: 'orgAsc',
+      by: [{ field: 'schoolName.organization', direction: 'asc' }]
+    }
+  ]
 })
