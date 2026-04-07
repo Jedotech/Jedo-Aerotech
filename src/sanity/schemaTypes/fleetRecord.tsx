@@ -183,6 +183,7 @@ export default defineType({
       name: 'lastAlertMilestone',
       title: 'Last Alert Milestone',
       type: 'number',
+      initialValue: 0, // Forces visibility in the database/UI
       description: 'The last health percentage (20, 10, 5, 0) for which an email alert was triggered.',
       readOnly: true,
     }),
