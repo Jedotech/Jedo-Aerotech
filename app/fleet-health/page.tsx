@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. UPDATED DATA INTERFACE
+// 1. DATA INTERFACE
 interface FleetAsset {
   _id: string;
   tailNumber: string;
@@ -19,7 +19,6 @@ interface FleetAsset {
   purchasePrice?: number;
   dailyUtilization?: number;
   operatorEmail: string;
-  // --- NEW FIELDS ---
   serialNumber?: string;
   retreadStatus?: string;
   vendorName?: string;
@@ -74,9 +73,16 @@ export default function FleetHealth() {
     fetchFleet()
   }, [router])
 
+  // --- HEALTH LOGIC UPDATE ---
   const calculateHealth = (current: number, max: number) => {
     const percentage = ((max - (current || 0)) / max) * 100;
     return Math.max(0, Math.min(100, percentage));
+  }
+
+  const getHealthColor = (health: number) => {
+    if (health < 20) return '#ef4444'; // CRITICAL (Red)
+    if (health < 50) return '#f59e0b'; // WARNING (Amber)
+    return '#10b981'; // HEALTHY (Green)
   }
 
   const groupedFleet = assets.reduce((acc, asset) => {
@@ -94,7 +100,7 @@ export default function FleetHealth() {
   }).length;
   
   const avgFleetHealth = assets.length > 0 
-    ? (assets.reduce((sum, a) => sum + calculateHealth(a.currentLandings, a.maxDesignLife), 0) / assets.length).toFixed(0)
+    ? Number((assets.reduce((sum, a) => sum + calculateHealth(a.currentLandings, a.maxDesignLife), 0) / assets.length).toFixed(0))
     : 0;
 
   const generateWaMessage = (tail: string, tyres: FleetAsset[]) => {
@@ -115,7 +121,7 @@ export default function FleetHealth() {
       const health = calculateHealth(t.currentLandings, t.maxDesignLife);
       const pos = posCodeMap[t.tyrePosition || ''] || '??';
       
-      const statusLabel = health < 20 ? `🚨 *AOG RISK*` : `✅ *MONITORING*`;
+      const statusLabel = health < 20 ? `🚨 *AOG RISK*` : health < 50 ? `⚠️ *WARNING*` : `✅ *MONITORING*`;
       
       msg += `${statusLabel}\n`;
       msg += `Pos: [${pos}] | S/N: ${t.serialNumber || 'TBD'}\n`; 
@@ -163,9 +169,9 @@ export default function FleetHealth() {
           <div style={summaryCard}>
             <span style={summaryLabel}>FLEET HEALTH INDEX</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginTop: '10px' }}>
-                <h2 style={summaryValue}>{avgFleetHealth}%</h2>
+                <h2 style={{ ...summaryValue, color: getHealthColor(avgFleetHealth) }}>{avgFleetHealth}%</h2>
                 <div style={progressBase}>
-                    <div style={{ height: '100%', width: `${avgFleetHealth}%`, backgroundColor: '#10b981', borderRadius: '10px', boxShadow: '0 0 10px rgba(16, 185, 129, 0.3)' }} />
+                    <div style={{ height: '100%', width: `${avgFleetHealth}%`, backgroundColor: getHealthColor(avgFleetHealth), borderRadius: '10px', boxShadow: `0 0 10px ${getHealthColor(avgFleetHealth)}4D` }} />
                 </div>
             </div>
           </div>
@@ -209,7 +215,7 @@ export default function FleetHealth() {
               <div style={tyreContainer}>
                 {data.tyres.map((tyre) => {
                   const health = calculateHealth(tyre.currentLandings, tyre.maxDesignLife);
-                  const color = health < 20 ? '#ef4444' : health < 50 ? '#f59e0b' : '#10b981';
+                  const statusColor = getHealthColor(health);
                   const remaining = Math.max(0, tyre.maxDesignLife - tyre.currentLandings);
                   
                   const posCodeMap: Record<string, string> = {
@@ -220,9 +226,9 @@ export default function FleetHealth() {
                   const posCode = posCodeMap[tyre.tyrePosition || ''] || '??';
 
                   return (
-                    <div key={tyre._id} style={technicalRow}>
+                    <div key={tyre._id} style={{ ...technicalRow, borderLeft: `2px solid ${statusColor}` }}>
                       <div style={posCodeBox}>
-                        <span style={{ fontSize: '0.7rem', fontWeight: '900', color: '#ffb400' }}>{posCode}</span>
+                        <span style={{ fontSize: '0.7rem', fontWeight: '900', color: statusColor }}>{posCode}</span>
                       </div>
                       
                       <div style={{ flexGrow: 1, minWidth: '120px' }}>
@@ -231,26 +237,25 @@ export default function FleetHealth() {
                             <span style={pnLabel}>S/N: {tyre.serialNumber || 'TBD'}</span>
                         </div>
                         <div style={assetProgressWrapper}>
-                          <div style={{ height: '100%', width: `${health}%`, backgroundColor: color, borderRadius: '10px' }} />
+                          <div style={{ height: '100%', width: `${health}%`, backgroundColor: statusColor, borderRadius: '10px' }} />
                         </div>
                         <p style={{ margin: '4px 0 0', fontSize: '0.5rem', color: '#64748b' }}>P/N: {tyre.partNumber || 'TBD'}</p>
                       </div>
 
                       <div style={techDataColumn}>
                         <span style={columnHeader}>ACCUMULATED</span>
-                        <span style={{ ...columnValue, color }}>{tyre.currentLandings} / {tyre.maxDesignLife}</span>
+                        <span style={{ ...columnValue, color: statusColor }}>{tyre.currentLandings} / {tyre.maxDesignLife}</span>
                       </div>
 
                       <div style={techDataColumn}>
                         <span style={columnHeader}>REMAINING</span>
-                        <span style={{ ...columnValue, color }}>{remaining} LNDG</span>
+                        <span style={{ ...columnValue, color: statusColor }}>{remaining} LNDG</span>
                       </div>
                     </div>
                   );
                 })}
               </div>
 
-              {/* SMARTER MICRO-DATA BADGE */}
               <div style={{ 
                 marginTop: '20px', 
                 display: 'flex', 
@@ -273,7 +278,7 @@ export default function FleetHealth() {
                   fontFamily: 'monospace',
                   textTransform: 'uppercase'
                 }}>
-                   JEDO TECH <span style={{ color: '#334155', margin: '0 4px' }}>|</span> VERIFIED
+                    JEDO TECH <span style={{ color: '#334155', margin: '0 4px' }}>|</span> VERIFIED
                 </span>
               </div>
 
@@ -292,7 +297,7 @@ export default function FleetHealth() {
   )
 }
 
-// --- STYLES (PRESERVED) ---
+// --- STYLES PRESERVED ---
 const navBarStyle: any = { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', padding: '18px 40px', backgroundColor: '#020617' };
 const navLogoSection = { flex: '0 0 150px' };
 const navTitleSection: any = { flex: '1', textAlign: 'center', minWidth: '300px' };
