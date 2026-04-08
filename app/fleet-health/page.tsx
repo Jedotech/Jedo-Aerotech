@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from 'next-sanity'
 
-// 1. DATA INTERFACE (Updated with purchasePrice for CPL)
+// 1. DATA INTERFACE
 interface FleetAsset {
   _id: string;
   tailNumber: string;
@@ -16,7 +16,7 @@ interface FleetAsset {
   tyrePosition?: string;
   currentLandings: number;
   maxDesignLife: number;
-  purchasePrice?: number; // Mapped to Acquisition Cost in Sanity
+  purchasePrice?: number;
   dailyUtilization?: number;
   operatorEmail: string;
   serialNumber?: string;
@@ -73,7 +73,7 @@ export default function FleetHealth() {
     fetchFleet()
   }, [router])
 
-  // --- HEALTH LOGIC ---
+  // --- HEALTH LOGIC UPDATE ---
   const calculateHealth = (current: number, max: number) => {
     const percentage = ((max - (current || 0)) / max) * 100;
     return Math.max(0, Math.min(100, percentage));
@@ -225,11 +225,6 @@ export default function FleetHealth() {
                   };
                   const posCode = posCodeMap[tyre.tyrePosition || ''] || '??';
 
-                  // CPL CALCULATION
-                  const cpl = (tyre.purchasePrice && tyre.currentLandings > 0) 
-                    ? (tyre.purchasePrice / tyre.currentLandings).toFixed(2) 
-                    : '0.00';
-
                   return (
                     <div key={tyre._id} style={{ ...technicalRow, borderLeft: `2px solid ${statusColor}` }}>
                       <div style={posCodeBox}>
@@ -244,21 +239,7 @@ export default function FleetHealth() {
                         <div style={assetProgressWrapper}>
                           <div style={{ height: '100%', width: `${health}%`, backgroundColor: statusColor, borderRadius: '10px' }} />
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', alignItems: 'center' }}>
-                          <p style={{ margin: 0, fontSize: '0.5rem', color: '#64748b' }}>P/N: {tyre.partNumber || 'TBD'}</p>
-                          
-                          {/* CPL BADGE */}
-                          <div style={{ 
-                            backgroundColor: 'rgba(6, 182, 212, 0.1)', 
-                            padding: '2px 6px', 
-                            borderRadius: '4px', 
-                            border: '1px solid rgba(6, 182, 212, 0.2)' 
-                          }}>
-                            <span style={{ fontSize: '0.5rem', color: '#06b6d4', fontWeight: 'bold' }}>
-                              CPL: ₹{cpl}
-                            </span>
-                          </div>
-                        </div>
+                        <p style={{ margin: '4px 0 0', fontSize: '0.5rem', color: '#64748b' }}>P/N: {tyre.partNumber || 'TBD'}</p>
                       </div>
 
                       <div style={techDataColumn}>
