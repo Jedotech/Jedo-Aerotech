@@ -19,7 +19,6 @@ interface FleetAsset {
   purchasePrice?: number;
   dailyUtilization?: number;
   operatorEmail: string;
-  // --- NEW FIELDS ---
   serialNumber?: string;
   retreadStatus?: string;
   vendorName?: string;
@@ -132,17 +131,32 @@ export default function FleetHealth() {
   return (
     <div style={{ backgroundColor: '#020617', minHeight: '100vh', fontFamily: 'Inter, sans-serif', color: 'white' }}>
       
-      <nav style={navBarStyle}>
+      {/* RESPONSIVE INLINE STYLES */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 768px) {
+          .nav-bar { padding: 15px 20px !important; flex-direction: column !important; gap: 15px !important; }
+          .nav-title { order: -1 !important; min-width: 100% !important; }
+          .nav-actions { width: 100% !important; justify-content: center !important; }
+          .summary-panel { padding: 20px !important; }
+          .fleet-grid { grid-template-columns: 1fr !important; padding: 10px !important; }
+          .aircraft-card { padding: 18px !important; }
+          .technical-row { flex-wrap: wrap !important; }
+          .tech-data-col { text-align: left !important; min-width: 45% !important; }
+          .main-title { font-size: 1rem !important; }
+        }
+      `}} />
+
+      <nav className="nav-bar" style={navBarStyle}>
         <div style={navLogoSection}>
           <Link href="/"><img src="/jedo-logo.png" alt="Jedo" style={{ height: '28px' }} /></Link>
         </div>
 
-        <div style={navTitleSection}>
-          <h1 style={responsiveMainTitle}>
+        <div className="nav-title" style={navTitleSection}>
+          <h1 className="main-title" style={responsiveMainTitle}>
             <span style={{ color: '#06b6d4', textShadow: '0 0 12px rgba(6, 182, 212, 0.4)' }}>
               {orgName.toUpperCase()}
             </span> 
-            <span style={{ color: '#475569', margin: '0 15px', fontWeight: '300' }}>/</span> 
+            <span style={{ color: '#475569', margin: '0 10px', fontWeight: '300' }}>/</span> 
             <span style={{ color: '#f8fafc', opacity: 0.9 }}>FLEET COMMAND</span>
           </h1>
           <p style={telemetryText}>
@@ -150,7 +164,7 @@ export default function FleetHealth() {
           </p>
         </div>
 
-        <div style={navActionSection}>
+        <div className="nav-actions" style={navActionSection}>
           <Link href="/update-logbook" style={navActionBtn}>+ LOGBOOK</Link>
           <button onClick={() => { localStorage.clear(); router.push('/login'); }} style={logoutBtn}>LOGOUT</button>
         </div>
@@ -158,7 +172,7 @@ export default function FleetHealth() {
 
       <div style={{ height: '1px', backgroundColor: 'rgba(255,180,0,0.15)', width: '100%' }} />
 
-      <section style={summaryPanel}>
+      <section className="summary-panel" style={summaryPanel}>
         <div style={summaryGrid}>
           <div style={summaryCard}>
             <span style={summaryLabel}>FLEET HEALTH INDEX</span>
@@ -195,9 +209,9 @@ export default function FleetHealth() {
       </header>
 
       <main style={mainContentStyle}>
-        <div style={fleetGrid}>
+        <div className="fleet-grid" style={fleetGrid}>
           {Object.entries(groupedFleet).map(([tail, data]) => (
-            <div key={tail} style={aircraftCard}>
+            <div key={tail} className="aircraft-card" style={aircraftCard}>
               <div style={aircraftHeader}>
                 <div>
                   <h2 style={tailText}>{tail}</h2>
@@ -220,7 +234,7 @@ export default function FleetHealth() {
                   const posCode = posCodeMap[tyre.tyrePosition || ''] || '??';
 
                   return (
-                    <div key={tyre._id} style={technicalRow}>
+                    <div key={tyre._id} className="technical-row" style={technicalRow}>
                       <div style={posCodeBox}>
                         <span style={{ fontSize: '0.7rem', fontWeight: '900', color: '#ffb400' }}>{posCode}</span>
                       </div>
@@ -236,12 +250,12 @@ export default function FleetHealth() {
                         <p style={{ margin: '4px 0 0', fontSize: '0.5rem', color: '#64748b' }}>P/N: {tyre.partNumber || 'TBD'}</p>
                       </div>
 
-                      <div style={techDataColumn}>
+                      <div className="tech-data-col" style={techDataColumn}>
                         <span style={columnHeader}>ACCUMULATED</span>
                         <span style={{ ...columnValue, color }}>{tyre.currentLandings} / {tyre.maxDesignLife}</span>
                       </div>
 
-                      <div style={techDataColumn}>
+                      <div className="tech-data-col" style={techDataColumn}>
                         <span style={columnHeader}>REMAINING</span>
                         <span style={{ ...columnValue, color }}>{remaining} LNDG</span>
                       </div>
@@ -250,7 +264,6 @@ export default function FleetHealth() {
                 })}
               </div>
 
-              {/* SMARTER MICRO-DATA BADGE */}
               <div style={{ 
                 marginTop: '20px', 
                 display: 'flex', 
@@ -273,7 +286,7 @@ export default function FleetHealth() {
                   fontFamily: 'monospace',
                   textTransform: 'uppercase'
                 }}>
-                   JEDO TECH <span style={{ color: '#334155', margin: '0 4px' }}>|</span> VERIFIED
+                    JEDO TECH <span style={{ color: '#334155', margin: '0 4px' }}>|</span> VERIFIED
                 </span>
               </div>
 
