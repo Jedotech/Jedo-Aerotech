@@ -69,7 +69,8 @@ export default function FleetHealth() {
             ...,
             "vendorName": vendorName,
             "serialNumber": serialNumber,
-            "retreadStatus": retreadStatus
+            "retreadStatus": retreadStatus,
+            "tyreModel": tyreModel
           }`,
           { org: storedOrg }
         )
@@ -136,6 +137,7 @@ export default function FleetHealth() {
       
       msg += `${statusLabel}\n`;
       msg += `Pos: [${pos}] | S/N: ${t.serialNumber || 'TBD'}\n`; 
+      msg += `Model: ${t.tyreModel || 'Standard'}\n`;
       msg += `Cond: ${t.retreadStatus || 'New'}\n`;
       msg += `Rem: ${remaining} Landings\n\n`;
     });
@@ -250,7 +252,7 @@ export default function FleetHealth() {
                       
                       <div style={{ flexGrow: 1, minWidth: '120px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4px' }}>
-                            <span style={makeLabel}>{tyre.manufacturer} ({tyre.retreadStatus || 'New'})</span>
+                            <span style={makeLabel}>{tyre.manufacturer} {tyre.tyreModel && `- ${tyre.tyreModel}`} ({tyre.retreadStatus || 'New'})</span>
                             <span style={pnLabel}>S/N: {tyre.serialNumber || 'TBD'}</span>
                         </div>
                         <div style={assetProgressWrapper}>
