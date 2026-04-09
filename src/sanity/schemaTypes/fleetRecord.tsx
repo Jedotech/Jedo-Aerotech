@@ -111,14 +111,7 @@ export default defineType({
       type: 'string',
     }),
 
-    defineField({
-      name: 'maintenanceLog',
-      title: 'Maintenance / Journey Log Notes',
-      type: 'array',
-      of: [{ type: 'string' }],
-    }),
-
-    // --- NEW: HISTORICAL AUDIT LOG ---
+    // --- STRUCTURED HISTORICAL AUDIT LOG ---
     defineField({
       name: 'auditLog',
       title: 'Maintenance Audit Log',
@@ -200,7 +193,7 @@ export default defineType({
       name: 'lastAlertMilestone',
       title: 'Last Alert Milestone',
       type: 'number',
-      initialValue: 0, // Forces visibility in the database/UI
+      initialValue: 0,
       description: 'The last health percentage (20, 10, 5, 0) for which an email alert was triggered.',
       readOnly: true,
     }),
