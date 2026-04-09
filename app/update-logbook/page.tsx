@@ -55,7 +55,6 @@ export default function UpdateLogbook() {
     setLoading(true)
     setStatus('⌛ Communicating with Jedo Vault...')
     
-    // ARCHITECT'S LOGIC: Data points bundled for the 'auditLog' catcher
     const newTotal = (selectedTyre.currentLandings || 0) + Number(todaysActivity)
     
     const result = await updateTyreLandings(
@@ -67,7 +66,11 @@ export default function UpdateLogbook() {
     )
 
     if (result.success) {
-      setStatus(`✅ Entry logged for ${entryDate}`)
+      // ARCHITECT'S UI LOGIC: Format YYYY-MM-DD to DD-MM-YYYY for user confirmation
+      const [year, month, day] = entryDate.split('-');
+      const formattedDateForUser = `${day}-${month}-${year}`;
+
+      setStatus(`✅ Entry logged for ${formattedDateForUser}`)
       setTodaysActivity(''); 
       setTailNumber(''); 
       setSelectedTyre(null); 
