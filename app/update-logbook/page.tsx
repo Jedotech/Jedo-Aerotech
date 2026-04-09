@@ -17,7 +17,7 @@ export default function UpdateLogbook() {
   const [foundTyres, setFoundTyres] = useState<any[]>([])
   const [selectedTyre, setSelectedTyre] = useState<any>(null)
   const [todaysActivity, setTodaysActivity] = useState('')
-  const [entryDate, setEntryDate] = useState(new Date().toISOString().split('T')[0]) // NEW: Date State
+  const [entryDate, setEntryDate] = useState(new Date().toISOString().split('T')[0]) 
   const [comments, setComments] = useState('') 
   const [status, setStatus] = useState('Enter Tail Number...')
   const [loading, setLoading] = useState(false)
@@ -32,7 +32,6 @@ export default function UpdateLogbook() {
             { tail: cleanTail }
           )
           setFoundTyres(data || [])
-          // FIXED: Added Emoji so the style logic recognizes this as a 'Success' color
           setStatus(data.length > 0 ? '✅ Gear positions identified.' : '❌ Tail not found.')
         } catch (err) { setStatus('❌ Sync error.') }
       }
@@ -56,12 +55,9 @@ export default function UpdateLogbook() {
     setLoading(true)
     setStatus('⌛ Communicating with Jedo Vault...')
     
-    // ARCHITECT'S LOGIC: Append date and landings to the comments for the Forensic Report Engine
     const auditNote = `[${entryDate}] Added ${todaysActivity} LNDG. Note: ${comments || 'Routine ops'}`;
-
     const newTotal = (selectedTyre.currentLandings || 0) + Number(todaysActivity)
     
-    // ACTION: Updated to send the auditNote to the backend
     const result = await updateTyreLandings(selectedTyre._id, newTotal, auditNote)
 
     if (result.success) {
@@ -89,19 +85,18 @@ export default function UpdateLogbook() {
       <main style={cardFlexWrapper}>
         <div style={formCard}>
           <h2 style={titleStyle}>LOGBOOK MAINTENANCE ENTRY</h2>
-          <div style={{ height: '1px', backgroundColor: '#e2e8f0', marginBottom: '20px' }} />
+          <div style={{ height: '1px', backgroundColor: '#e2e8f0', marginBottom: '15px' }} />
           
           <form onSubmit={handleUpdate}>
-            {/* DUAL COLUMN: TAIL NUMBER & DATE */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px', marginBottom: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px', marginBottom: '10px' }}>
               <div style={inputGroup}>
                 <label style={labelStyle}>AIRCRAFT REGISTRATION</label>
                 <input 
                   type="text" 
                   placeholder="e.g. VT-JED" 
                   value={tailNumber} 
-                  onChange={(e) => setTailNumber(e.target.value.toUpperCase())} // Force uppercase on change
-                  style={{ ...inputStyle, textTransform: 'uppercase' }} // Force visual uppercase
+                  onChange={(e) => setTailNumber(e.target.value.toUpperCase())}
+                  style={{ ...inputStyle, textTransform: 'uppercase' }} 
                   required 
                 />
               </div>
@@ -112,7 +107,7 @@ export default function UpdateLogbook() {
                   value={entryDate} 
                   onChange={(e) => setEntryDate(e.target.value)} 
                   style={inputStyle} 
-                  max={new Date().toISOString().split('T')[0]} // NEW: Blocks any date in the future
+                  max={new Date().toISOString().split('T')[0]} 
                   required 
                 />
               </div>
@@ -131,7 +126,7 @@ export default function UpdateLogbook() {
               </select>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '10px' }}>
                 <div>
                   <label style={labelStyle}>PREVIOUS TOTAL</label>
                   <div style={readOnlyDisplay}>{selectedTyre?.currentLandings ?? '--'}</div>
@@ -143,12 +138,12 @@ export default function UpdateLogbook() {
             </div>
 
             <div style={inputGroup}>
-              <label style={labelStyle}>FACTORS / COMMENTS (PILOT, WEATHER, RUNWAY)</label>
+              <label style={labelStyle}>FACTORS / COMMENTS (OPTIONAL)</label>
               <textarea 
-                placeholder="e.g. Student solo, Heavy crosswind, Soft field landings..." 
+                placeholder="Pilot, Weather, or Runway notes..." 
                 value={comments} 
                 onChange={(e) => setComments(e.target.value)} 
-                style={{ ...inputStyle, minHeight: '60px', fontSize: '0.8rem' }} 
+                style={{ ...inputStyle, minHeight: '40px', fontSize: '0.8rem', padding: '6px 12px' }} 
               />
             </div>
 
@@ -163,39 +158,24 @@ export default function UpdateLogbook() {
   )
 }
 
-// --- STYLES PRESERVED ---
+// --- REDUCED HEIGHT STYLES ---
 const containerStyle: React.CSSProperties = { minHeight: '100vh', backgroundColor: '#020617', fontFamily: 'Inter, sans-serif', overflow: 'hidden' };
 const navWrapper: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 30px', position: 'fixed', top: 0, width: '100%' };
 const topRightLink: React.CSSProperties = { fontSize: '0.65rem', color: '#ffb400', fontWeight: '900', textDecoration: 'none', border: '1px solid #ffb400', padding: '6px 12px', borderRadius: '4px' };
-const cardFlexWrapper: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px' };
-const formCard: React.CSSProperties = { backgroundColor: 'white', padding: '25px', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.6)', width: '100%', maxWidth: '420px' };
-const titleStyle: React.CSSProperties = { color: '#001a35', fontWeight: '900', fontSize: '1rem', marginBottom: '15px', textAlign: 'center' };
-const inputGroup: React.CSSProperties = { textAlign: 'left', marginBottom: '12px' };
-const labelStyle: React.CSSProperties = { display: 'block', fontSize: '0.55rem', fontWeight: '900', color: '#94a3b8', marginBottom: '4px', letterSpacing: '0.5px' };
-const inputStyle: React.CSSProperties = { width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #e2e8f0', fontSize: '0.85rem', outline: 'none', color: '#001a35' };
-const readOnlyDisplay: React.CSSProperties = { width: '100%', padding: '8px 12px', borderRadius: '8px', backgroundColor: '#f8fafc', fontWeight: '800', fontSize: '0.9rem', color: '#334155', border: '1.5px dashed #cbd5e1', textAlign: 'center' };
-const btnStyle: React.CSSProperties = { width: '100%', padding: '12px', backgroundColor: '#001a35', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '900', cursor: 'pointer', fontSize: '0.8rem', marginTop: '5px' };
+const cardFlexWrapper: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '10px' };
+const formCard: React.CSSProperties = { backgroundColor: 'white', padding: '18px 25px', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.6)', width: '100%', maxWidth: '420px' };
+const titleStyle: React.CSSProperties = { color: '#001a35', fontWeight: '900', fontSize: '0.95rem', marginBottom: '10px', textAlign: 'center' };
+const inputGroup: React.CSSProperties = { textAlign: 'left', marginBottom: '10px' };
+const labelStyle: React.CSSProperties = { display: 'block', fontSize: '0.55rem', fontWeight: '900', color: '#94a3b8', marginBottom: '3px', letterSpacing: '0.5px' };
+const inputStyle: React.CSSProperties = { width: '100%', padding: '6px 12px', borderRadius: '8px', border: '1.5px solid #e2e8f0', fontSize: '0.85rem', outline: 'none', color: '#001a35' };
+const readOnlyDisplay: React.CSSProperties = { width: '100%', padding: '6px 12px', borderRadius: '8px', backgroundColor: '#f8fafc', fontWeight: '800', fontSize: '0.9rem', color: '#334155', border: '1.5px dashed #cbd5e1', textAlign: 'center' };
+const btnStyle: React.CSSProperties = { width: '100%', padding: '10px', backgroundColor: '#001a35', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '900', cursor: 'pointer', fontSize: '0.8rem', marginTop: '5px' };
 
 const statusStyle = (msg: string): React.CSSProperties => {
-  let color = '#f43f5e'; // Default Red
+  let color = '#f43f5e'; 
   let bgColor = 'transparent';
+  if (msg.includes('✅')) { color = '#10b981'; bgColor = '#ecfdf5'; }
+  else if (msg.includes('⌛') || msg.includes('Enter')) { color = '#64748b'; bgColor = 'transparent'; }
 
-  if (msg.includes('✅')) {
-    color = '#10b981'; // Green
-    bgColor = '#ecfdf5';
-  } else if (msg.includes('⌛') || msg.includes('Enter')) {
-    color = '#64748b'; // Neutral Grey/Blue
-    bgColor = 'transparent';
-  }
-
-  return {
-    marginTop: '12px',
-    fontSize: '0.7rem',
-    fontWeight: 'bold',
-    color: color,
-    textAlign: 'center',
-    padding: '6px',
-    borderRadius: '6px',
-    backgroundColor: bgColor
-  };
+  return { marginTop: '10px', fontSize: '0.7rem', fontWeight: 'bold', color: color, textAlign: 'center', padding: '4px', borderRadius: '6px', backgroundColor: bgColor };
 };
