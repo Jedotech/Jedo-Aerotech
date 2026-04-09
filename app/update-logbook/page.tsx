@@ -32,6 +32,7 @@ export default function UpdateLogbook() {
             { tail: cleanTail }
           )
           setFoundTyres(data || [])
+          // FIXED: Added Emoji so the style logic recognizes this as a 'Success' color
           setStatus(data.length > 0 ? '✅ Gear positions identified.' : '❌ Tail not found.')
         } catch (err) { setStatus('❌ Sync error.') }
       }
@@ -95,7 +96,14 @@ export default function UpdateLogbook() {
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px', marginBottom: '12px' }}>
               <div style={inputGroup}>
                 <label style={labelStyle}>AIRCRAFT REGISTRATION</label>
-                <input type="text" placeholder="e.g. VT-JED" value={tailNumber} onChange={(e) => setTailNumber(e.target.value)} style={inputStyle} required />
+                <input 
+                  type="text" 
+                  placeholder="e.g. VT-JED" 
+                  value={tailNumber} 
+                  onChange={(e) => setTailNumber(e.target.value.toUpperCase())} // Force uppercase on change
+                  style={{ ...inputStyle, textTransform: 'uppercase' }} // Force visual uppercase
+                  required 
+                />
               </div>
               <div style={inputGroup}>
                 <label style={labelStyle}>LOG DATE</label>
