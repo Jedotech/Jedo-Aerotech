@@ -27,12 +27,17 @@ export default function UpdateLogbook() {
       const cleanTail = tailNumber.trim().toUpperCase()
       if (cleanTail.length >= 4) {
         try {
+          // ARCHITECT'S FIX: Added 'status == "active"' to filter out archived/retired tyres
           const data = await readClient.fetch(
-            `*[_type == "fleetRecord" && tailNumber == $tail]{_id, tyrePosition, currentLandings}`, 
+            `*[_type == "fleetRecord" && tailNumber == $tail && status == "active"]{
+              _id, 
+              tyrePosition, 
+              currentLandings
+            }`, 
             { tail: cleanTail }
           )
           setFoundTyres(data || [])
-          setStatus(data.length > 0 ? '✅ Gear positions identified.' : '❌ Tail not found.')
+          setStatus(data.length > 0 ? '✅ Gear positions identified.' : '❌ No active tyres found.')
         } catch (err) { setStatus('❌ Sync error.') }
       }
     }
@@ -66,7 +71,6 @@ export default function UpdateLogbook() {
     )
 
     if (result.success) {
-      // ARCHITECT'S UI LOGIC: Format YYYY-MM-DD to DD-MM-YYYY for user confirmation
       const [year, month, day] = entryDate.split('-');
       const formattedDateForUser = `${day}-${month}-${year}`;
 
@@ -97,7 +101,6 @@ export default function UpdateLogbook() {
           <div style={{ height: '1px', backgroundColor: '#e2e8f0', marginBottom: '15px' }} />
           
           <form onSubmit={handleUpdate}>
-            {/* DUAL COLUMN: TAIL NUMBER & DATE */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px', marginBottom: '10px' }}>
               <div style={inputGroup}>
                 <label style={labelStyle}>AIRCRAFT REGISTRATION</label>
@@ -168,7 +171,7 @@ export default function UpdateLogbook() {
   )
 }
 
-// --- REDUCED HEIGHT STYLES ---
+// --- STYLES PRESERVED ---
 const containerStyle: React.CSSProperties = { minHeight: '100vh', backgroundColor: '#020617', fontFamily: 'Inter, sans-serif', overflow: 'hidden' };
 const navWrapper: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 30px', position: 'fixed', top: 0, width: '100%' };
 const topRightLink: React.CSSProperties = { fontSize: '0.65rem', color: '#ffb400', fontWeight: '900', textDecoration: 'none', border: '1px solid #ffb400', padding: '6px 12px', borderRadius: '4px' };
