@@ -14,19 +14,14 @@ const client = createClient({
 export default function AssetArchive() {
   const [retiredAssets, setRetiredAssets] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [exchangeRate, setExchangeRate] = useState(84.00)
+
+  // ARCHITECT'S DECISION: Static rate for historical consistency (Freeze on Failure)
+  const STATIC_EXCHANGE_RATE = 84.00;
 
   useEffect(() => {
     const storedOrg = localStorage.getItem('fleet_user_org')
     async function fetchArchive() {
       try {
-        // Fetch Live Exchange Rate for consistent CPL reporting
-        const rateRes = await fetch(`https://v6.exchangerate-api.com/v6/cf89f7b96ff3c0675edcfe39/pair/USD/INR`)
-        const rateData = await rateRes.json()
-        if (rateData.conversion_rate) {
-          setExchangeRate(rateData.conversion_rate)
-        }
-
         const data = await client.fetch(
           `*[_type == "fleetRecord" && schoolName->organization == $org && status == "retired"] | order(_updatedAt desc)`,
           { org: storedOrg }
@@ -73,8 +68,8 @@ export default function AssetArchive() {
           <tbody>
             {retiredAssets.length > 0 ? (
               retiredAssets.map(asset => {
-                // ARCHITECT'S MATH: Calculate Final CPL for the record
-                const priceINR = (asset.purchasePrice || 0) * exchangeRate;
+                // Calculation using the static historical rate
+                const priceINR = (asset.purchasePrice || 0) * STATIC_EXCHANGE_RATE;
                 const finalCpl = (priceINR > 0 && asset.currentLandings > 0) 
                   ? (priceINR / asset.currentLandings).toFixed(2) 
                   : '0.00';
@@ -91,10 +86,9 @@ export default function AssetArchive() {
                       </span>
                     </td>
                     <td style={tdStyle}>
-                      {/* HIGHLIGHTED CPL DATA POINT */}
+                      {/* LEAN CPL HIGHLIGHT */}
                       <div style={cplHighlightBox}>
-                        <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block', lineHeight: '1' }}>INR</span>
-                        <span style={{ color: '#06b6d4', fontWeight: '900', fontSize: '1rem' }}>₹{finalCpl}</span>
+                        <span style={{ color: '#06b6d4', fontWeight: '900', fontSize: '0.85rem' }}>₹{finalCpl}</span>
                       </div>
                     </td>
                     <td style={tdStyle}>
@@ -120,12 +114,11 @@ export default function AssetArchive() {
 // --- ARCHITECTURAL STYLES ---
 
 const cplHighlightBox = {
-  backgroundColor: 'rgba(6, 182, 212, 0.08)',
-  padding: '8px 12px',
-  borderRadius: '6px',
-  border: '1px solid rgba(6, 182, 212, 0.2)',
+  backgroundColor: 'rgba(6, 182, 212, 0.05)',
+  padding: '4px 10px', // Smaller padding for lean rows
+  borderRadius: '4px',
+  border: '1px solid rgba(6, 182, 212, 0.15)',
   display: 'inline-block',
-  minWidth: '80px',
   textAlign: 'center' as const
 };
 
@@ -173,7 +166,7 @@ const trStyle = {
 };
 
 const tdStyle = { 
-  padding: '18px 20px', 
+  padding: '12px 20px', // Reduced vertical padding for leaner rows
   fontSize: '0.85rem' 
 };
 
@@ -196,9 +189,9 @@ const codeStyle = {
 };
 
 const reasonBadge = (reason: string) => ({
-  fontSize: '0.6rem',
+  fontSize: '0.55rem', // Slightly smaller text
   fontWeight: '800',
-  padding: '4px 8px',
+  padding: '3px 8px',
   borderRadius: '4px',
   backgroundColor: reason === 'FOD' || reason === 'Flat Spot' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(100, 116, 139, 0.1)',
   color: reason === 'FOD' || reason === 'Flat Spot' ? '#ef4444' : '#94a3b8',
