@@ -170,6 +170,7 @@ export default function FleetHealth() {
         </div>
 
         <div style={navActionSection}>
+          <Link href="/reports" style={intelligenceBtn}>📊 INTELLIGENCE</Link>
           <Link href="/archive" style={archiveBtn}>🏛️ ARCHIVE</Link>
           <Link href="/update-logbook" style={navActionBtn}>+ LOGBOOK</Link>
           <button onClick={() => { localStorage.clear(); router.push('/login'); }} style={logoutBtn}>LOGOUT</button>
@@ -335,12 +336,13 @@ export default function FleetHealth() {
 const navBarStyle: any = { display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', padding: '18px 40px', backgroundColor: '#020617' };
 const navLogoSection = { flex: '0 0 150px' };
 const navTitleSection: any = { flex: '1', textAlign: 'center', minWidth: '300px' };
-const navActionSection = { flex: '0 0 380px', display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' };
+const navActionSection = { flex: '0 0 520px', display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' };
 const responsiveMainTitle = { fontSize: '1.2rem', fontWeight: '900', margin: 0, letterSpacing: '1.5px' };
 const telemetryText = { fontSize: '0.6rem', color: '#10b981', fontWeight: '800', margin: '2px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' };
 const pulseDot = { width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 8px #10b981' };
 const navActionBtn = { backgroundColor: '#ffb400', color: '#020617', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: '900', fontSize: '0.65rem', whiteSpace: 'nowrap' as const, letterSpacing: '0.5px' };
 const archiveBtn = { backgroundColor: '#1e293b', color: '#94a3b8', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: '800', fontSize: '0.65rem', border: '1px solid #334155' };
+const intelligenceBtn = { backgroundColor: 'rgba(6, 182, 212, 0.1)', color: '#06b6d4', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: '800', fontSize: '0.65rem', border: '1px solid rgba(6, 182, 212, 0.3)' };
 const logoutBtn = { background: 'none', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '700' };
 const summaryPanel = { backgroundColor: '#0b0f1a', padding: '40px', borderBottom: '1px solid #1e293b' };
 const summaryGrid = { maxWidth: '1440px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' };
