@@ -31,21 +31,20 @@ export default function UpdateLogbook() {
             { tail: cleanTail }
           )
           setFoundTyres(data || [])
-          setStatus(data.length > 0 ? 'Gear positions identified.' : '❌ Tail not found.')
-        } catch (err) { setStatus('Sync error.') }
+          // FIXED: Added Emoji so the style logic recognizes this as a 'Success' color
+          setStatus(data.length > 0 ? '✅ Gear positions identified.' : '❌ Tail not found.')
+        } catch (err) { setStatus('❌ Sync error.') }
       }
     }
     fetchTyres()
   }, [tailNumber])
 
-  // --- REFACTORED: SHORTER & SMARTER BUTTON LOGIC ---
   const getButtonText = () => {
     if (loading) return 'SYNCING...';
     if (!tailNumber) return 'AWAITING AIRCRAFT';
     if (foundTyres.length === 0) return 'CHECK TAIL NUMBER';
     if (!selectedTyre) return 'CHOOSE GEAR POSITION';
     
-    // Short, Smart Final Action Statement
     const pos = selectedTyre.tyrePosition.replace('Gear', '').trim().toUpperCase();
     return `UPDATE ${tailNumber.toUpperCase()} [${pos}]`;
   }
@@ -54,7 +53,7 @@ export default function UpdateLogbook() {
     e.preventDefault()
     if (!selectedTyre) return
     setLoading(true)
-    setStatus('Communicating with Jedo Vault...')
+    setStatus('⌛ Communicating with Jedo Vault...')
 
     const newTotal = (selectedTyre.currentLandings || 0) + Number(todaysActivity)
     const result = await updateTyreLandings(selectedTyre._id, newTotal)
@@ -130,6 +129,7 @@ export default function UpdateLogbook() {
               {getButtonText()}
             </button>
           </form>
+          {/* The helper function below now sees the ✅ and uses the correct color */}
           {status && <p style={statusStyle(status)}>{status}</p>}
         </div>
       </main>
@@ -149,4 +149,29 @@ const labelStyle: React.CSSProperties = { display: 'block', fontSize: '0.55rem',
 const inputStyle: React.CSSProperties = { width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1.5px solid #e2e8f0', fontSize: '0.85rem', outline: 'none', color: '#001a35' };
 const readOnlyDisplay: React.CSSProperties = { width: '100%', padding: '8px 12px', borderRadius: '8px', backgroundColor: '#f8fafc', fontWeight: '800', fontSize: '0.9rem', color: '#334155', border: '1.5px dashed #cbd5e1', textAlign: 'center' };
 const btnStyle: React.CSSProperties = { width: '100%', padding: '12px', backgroundColor: '#001a35', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '900', cursor: 'pointer', fontSize: '0.8rem', marginTop: '5px' };
-const statusStyle = (msg: string): React.CSSProperties => ({ marginTop: '12px', fontSize: '0.7rem', fontWeight: 'bold', color: msg.includes('✅') ? '#10b981' : '#f43f5e', textAlign: 'center', padding: '6px', borderRadius: '6px', backgroundColor: msg.includes('✅') ? '#ecfdf5' : 'transparent' });
+
+// ARCHITECT NOTE: The logic here specifically looks for '✅' to turn text green. 
+// If it finds '⌛' (hourglass), I've added a blue/neutral state.
+const statusStyle = (msg: string): React.CSSProperties => {
+  let color = '#f43f5e'; // Default Red
+  let bgColor = 'transparent';
+
+  if (msg.includes('✅')) {
+    color = '#10b981'; // Green
+    bgColor = '#ecfdf5';
+  } else if (msg.includes('⌛') || msg.includes('Enter')) {
+    color = '#64748b'; // Neutral Grey/Blue
+    bgColor = 'transparent';
+  }
+
+  return {
+    marginTop: '12px',
+    fontSize: '0.7rem',
+    fontWeight: 'bold',
+    color: color,
+    textAlign: 'center',
+    padding: '6px',
+    borderRadius: '6px',
+    backgroundColor: bgColor
+  };
+};
