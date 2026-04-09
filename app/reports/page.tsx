@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from 'next-sanity'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation' // Added for navigation protection
+import { useRouter } from 'next/navigation'
 
 const client = createClient({
   projectId: 'm2pa474h', 
@@ -27,7 +27,6 @@ export default function AviationIntelligence() {
   const STATIC_RATE = 84.00;
 
   useEffect(() => {
-    // SECURITY GATEKEEPER
     const isAuthorized = localStorage.getItem('fleet_access')
     const storedOrg = localStorage.getItem('fleet_user_org')
     
@@ -85,11 +84,27 @@ export default function AviationIntelligence() {
     generateReport()
   }, [router])
 
+  // --- ARCHITECT'S EXPORT LOGIC ---
+  const handleExport = () => {
+    window.print();
+  }
+
   if (loading) return <div style={loaderStyle}>GENERATING INTELLIGENCE REPORT...</div>
 
   return (
     <div style={{ backgroundColor: '#020617', minHeight: '100vh', color: 'white', padding: '40px', fontFamily: 'Inter, sans-serif' }}>
       
+      {/* CSS Injection for Print Formatting */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          body { background-color: white !important; color: black !important; }
+          .no-print { display: none !important; }
+          div { border-color: #e2e8f0 !important; }
+          h1, h2, h3, span, p { color: black !important; }
+          span[style*="color: rgb(6, 182, 212)"] { color: #0891b2 !important; }
+        }
+      `}} />
+
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
         <div>
           <h1 style={{ fontSize: '1.4rem', fontWeight: '900', margin: 0, letterSpacing: '1px' }}>
@@ -99,10 +114,12 @@ export default function AviationIntelligence() {
             DATA-DRIVEN PERFORMANCE ANALYSIS
           </p>
         </div>
-        <Link href="/fleet-health" style={backButtonStyle}>RETURN TO COMMAND</Link>
+        <div className="no-print" style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={handleExport} style={exportButtonStyle}>📥 EXPORT TO PDF</button>
+          <Link href="/fleet-health" style={backButtonStyle}>RETURN TO COMMAND</Link>
+        </div>
       </header>
 
-      {/* KPI GRID */}
       <div style={kpiGrid}>
         <div style={kpiCard}>
           <span style={kpiLabel}>TOTAL MANAGED LANDINGS</span>
@@ -171,4 +188,5 @@ const analyticsBox = { backgroundColor: '#0b0f1a', padding: '30px', borderRadius
 const boxTitle = { fontSize: '0.7rem', fontWeight: '900', color: '#64748b', letterSpacing: '1.5px', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '10px' };
 const dataRow = { display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.03)', fontSize: '0.85rem' };
 const backButtonStyle = { backgroundColor: 'transparent', color: '#ffb400', textDecoration: 'none', padding: '8px 20px', borderRadius: '6px', fontSize: '0.65rem', fontWeight: '900', border: '1px solid #ffb400' };
+const exportButtonStyle = { backgroundColor: '#ffb400', color: '#020617', border: 'none', padding: '8px 20px', borderRadius: '6px', fontSize: '0.65rem', fontWeight: '900', cursor: 'pointer' };
 const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#020617', color: '#ffb400', fontWeight: '900', letterSpacing: '3px' };
