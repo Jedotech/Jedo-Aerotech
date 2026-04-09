@@ -55,10 +55,16 @@ export default function UpdateLogbook() {
     setLoading(true)
     setStatus('⌛ Communicating with Jedo Vault...')
     
-    const auditNote = `[${entryDate}] Added ${todaysActivity} LNDG. Note: ${comments || 'Routine ops'}`;
+    // ARCHITECT'S LOGIC: Data points bundled for the 'auditLog' catcher
     const newTotal = (selectedTyre.currentLandings || 0) + Number(todaysActivity)
     
-    const result = await updateTyreLandings(selectedTyre._id, newTotal, auditNote)
+    const result = await updateTyreLandings(
+      selectedTyre._id, 
+      newTotal, 
+      Number(todaysActivity), 
+      entryDate, 
+      comments
+    )
 
     if (result.success) {
       setStatus(`✅ Entry logged for ${entryDate}`)
@@ -88,6 +94,7 @@ export default function UpdateLogbook() {
           <div style={{ height: '1px', backgroundColor: '#e2e8f0', marginBottom: '15px' }} />
           
           <form onSubmit={handleUpdate}>
+            {/* DUAL COLUMN: TAIL NUMBER & DATE */}
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px', marginBottom: '10px' }}>
               <div style={inputGroup}>
                 <label style={labelStyle}>AIRCRAFT REGISTRATION</label>
