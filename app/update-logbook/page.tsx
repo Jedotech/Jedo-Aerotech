@@ -107,7 +107,14 @@ export default function UpdateLogbook() {
               </div>
               <div style={inputGroup}>
                 <label style={labelStyle}>LOG DATE</label>
-                <input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} style={inputStyle} required />
+                <input 
+                  type="date" 
+                  value={entryDate} 
+                  onChange={(e) => setEntryDate(e.target.value)} 
+                  style={inputStyle} 
+                  max={new Date().toISOString().split('T')[0]} // NEW: Blocks any date in the future
+                  required 
+                />
               </div>
             </div>
 
