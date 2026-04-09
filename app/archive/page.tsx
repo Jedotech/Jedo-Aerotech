@@ -91,7 +91,11 @@ export default function AssetArchive() {
                       </span>
                     </td>
                     <td style={tdStyle}>
-                      <span style={{ color: '#06b6d4', fontWeight: '700' }}>₹{finalCpl}</span>
+                      {/* HIGHLIGHTED CPL DATA POINT */}
+                      <div style={cplHighlightBox}>
+                        <span style={{ fontSize: '0.6rem', color: '#64748b', display: 'block', lineHeight: '1' }}>INR</span>
+                        <span style={{ color: '#06b6d4', fontWeight: '900', fontSize: '1rem' }}>₹{finalCpl}</span>
+                      </div>
                     </td>
                     <td style={tdStyle}>
                       <span style={reasonBadge(asset.removalReason)}>
@@ -114,6 +118,16 @@ export default function AssetArchive() {
 }
 
 // --- ARCHITECTURAL STYLES ---
+
+const cplHighlightBox = {
+  backgroundColor: 'rgba(6, 182, 212, 0.08)',
+  padding: '8px 12px',
+  borderRadius: '6px',
+  border: '1px solid rgba(6, 182, 212, 0.2)',
+  display: 'inline-block',
+  minWidth: '80px',
+  textAlign: 'center' as const
+};
 
 const headingStyle = { 
   fontSize: '1.8rem', 
