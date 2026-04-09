@@ -45,7 +45,7 @@ export default function AssetArchive() {
           <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '5px', letterSpacing: '1px' }}>CERTIFIED RECORD OF DECOMMISSIONED COMPONENTS</p>
         </div>
         
-        {/* REFACTORED BACK LINK: Clean, Professional Ghost Button */}
+        {/* REFACTORED BACK LINK: Updated to Gold Color */}
         <Link href="/fleet-health" style={backButtonStyle}>
           RETURN TO LIVE COMMAND
         </Link>
@@ -101,14 +101,14 @@ const headingStyle = {
 };
 
 const backButtonStyle = { 
-  backgroundColor: 'rgba(255,255,255,0.03)',
-  color: '#94a3b8',
+  backgroundColor: 'rgba(255, 180, 0, 0.05)',
+  color: '#ffb400', // GOLD COLOR UPDATED
   textDecoration: 'none',
   padding: '10px 20px',
   borderRadius: '8px',
   fontSize: '0.65rem',
   fontWeight: '800',
-  border: '1px solid #1e293b',
+  border: '1px solid #ffb400', // GOLD COLOR UPDATED
   transition: 'all 0.2s ease',
   letterSpacing: '1px'
 };
