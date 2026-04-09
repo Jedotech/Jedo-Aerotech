@@ -3,6 +3,7 @@ import fleetRecord from './fleetRecord'
 import client from './client'
 import purchase from './purchase'
 import fleetUser from './fleetUser'     
+import aircraft from './aircraft' // NEW: Aircraft Registry Source
 
 /**
  * The Master Schema List for Jedo Admin
@@ -15,7 +16,8 @@ export const schemaTypes = [
   fleetRecord, 
   client, 
   purchase,
-  fleetUser 
+  fleetUser,
+  aircraft // NEW: Added to the global schema list
 ]
 
 // Default export for the Sanity Config
