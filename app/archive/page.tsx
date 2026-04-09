@@ -14,12 +14,19 @@ const client = createClient({
 export default function AssetArchive() {
   const [retiredAssets, setRetiredAssets] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [exchangeRate, setExchangeRate] = useState(84.00)
 
   useEffect(() => {
     const storedOrg = localStorage.getItem('fleet_user_org')
     async function fetchArchive() {
       try {
-        // Updated query to explicitly pull partNumber
+        // Fetch Live Exchange Rate for consistent CPL reporting
+        const rateRes = await fetch(`https://v6.exchangerate-api.com/v6/cf89f7b96ff3c0675edcfe39/pair/USD/INR`)
+        const rateData = await rateRes.json()
+        if (rateData.conversion_rate) {
+          setExchangeRate(rateData.conversion_rate)
+        }
+
         const data = await client.fetch(
           `*[_type == "fleetRecord" && schoolName->organization == $org && status == "retired"] | order(_updatedAt desc)`,
           { org: storedOrg }
@@ -45,7 +52,6 @@ export default function AssetArchive() {
           <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '5px', letterSpacing: '1px' }}>CERTIFIED RECORD OF DECOMMISSIONED COMPONENTS</p>
         </div>
         
-        {/* REFACTORED BACK LINK: Updated to Gold Color */}
         <Link href="/fleet-health" style={backButtonStyle}>
           RETURN TO LIVE COMMAND
         </Link>
@@ -60,32 +66,44 @@ export default function AssetArchive() {
               <th style={thStyle}>PART NUMBER (P/N)</th>
               <th style={thStyle}>SERIAL NUMBER (S/N)</th>
               <th style={thStyle}>FINAL / DESIGN LIFE</th>
+              <th style={thStyle}>FINAL CPL</th>
               <th style={thStyle}>REMOVAL REASON</th>
             </tr>
           </thead>
           <tbody>
             {retiredAssets.length > 0 ? (
-              retiredAssets.map(asset => (
-                <tr key={asset._id} style={trStyle}>
-                  <td style={tdStyle}><span style={tailBadge}>{asset.tailNumber}</span></td>
-                  <td style={tdStyle}>{asset.manufacturer} <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>{asset.tyreModel}</span></td>
-                  <td style={tdStyle}><code style={codeStyle}>{asset.partNumber || 'N/A'}</code></td>
-                  <td style={tdStyle}><code style={codeStyle}>{asset.serialNumber}</code></td>
-                  <td style={tdStyle}>
-                    <span style={{ fontWeight: '700' }}>
-                        {asset.currentLandings || 0} / {asset.maxDesignLife || 300}
-                    </span>
-                  </td>
-                  <td style={tdStyle}>
-                    <span style={reasonBadge(asset.removalReason)}>
-                      {asset.removalReason?.toUpperCase() || 'NORMAL WEAR'}
-                    </span>
-                  </td>
-                </tr>
-              ))
+              retiredAssets.map(asset => {
+                // ARCHITECT'S MATH: Calculate Final CPL for the record
+                const priceINR = (asset.purchasePrice || 0) * exchangeRate;
+                const finalCpl = (priceINR > 0 && asset.currentLandings > 0) 
+                  ? (priceINR / asset.currentLandings).toFixed(2) 
+                  : '0.00';
+
+                return (
+                  <tr key={asset._id} style={trStyle}>
+                    <td style={tdStyle}><span style={tailBadge}>{asset.tailNumber}</span></td>
+                    <td style={tdStyle}>{asset.manufacturer} <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>{asset.tyreModel}</span></td>
+                    <td style={tdStyle}><code style={codeStyle}>{asset.partNumber || 'N/A'}</code></td>
+                    <td style={tdStyle}><code style={codeStyle}>{asset.serialNumber}</code></td>
+                    <td style={tdStyle}>
+                      <span style={{ fontWeight: '700' }}>
+                          {asset.currentLandings || 0} / {asset.maxDesignLife || 300}
+                      </span>
+                    </td>
+                    <td style={tdStyle}>
+                      <span style={{ color: '#06b6d4', fontWeight: '700' }}>₹{finalCpl}</span>
+                    </td>
+                    <td style={tdStyle}>
+                      <span style={reasonBadge(asset.removalReason)}>
+                        {asset.removalReason?.toUpperCase() || 'NORMAL WEAR'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
-                <td colSpan={6} style={{ padding: '100px', textAlign: 'center', color: '#475569' }}>NO ARCHIVED RECORDS FOUND FOR THIS ORGANIZATION</td>
+                <td colSpan={7} style={{ padding: '100px', textAlign: 'center', color: '#475569' }}>NO ARCHIVED RECORDS FOUND FOR THIS ORGANIZATION</td>
               </tr>
             )}
           </tbody>
@@ -106,13 +124,13 @@ const headingStyle = {
 
 const backButtonStyle = { 
   backgroundColor: 'rgba(255, 180, 0, 0.05)',
-  color: '#ffb400', // GOLD COLOR UPDATED
+  color: '#ffb400',
   textDecoration: 'none',
   padding: '10px 20px',
   borderRadius: '8px',
   fontSize: '0.65rem',
   fontWeight: '800',
-  border: '1px solid #ffb400', // GOLD COLOR UPDATED
+  border: '1px solid #ffb400',
   transition: 'all 0.2s ease',
   letterSpacing: '1px'
 };
