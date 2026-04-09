@@ -59,7 +59,7 @@ export default function AssetArchive() {
               <th style={thStyle}>BRAND / MODEL</th>
               <th style={thStyle}>PART NUMBER (P/N)</th>
               <th style={thStyle}>SERIAL NUMBER (S/N)</th>
-              <th style={thStyle}>FINAL LNDG</th>
+              <th style={thStyle}>FINAL / DESIGN LIFE</th>
               <th style={thStyle}>REMOVAL REASON</th>
             </tr>
           </thead>
@@ -71,7 +71,11 @@ export default function AssetArchive() {
                   <td style={tdStyle}>{asset.manufacturer} <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>{asset.tyreModel}</span></td>
                   <td style={tdStyle}><code style={codeStyle}>{asset.partNumber || 'N/A'}</code></td>
                   <td style={tdStyle}><code style={codeStyle}>{asset.serialNumber}</code></td>
-                  <td style={tdStyle}><span style={{ fontWeight: '700' }}>{asset.currentLandings}</span></td>
+                  <td style={tdStyle}>
+                    <span style={{ fontWeight: '700' }}>
+                        {asset.currentLandings || 0} / {asset.maxDesignLife || 300}
+                    </span>
+                  </td>
                   <td style={tdStyle}>
                     <span style={reasonBadge(asset.removalReason)}>
                       {asset.removalReason?.toUpperCase() || 'NORMAL WEAR'}
