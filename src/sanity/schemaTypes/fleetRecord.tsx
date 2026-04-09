@@ -7,6 +7,16 @@ export default defineType({
   type: 'document',
   icon: ActivityIcon,
   fields: [
+    // --- NEW: RELATIONAL AIRCRAFT REFERENCE ---
+    defineField({
+      name: 'aircraft',
+      title: 'Assigned Aircraft',
+      type: 'reference',
+      to: [{ type: 'aircraft' }],
+      description: 'Select the aircraft from the registry to sync model and tail data.',
+      validation: (Rule) => Rule.required(),
+    }),
+
     // --- ORGANIZATION REFERENCE ---
     defineField({
       name: 'schoolName',
@@ -15,22 +25,6 @@ export default defineType({
       to: [{ type: 'fleetUser' }],
       weak: true,
       validation: (Rule) => Rule.required(),
-    }),
-
-    defineField({
-      name: 'tailNumber',
-      title: 'Registration / Tail Number',
-      type: 'string',
-      validation: (Rule) => Rule.required(),
-    }),
-
-    defineField({
-      name: 'aircraftModel',
-      title: 'Aircraft Model',
-      type: 'string',
-      options: {
-        list: ['Cessna 172', 'Cessna 152', 'Piper Archer', 'Beechcraft Baron'],
-      },
     }),
 
     defineField({
@@ -53,7 +47,6 @@ export default defineType({
       },
     }),
 
-    // --- SOURCING & COMPLIANCE AUTHORITY (REBRANDED) ---
     defineField({
       name: 'vendorName',
       title: 'Sourcing & Compliance Authority',
@@ -70,6 +63,27 @@ export default defineType({
       options: {
         list: ['Nose Gear', 'Main Left', 'Main Right'],
       },
+      // ARCHITECT'S GUARD: Prevents two active tyres in the same position on one plane
+      validation: (Rule) => Rule.custom(async (value, context) => {
+        const { document, getClient } = context;
+        const client = getClient({ apiVersion: '2023-05-03' });
+        
+        if (!value || document?.status === 'retired' || !document?.aircraft?._ref) return true;
+
+        const query = `count(*[_type == "fleetRecord" && 
+                              aircraft._ref == $aircraftRef && 
+                              tyrePosition == $pos && 
+                              status == "active" && 
+                              _id != $currentId])`;
+        
+        const count = await client.fetch(query, {
+          aircraftRef: document.aircraft._ref,
+          pos: value,
+          currentId: document._id.replace('drafts.', '')
+        });
+
+        return count > 0 ? `This aircraft already has an active tyre in the ${value} position.` : true;
+      }),
     }),
 
     defineField({
@@ -98,7 +112,6 @@ export default defineType({
       type: 'number',
     }),
 
-    // --- PURCHASE DETAILS ---
     defineField({
       name: 'purchasePrice',
       title: 'Acquisition Cost (USD)',
@@ -111,7 +124,6 @@ export default defineType({
       type: 'string',
     }),
 
-    // --- STRUCTURED HISTORICAL AUDIT LOG ---
     defineField({
       name: 'auditLog',
       title: 'Maintenance Audit Log',
@@ -134,7 +146,6 @@ export default defineType({
       type: 'string',
     }),
 
-    // --- MRO ANALYTICS & ASSET TRACKING ---
     defineField({
       name: 'serialNumber',
       title: 'Tyre Serial Number (S/N)',
@@ -188,7 +199,6 @@ export default defineType({
       },
     }),
 
-    // --- AUTOMATION MEMORY FIELD ---
     defineField({
       name: 'lastAlertMilestone',
       title: 'Last Alert Milestone',
@@ -199,7 +209,6 @@ export default defineType({
     }),
   ],
 
-  // --- SORTING CONFIGURATION ---
   orderings: [
     {
       title: 'Aviation School (A-Z)',
@@ -213,20 +222,19 @@ export default defineType({
     },
   ],
 
-  // --- PREVIEW ---
   preview: {
     select: {
-      title: 'tailNumber',
+      tail: 'aircraft.tailNumber',
       orgName: 'schoolName.organization',
       pos: 'tyrePosition',
       status: 'status',
       sn: 'serialNumber',
     },
-    prepare({ title, orgName, pos, status, sn }) {
+    prepare({ tail, orgName, pos, status, sn }) {
       const statusIcon = status === 'retired' ? '📁 [ARCHIVED] ' : '';
       const serialLabel = sn ? ` | S/N: ${sn}` : '';
       return {
-        title: `${statusIcon}${title}${serialLabel}`,
+        title: `${statusIcon}${tail || 'Unassigned'}${serialLabel}`,
         subtitle: `${pos || 'Gear'} | ${orgName || 'Loading School...'}`
       }
     }
