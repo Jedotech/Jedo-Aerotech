@@ -12,7 +12,8 @@ const serverClient = createClient({
 
 /**
  * Updates the accumulated landings and appends a structured entry 
- * to the historical Audit Log.
+ * to the historical Audit Log. Includes a safety check to initialize
+ * the array if it is empty.
  */
 export async function updateTyreLandings(
   tyreId: string, 
@@ -22,15 +23,20 @@ export async function updateTyreLandings(
   notes: string
 ) {
   try {
+    // 1. Prepare the new log entry
+    const newEntry = {
+      _key: Math.random().toString(36).substring(2, 11), // Required unique key
+      date: logDate,
+      landingsAdded: Number(landingsAdded),
+      notes: notes || 'Routine update'
+    };
+
+    // 2. Execute atomic patch with safety initialization
     await serverClient
       .patch(tyreId)
-      .set({ currentLandings: newTotal }) // Updates the main counter
-      .insert('after', 'auditLog[-1]', [{ // Appends new object to the history array
-        _key: Math.random().toString(36).substring(2, 11), // Required unique key for Sanity arrays
-        date: logDate,
-        landingsAdded: Number(landingsAdded),
-        notes: notes || 'Routine update'
-      }])
+      .set({ currentLandings: newTotal }) // Update the master counter
+      .setIfMissing({ auditLog: [] })     // CRITICAL: Ensure array exists first
+      .insert('after', 'auditLog[-1]', [newEntry]) // Push to the end of the log
       .commit()
 
     return { success: true }
