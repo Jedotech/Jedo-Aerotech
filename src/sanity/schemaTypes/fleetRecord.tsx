@@ -118,6 +118,23 @@ export default defineType({
       of: [{ type: 'string' }],
     }),
 
+    // --- NEW: HISTORICAL AUDIT LOG ---
+    defineField({
+      name: 'auditLog',
+      title: 'Maintenance Audit Log',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'date', type: 'date', title: 'Log Date' },
+            { name: 'landingsAdded', type: 'number', title: 'Landings Added' },
+            { name: 'notes', type: 'text', title: 'Factors/Comments' }
+          ]
+        }
+      ]
+    }),
+
     defineField({
       name: 'operatorEmail',
       title: 'Owner / Maintenance Email',
