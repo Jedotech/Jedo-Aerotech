@@ -31,20 +31,23 @@ export default function UpdateLogbook() {
             { tail: cleanTail }
           )
           setFoundTyres(data || [])
-          setStatus(data.length > 0 ? 'Select Position' : '❌ No tyres found.')
-        } catch (err) { setStatus('Connection Error') }
+          setStatus(data.length > 0 ? 'Gear positions identified.' : '❌ Tail not found.')
+        } catch (err) { setStatus('Sync error.') }
       }
     }
     fetchTyres()
   }, [tailNumber])
 
-  // --- ARCHITECT'S DYNAMIC BUTTON LOGIC ---
+  // --- REFACTORED: SHORTER & SMARTER BUTTON LOGIC ---
   const getButtonText = () => {
-    if (loading) return 'SYNCING SECURELY...';
-    if (!tailNumber) return 'AWAITING AIRCRAFT ID';
-    if (foundTyres.length === 0) return 'VALIDATE TAIL NUMBER';
-    if (!selectedTyre) return 'SELECT POSITION';
-    return `SYNC ${selectedTyre.tyrePosition.toUpperCase()} FOR ${tailNumber.toUpperCase()}`;
+    if (loading) return 'SYNCING...';
+    if (!tailNumber) return 'AWAITING AIRCRAFT';
+    if (foundTyres.length === 0) return 'CHECK TAIL NUMBER';
+    if (!selectedTyre) return 'CHOOSE GEAR POSITION';
+    
+    // Short, Smart Final Action Statement
+    const pos = selectedTyre.tyrePosition.replace('Gear', '').trim().toUpperCase();
+    return `UPDATE ${tailNumber.toUpperCase()} [${pos}]`;
   }
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -57,14 +60,14 @@ export default function UpdateLogbook() {
     const result = await updateTyreLandings(selectedTyre._id, newTotal)
 
     if (result.success) {
-      setStatus(`✅ SUCCESS: ${selectedTyre.tyrePosition} Updated for ${tailNumber.toUpperCase()}`)
+      setStatus(`✅ ${selectedTyre.tyrePosition} Synced for ${tailNumber.toUpperCase()}`)
       setTodaysActivity(''); 
       setTailNumber(''); 
       setSelectedTyre(null); 
       setFoundTyres([]);
       setComments(''); 
     } else {
-      setStatus('❌ SYNC FAILED. Please contact AJ.')
+      setStatus('❌ SYNC FAILED.')
     }
     setLoading(false)
   }
@@ -90,14 +93,14 @@ export default function UpdateLogbook() {
             </div>
 
             <div style={inputGroup}>
-              <label style={labelStyle}>TYRE POSITION</label>
+              <label style={labelStyle}>GEAR POSITION</label>
               <select 
                 style={inputStyle} 
                 onChange={(e) => setSelectedTyre(foundTyres.find(t => t._id === e.target.value))} 
                 required
                 disabled={foundTyres.length === 0}
               >
-                <option value="">{foundTyres.length > 0 ? '-- Choose Position --' : 'Enter valid Tail Number...'}</option>
+                <option value="">{foundTyres.length > 0 ? '-- Select Position --' : 'Awaiting aircraft ID...'}</option>
                 {foundTyres.map(t => <option key={t._id} value={t._id}>{t.tyrePosition}</option>)}
               </select>
             </div>
@@ -116,7 +119,7 @@ export default function UpdateLogbook() {
             <div style={inputGroup}>
               <label style={labelStyle}>MAINTENANCE COMMENTS (OPTIONAL)</label>
               <textarea 
-                placeholder="Note any FOD, pressure checks, or wear patterns..." 
+                placeholder="Note any FOD or wear patterns..." 
                 value={comments} 
                 onChange={(e) => setComments(e.target.value)} 
                 style={{ ...inputStyle, minHeight: '45px', fontSize: '0.85rem' }} 
@@ -134,7 +137,7 @@ export default function UpdateLogbook() {
   )
 }
 
-// --- STYLES PRESERVED WITH MINOR TWEAKS ---
+// --- STYLES PRESERVED ---
 const containerStyle: React.CSSProperties = { minHeight: '100vh', backgroundColor: '#020617', fontFamily: 'Inter, sans-serif', overflow: 'hidden' };
 const navWrapper: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 30px', position: 'fixed', top: 0, width: '100%' };
 const topRightLink: React.CSSProperties = { fontSize: '0.65rem', color: '#ffb400', fontWeight: '900', textDecoration: 'none', border: '1px solid #ffb400', padding: '6px 12px', borderRadius: '4px' };
