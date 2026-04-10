@@ -27,29 +27,14 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const code = accessCode.trim().toUpperCase()
+    const code = accessCode.trim()
 
     try {
-      // 1. Check for the new Fly High School static credential
-      if (code === 'AJ747') {
-        localStorage.setItem('fleet_access', 'true')
-        localStorage.setItem('fleet_user_org', 'Fly High School')
-        router.push('/fleet-health')
-        return
-      }
-
-      // 2. Check for the general master keys (Legacy)
-      if (code === 'CFC2026' || code === 'JEDO99') {
-        localStorage.setItem('fleet_access', 'true')
-        localStorage.setItem('fleet_user_org', 'Authorized Operator')
-        router.push('/fleet-health')
-        return
-      }
-
-      // 3. Check for dynamic users in Sanity database
+      // DYNAMIC AUTHENTICATION: Check for users in Sanity database ONLY
+      // This ensures that deleting a record in Sanity actually revokes access.
       const user = await client.fetch(
         `*[_type == "fleetUser" && accessCode == $code][0]`,
-        { code: accessCode.trim() }
+        { code: code }
       )
 
       if (user) {
@@ -138,7 +123,7 @@ export default function LoginPage() {
   )
 }
 
-// --- PROFESSIONAL STYLING ---
+// --- PROFESSIONAL STYLING PRESERVED ---
 const containerStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
