@@ -30,17 +30,30 @@ export default function LoginPage() {
     const code = accessCode.trim()
 
     try {
-      // DYNAMIC AUTHENTICATION: Check for users in Sanity database ONLY
-      // This ensures that deleting a record in Sanity actually revokes access.
+      // DYNAMIC AUTHENTICATION: Fetching user and checking role
       const user = await client.fetch(
-        `*[_type == "fleetUser" && accessCode == $code][0]`,
+        `*[_type == "fleetUser" && accessCode == $code][0]{
+          organization,
+          role
+        }`,
         { code: code }
       )
 
       if (user) {
+        // 1. Set Auth Flags
         localStorage.setItem('fleet_access', 'true')
         localStorage.setItem('fleet_user_org', user.organization || 'Authorized User')
-        router.push('/fleet-health')
+        
+        // 2. Set Role Flag for the God View security check
+        const userRole = user.role?.toUpperCase() || 'OPERATOR';
+        localStorage.setItem('jedo_user_role', userRole)
+
+        // 3. Smart Redirect Logic
+        if (userRole === 'ADMIN') {
+          router.push('/admin-intelligence')
+        } else {
+          router.push('/fleet-health')
+        }
       } else {
         setError('Invalid Access Code. Please contact Jedo Logistics.')
       }
@@ -123,7 +136,7 @@ export default function LoginPage() {
   )
 }
 
-// --- PROFESSIONAL STYLING PRESERVED ---
+// --- PROFESSIONAL STYLING (PRESERVED) ---
 const containerStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
