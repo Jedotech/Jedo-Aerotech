@@ -63,14 +63,26 @@ export default function FleetHealth() {
           setExchangeRate(rateData.conversion_rate)
         }
 
-        // 2. Fetch Fleet Data (Active Only)
+        // 2. Fetch Fleet Data (Multi-Tenant Aware)
+        // ARCHITECT'S FIX: Updated query to check schoolName->organization
         const data = await client.fetch(
           `*[_type == "fleetRecord" && schoolName->organization == $org && status == "active"] | order(tailNumber asc) {
-            ...,
-            "vendorName": vendorName,
-            "serialNumber": serialNumber,
-            "retreadStatus": retreadStatus,
-            "tyreModel": tyreModel
+            _id,
+            "tailNumber": aircraft->tailNumber,
+            "aircraftModel": aircraft->model,
+            manufacturer,
+            tyreModel,
+            partNumber,
+            tyrePosition,
+            currentLandings,
+            maxDesignLife,
+            purchasePrice,
+            dailyUtilization,
+            operatorEmail,
+            serialNumber,
+            retreadStatus,
+            vendorName,
+            status
           }`,
           { org: storedOrg }
         )
@@ -87,7 +99,7 @@ export default function FleetHealth() {
 
   // --- HEALTH LOGIC ---
   const calculateHealth = (current: number, max: number) => {
-    const percentage = ((max - (current || 0)) / max) * 100;
+    const percentage = ((max - (current || 0)) / (max || 1)) * 100;
     return Math.max(0, Math.min(100, percentage));
   }
 
@@ -97,11 +109,13 @@ export default function FleetHealth() {
     return '#10b981'; // HEALTHY (Green)
   }
 
+  // ARCHITECT'S FIX: Added safety check for undefined tailNumbers
   const groupedFleet = assets.reduce((acc, asset) => {
-    if (!acc[asset.tailNumber]) {
-      acc[asset.tailNumber] = { model: asset.aircraftModel, tyres: [] };
+    const tail = asset.tailNumber || 'UNASSIGNED';
+    if (!acc[tail]) {
+      acc[tail] = { model: asset.aircraftModel || 'UNKNOWN MODEL', tyres: [] };
     }
-    acc[asset.tailNumber].tyres.push(asset);
+    acc[tail].tyres.push(asset);
     return acc;
   }, {} as Record<string, { model: string, tyres: FleetAsset[] }>);
 
@@ -159,7 +173,7 @@ export default function FleetHealth() {
         <div style={navTitleSection}>
           <h1 style={responsiveMainTitle}>
             <span style={{ color: '#06b6d4', textShadow: '0 0 12px rgba(6, 182, 212, 0.4)' }}>
-              {orgName.toUpperCase()}
+              {orgName?.toUpperCase() || 'OPERATOR'}
             </span> 
             <span style={{ color: '#475569', margin: '0 15px', fontWeight: '300' }}>/</span> 
             <span style={{ color: '#f8fafc', opacity: 0.9 }}>FLEET COMMAND</span>
@@ -222,7 +236,7 @@ export default function FleetHealth() {
               <div style={aircraftHeader}>
                 <div>
                   <h2 style={tailText}>{tail}</h2>
-                  <p style={modelText}>{data.model.toUpperCase()}</p>
+                  <p style={modelText}>{data.model?.toUpperCase() || 'N/A'}</p>
                 </div>
                 <div style={activeBadge}>MONITORING</div>
               </div>
@@ -240,7 +254,6 @@ export default function FleetHealth() {
                   };
                   const posCode = posCodeMap[tyre.tyrePosition || ''] || '??';
 
-                  // CPL CALCULATION: (USD Price * Exchange Rate) / Accumulated Landings
                   const priceINR = (tyre.purchasePrice || 0) * exchangeRate;
                   const cpl = (priceINR > 0 && tyre.currentLandings > 0) 
                     ? (priceINR / tyre.currentLandings).toFixed(2) 
@@ -254,7 +267,7 @@ export default function FleetHealth() {
                       
                       <div style={{ flexGrow: 1, minWidth: '120px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4px' }}>
-                            <span style={makeLabel}>{tyre.manufacturer} {tyre.tyreModel && `- ${tyre.tyreModel}`} ({tyre.retreadStatus || 'New'})</span>
+                            <span style={makeLabel}>{tyre.manufacturer || 'Unknown'} {tyre.tyreModel && `- ${tyre.tyreModel}`} ({tyre.retreadStatus || 'New'})</span>
                             <span style={pnLabel}>S/N: {tyre.serialNumber || 'TBD'}</span>
                         </div>
                         <div style={assetProgressWrapper}>
@@ -263,7 +276,6 @@ export default function FleetHealth() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', alignItems: 'center' }}>
                           <p style={{ margin: 0, fontSize: '0.5rem', color: '#64748b' }}>P/N: {tyre.partNumber || 'TBD'}</p>
                           
-                          {/* CPL BADGE */}
                           <div style={{ 
                             backgroundColor: 'rgba(6, 182, 212, 0.1)', 
                             padding: '2px 6px', 
