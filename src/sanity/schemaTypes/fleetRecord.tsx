@@ -7,17 +7,7 @@ export default defineType({
   type: 'document',
   icon: ActivityIcon,
   fields: [
-    // --- NEW: RELATIONAL AIRCRAFT REFERENCE ---
-    defineField({
-      name: 'aircraft',
-      title: 'Assigned Aircraft',
-      type: 'reference',
-      to: [{ type: 'aircraft' }],
-      description: 'Select the aircraft from the registry to sync model and tail data.',
-      validation: (Rule) => Rule.required(),
-    }),
-
-    // --- ORGANIZATION REFERENCE ---
+    // --- NEW: THE MULTI-TENANT ANCHOR (Organization Reference) ---
     defineField({
       name: 'schoolName',
       title: 'Aviation School / Organization',
@@ -25,6 +15,26 @@ export default defineType({
       to: [{ type: 'fleetUser' }],
       weak: true,
       validation: (Rule) => Rule.required(),
+    }),
+
+    // --- RELATIONAL AIRCRAFT REFERENCE ---
+    defineField({
+      name: 'aircraft',
+      title: 'Assigned Aircraft',
+      type: 'reference',
+      to: [{ type: 'aircraft' }],
+      description: 'Select the aircraft from the registry to sync model and tail data.',
+      validation: (Rule) => Rule.required(),
+      // ARCHITECT'S TIP: Filters aircraft list to only show planes belonging to the selected school
+      options: {
+        filter: ({ document }) => {
+          if (!document.schoolName) return {}
+          return {
+            filter: 'schoolName._ref == $schoolRef',
+            params: { schoolRef: document.schoolName._ref },
+          }
+        },
+      },
     }),
 
     defineField({
