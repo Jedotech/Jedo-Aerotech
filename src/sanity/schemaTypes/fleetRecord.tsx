@@ -25,12 +25,11 @@ export default defineType({
       to: [{ type: 'aircraft' }],
       description: 'Select the aircraft from the registry to sync model and tail data.',
       validation: (Rule) => Rule.required(),
-      // ARCHITECT'S FIX: The filter now checks for either 'schoolName' or 'organization' fields 
-      // in the aircraft document to ensure compatibility with your Registry.
       options: {
         filter: ({ document }) => {
           if (!document.schoolName) return {}
           return {
+            // Checks both potential field names in the aircraft document for maximum compatibility
             filter: '(schoolName._ref == $schoolRef || organization._ref == $schoolRef)',
             params: { schoolRef: document.schoolName._ref },
           }
@@ -74,22 +73,25 @@ export default defineType({
       options: {
         list: ['Nose Gear', 'Main Left', 'Main Right'],
       },
+      // ARCHITECT'S GUARD: Optimized to ignore the current document/draft during validation
       validation: (Rule) => Rule.custom(async (value, context) => {
         const { document, getClient } = context;
         const client = getClient({ apiVersion: '2023-05-03' });
         
         if (!value || document?.status === 'retired' || !document?.aircraft?._ref) return true;
 
+        const currentId = document._id.replace('drafts.', '');
+
         const query = `count(*[_type == "fleetRecord" && 
                               aircraft._ref == $aircraftRef && 
                               tyrePosition == $pos && 
                               status == "active" && 
-                              _id != $currentId])`;
+                              !(_id in [$id, "drafts." + $id])])`;
         
         const count = await client.fetch(query, {
           aircraftRef: document.aircraft._ref,
           pos: value,
-          currentId: document._id.replace('drafts.', '')
+          id: currentId
         });
 
         return count > 0 ? `This aircraft already has an active tyre in the ${value} position.` : true;
