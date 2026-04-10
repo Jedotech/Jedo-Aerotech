@@ -7,7 +7,7 @@ export default defineType({
   type: 'document',
   icon: ActivityIcon,
   fields: [
-    // --- NEW: THE MULTI-TENANT ANCHOR (Organization Reference) ---
+    // --- ORGANIZATION REFERENCE ---
     defineField({
       name: 'schoolName',
       title: 'Aviation School / Organization',
@@ -25,12 +25,13 @@ export default defineType({
       to: [{ type: 'aircraft' }],
       description: 'Select the aircraft from the registry to sync model and tail data.',
       validation: (Rule) => Rule.required(),
-      // ARCHITECT'S TIP: Filters aircraft list to only show planes belonging to the selected school
+      // ARCHITECT'S FIX: The filter now checks for either 'schoolName' or 'organization' fields 
+      // in the aircraft document to ensure compatibility with your Registry.
       options: {
         filter: ({ document }) => {
           if (!document.schoolName) return {}
           return {
-            filter: 'schoolName._ref == $schoolRef',
+            filter: '(schoolName._ref == $schoolRef || organization._ref == $schoolRef)',
             params: { schoolRef: document.schoolName._ref },
           }
         },
@@ -73,7 +74,6 @@ export default defineType({
       options: {
         list: ['Nose Gear', 'Main Left', 'Main Right'],
       },
-      // ARCHITECT'S GUARD: Prevents two active tyres in the same position on one plane
       validation: (Rule) => Rule.custom(async (value, context) => {
         const { document, getClient } = context;
         const client = getClient({ apiVersion: '2023-05-03' });
