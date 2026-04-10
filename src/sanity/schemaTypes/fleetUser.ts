@@ -1,5 +1,5 @@
 import { defineType, defineField } from 'sanity'
-import { UserIcon } from '@sanity/icons' // Added an icon for better UI
+import { UserIcon } from '@sanity/icons'
 
 export default defineType({
   name: 'fleetUser',
@@ -11,7 +11,7 @@ export default defineType({
       name: 'organization',
       title: 'Organization Name',
       type: 'string',
-      validation: (Rule) => Rule.required(), // Recommended: Prevent empty names
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'accessCode',
@@ -20,11 +20,27 @@ export default defineType({
       description: 'The password assigned to this organization',
       validation: (Rule) => Rule.required(),
     }),
+    // --- ADDED ROLE FIELD FOR ADMIN INTELLIGENCE ---
+    defineField({
+      name: 'role',
+      title: 'User Role',
+      type: 'string',
+      description: 'Determines if the user sees their own fleet or the Master Intelligence Dashboard',
+      initialValue: 'OPERATOR',
+      options: {
+        list: [
+          { title: 'Admin (Jedo Internal)', value: 'ADMIN' },
+          { title: 'Operator (Client)', value: 'OPERATOR' },
+        ],
+        layout: 'radio',
+      },
+      validation: (Rule) => Rule.required(),
+    }),
   ],
-  // THIS BLOCK FIXES THE DROPDOWN DISPLAY
   preview: {
     select: {
-      title: 'organization', // Tells Sanity: Use "organization" as the label
+      title: 'organization',
+      subtitle: 'role', // Added subtitle so you can see roles at a glance in the list
     },
   },
 })
