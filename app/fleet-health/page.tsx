@@ -64,7 +64,7 @@ export default function FleetHealth() {
         }
 
         // 2. Fetch Fleet Data (Multi-Tenant Aware)
-        // ARCHITECT'S FIX: Updated query to check schoolName->organization
+        // ARCHITECT'S FIX: Resolved tailNumber and model via aircraft reference
         const data = await client.fetch(
           `*[_type == "fleetRecord" && schoolName->organization == $org && status == "active"] | order(tailNumber asc) {
             _id,
@@ -109,7 +109,7 @@ export default function FleetHealth() {
     return '#10b981'; // HEALTHY (Green)
   }
 
-  // ARCHITECT'S FIX: Added safety check for undefined tailNumbers
+  // ARCHITECT'S GUARD: Defensive grouping to handle undefined tailNumbers
   const groupedFleet = assets.reduce((acc, asset) => {
     const tail = asset.tailNumber || 'UNASSIGNED';
     if (!acc[tail]) {
@@ -353,33 +353,4 @@ const responsiveMainTitle = { fontSize: '1.2rem', fontWeight: '900', margin: 0, 
 const telemetryText = { fontSize: '0.6rem', color: '#10b981', fontWeight: '800', margin: '2px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' };
 const pulseDot = { width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 8px #10b981' };
 const navActionBtn = { backgroundColor: '#ffb400', color: '#020617', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: '900', fontSize: '0.65rem', whiteSpace: 'nowrap' as const, letterSpacing: '0.5px' };
-const archiveBtn = { backgroundColor: '#1e293b', color: '#94a3b8', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: '800', fontSize: '0.65rem', border: '1px solid #334155' };
-const intelligenceBtn = { backgroundColor: 'rgba(6, 182, 212, 0.1)', color: '#06b6d4', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: '800', fontSize: '0.65rem', border: '1px solid rgba(6, 182, 212, 0.3)' };
-const logoutBtn = { background: 'none', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.65rem', fontWeight: '700' };
-const summaryPanel = { backgroundColor: '#0b0f1a', padding: '40px', borderBottom: '1px solid #1e293b' };
-const summaryGrid = { maxWidth: '1440px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' };
-const summaryCard = { backgroundColor: '#161d2f', padding: '24px', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.03)' };
-const summaryLabel = { fontSize: '0.65rem', fontWeight: '900', color: '#64748b', letterSpacing: '1.5px' };
-const summaryValue = { fontSize: '2.5rem', margin: '10px 0 0', fontWeight: '900' };
-const summarySubLabel = { fontSize: '0.6rem', color: '#94a3b8', margin: 0 };
-const progressBase = { flexGrow: 1, height: '8px', backgroundColor: '#0f172a', borderRadius: '10px' };
-const inventoryHeader = { padding: '40px 40px 0', maxWidth: '1440px', margin: '0 auto' };
-const inventoryTitle = { fontSize: '0.75rem', color: '#64748b', fontWeight: '900', letterSpacing: '3px' };
-const mainContentStyle = { padding: '20px 40px 100px', maxWidth: '1440px', margin: '0 auto' };
-const fleetGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(480px, 1fr))', gap: '25px' };
-const aircraftCard = { backgroundColor: '#0b0f1a', borderRadius: '18px', padding: '28px', border: '1px solid #1e293b' };
-const aircraftHeader = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' };
-const tailText = { fontSize: '1.6rem', fontWeight: '900', margin: 0, color: '#ffb400', letterSpacing: '1px' };
-const modelText = { margin: 0, fontSize: '0.65rem', color: '#64748b', fontWeight: '800', letterSpacing: '1px' };
-const activeBadge = { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '5px 12px', borderRadius: '6px', fontSize: '0.55rem', fontWeight: '900', letterSpacing: '1px' };
-const tyreContainer = { display: 'flex', flexDirection: 'column' as const, gap: '15px' };
-const technicalRow = { display: 'flex', alignItems: 'center', gap: '15px', padding: '12px', backgroundColor: '#161d2f', borderRadius: '10px' };
-const posCodeBox = { width: '32px', height: '32px', backgroundColor: '#020617', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #1e293b' };
-const makeLabel = { fontSize: '0.75rem', fontWeight: '700', color: '#cbd5e1' };
-const pnLabel = { fontSize: '0.55rem', fontWeight: '600', color: '#64748b' };
-const assetProgressWrapper = { flexGrow: 1, height: '4px', backgroundColor: '#1e293b', borderRadius: '10px' };
-const techDataColumn = { display: 'flex', flexDirection: 'column' as const, textAlign: 'right' as const, minWidth: '85px' };
-const columnHeader = { fontSize: '0.45rem', fontWeight: '900', color: '#64748b', letterSpacing: '0.5px' };
-const columnValue = { fontSize: '0.75rem', fontWeight: '900' };
-const orderBtn = { display: 'block', textAlign: 'center' as const, backgroundColor: 'transparent', color: '#ffb400', textDecoration: 'none', padding: '12px', borderRadius: '10px', fontWeight: '800', fontSize: '0.7rem', marginTop: '24px', border: '1px solid #ffb400' };
-const loaderStyle = { display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#020617', color: '#ffb400', fontWeight: '900', fontSize: '1.2rem', letterSpacing: '4px' };
+const archiveBtn = { backgroundColor: '#1e293b', color: '#94a3b8', textDecoration: 'none', padding: '6px
