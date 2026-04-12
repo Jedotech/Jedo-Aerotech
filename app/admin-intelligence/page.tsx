@@ -38,19 +38,18 @@ export default function MasterIntelligence() {
   const [loading, setLoading] = useState(true)
   const [mounted, setMounted] = useState(false)
   const [selectedSchool, setSelectedSchool] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState("") // SCALING FEATURE: Global Search
   const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
     async function fetchMasterData() {
       try {
-        // IMPROVED QUERY: Dereferencing with fallbacks
         const data = await client.fetch(`
           *[_type == "fleetRecord" && status == "active"] {
             _id,
             "tailNumber": aircraft->tailNumber,
             "aircraftModel": aircraft->model,
-            // We try 'name', then 'title', then 'organization' to ensure we get a string
             "schoolName": coalesce(schoolName->name, schoolName->title, schoolName->organization, "Unnamed School"),
             "organization": coalesce(schoolName->organization, "N/A"),
             manufacturer,
@@ -82,13 +81,28 @@ export default function MasterIntelligence() {
     return Math.max(0, Math.min(100, percentage));
   }
 
+  // SCALING LOGIC: Multi-parameter search filter
+  const globalFilteredAssets = useMemo(() => {
+    return assets.filter(a => 
+      a.schoolName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.tailNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (a.partNumber || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [assets, searchTerm]);
+
   const filteredAssets = useMemo(() => 
-    selectedSchool ? assets.filter(a => a.schoolName === selectedSchool) : assets
-  , [assets, selectedSchool]);
+    selectedSchool ? globalFilteredAssets.filter(a => a.schoolName === selectedSchool) : globalFilteredAssets
+  , [globalFilteredAssets, selectedSchool]);
 
   const salesLeads = useMemo(() => 
-    assets.filter(a => calculateHealth(a.currentLandings, a.maxDesignLife) < 20)
-  , [assets]);
+    globalFilteredAssets.filter(a => calculateHealth(a.currentLandings, a.maxDesignLife) < 20)
+  , [globalFilteredAssets]);
+
+  // SCALING LOGIC: Filtered School Directory
+  const visibleSchools = useMemo(() => {
+    const unique = Array.from(new Set(assets.map(a => a.schoolName)));
+    return unique.filter(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
+  }, [assets, searchTerm]);
 
   const downloadGlobalReport = () => {
     const headers = ["School", "Tail", "Model", "Pos", "S/N", "Landings", "Max", "Health%"];
@@ -116,7 +130,7 @@ export default function MasterIntelligence() {
             {selectedSchool ? `${selectedSchool.toUpperCase()} FLEET` : "MASTER INTELLIGENCE"}
           </h1>
           <p style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '4px' }}>
-            {selectedSchool ? `Full asset breakdown` : "Global Network Visibility & Revenue Engine"}
+            {selectedSchool ? `Deep audit for operator` : "Global Visibility, Revenue Engine & Scaling Search"}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '15px' }}>
@@ -125,18 +139,29 @@ export default function MasterIntelligence() {
         </div>
       </header>
 
+      {/* SEARCH BAR SECTION */}
+      <div style={searchBarContainer}>
+        <input 
+          type="text" 
+          placeholder="SEARCH BY SCHOOL, TAIL NUMBER, OR PART NUMBER..." 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={searchInputStyle}
+        />
+      </div>
+
       <div style={kpiGrid}>
-        <div style={kpiCard}><span style={kpiLabel}>TOTAL ACTIVE ASSETS</span><h2 style={kpiValue}>{filteredAssets.length}</h2></div>
-        <div style={kpiCard}><span style={kpiLabel}>MANAGED SCHOOLS</span><h2 style={kpiValue}>{new Set(assets.map(a => a.schoolName)).size}</h2></div>
-        <div style={{ ...kpiCard, borderLeft: '4px solid #ef4444' }}><span style={kpiLabel}>GLOBAL SALES LEADS</span><h2 style={{ ...kpiValue, color: '#ef4444' }}>{salesLeads.length}</h2></div>
-        <div style={kpiCard}><span style={kpiLabel}>AIRCRAFT IN NETWORK</span><h2 style={kpiValue}>{new Set(assets.map(a => a.tailNumber)).size}</h2></div>
+        <div style={kpiCard}><span style={kpiLabel}>MATCHING ASSETS</span><h2 style={kpiValue}>{filteredAssets.length}</h2></div>
+        <div style={kpiCard}><span style={kpiLabel}>MATCHING SCHOOLS</span><h2 style={kpiValue}>{new Set(filteredAssets.map(a => a.schoolName)).size}</h2></div>
+        <div style={{ ...kpiCard, borderLeft: '4px solid #ef4444' }}><span style={kpiLabel}>CRITICAL LEADS</span><h2 style={{ ...kpiValue, color: '#ef4444' }}>{salesLeads.length}</h2></div>
+        <div style={kpiCard}><span style={kpiLabel}>TOTAL NETWORK</span><h2 style={kpiValue}>{new Set(assets.map(a => a.tailNumber)).size}</h2></div>
       </div>
 
       <main style={mainGrid}>
         <section style={sectionBox}>
-          <h3 style={sectionTitle}>OPERATOR DIRECTORY</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {Array.from(new Set(assets.map(a => a.schoolName))).map(school => (
+          <h3 style={sectionTitle}>OPERATOR DIRECTORY ({visibleSchools.length})</h3>
+          <div style={directoryScroll}>
+            {visibleSchools.map(school => (
               <div key={school} onClick={() => setSelectedSchool(school)} 
                 style={{...schoolSelectCard, backgroundColor: selectedSchool === school ? '#1e293b' : '#161d2f', border: selectedSchool === school ? '1px solid #ffb400' : '1px solid transparent'}}>
                 <div>
@@ -150,34 +175,36 @@ export default function MasterIntelligence() {
         </section>
 
         <section style={sectionBox}>
-          <h3 style={sectionTitle}>{selectedSchool ? "DETAILED INVENTORY" : "GLOBAL CRITICAL LEADS"}</h3>
-          <table style={tableStyle}>
-            <thead>
-              <tr style={tableHeaderRow}>
-                {!selectedSchool && <th style={th}>SCHOOL</th>}
-                <th style={th}>TAIL #</th>
-                <th style={th}>POS</th>
-                <th style={th}>S/N</th>
-                <th style={th}>HEALTH</th>
-                <th style={th}>ACTION</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(selectedSchool ? filteredAssets : salesLeads).map(asset => {
-                const health = calculateHealth(asset.currentLandings, asset.maxDesignLife);
-                return (
-                  <tr key={asset._id} style={tableRow}>
-                    {!selectedSchool && <td style={{ ...td, color: '#06b6d4', fontWeight: '800' }}>{asset.schoolName}</td>}
-                    <td style={td}><strong>{asset.tailNumber}</strong></td>
-                    <td style={td}>{asset.tyrePosition}</td>
-                    <td style={td}>{asset.serialNumber || '---'}</td>
-                    <td style={{ ...td, color: health < 20 ? '#ef4444' : '#10b981', fontWeight: 'bold' }}>{health.toFixed(0)}%</td>
-                    <td style={td}><Link href={`https://wa.me/919600038089`} style={miniActionBtn}>QUOTE</Link></td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          <h3 style={sectionTitle}>{selectedSchool ? "DETAILED INVENTORY" : "SEARCH RESULTS / CRITICAL LEADS"}</h3>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={tableStyle}>
+              <thead>
+                <tr style={tableHeaderRow}>
+                  {!selectedSchool && <th style={th}>SCHOOL</th>}
+                  <th style={th}>TAIL #</th>
+                  <th style={th}>POS</th>
+                  <th style={th}>S/N</th>
+                  <th style={th}>HEALTH</th>
+                  <th style={th}>ACTION</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(selectedSchool ? filteredAssets : salesLeads).map(asset => {
+                  const health = calculateHealth(asset.currentLandings, asset.maxDesignLife);
+                  return (
+                    <tr key={asset._id} style={tableRow}>
+                      {!selectedSchool && <td style={{ ...td, color: '#06b6d4', fontWeight: '800', fontSize: '0.65rem' }}>{asset.schoolName}</td>}
+                      <td style={td}><strong>{asset.tailNumber}</strong></td>
+                      <td style={td}>{asset.tyrePosition}</td>
+                      <td style={td}>{asset.serialNumber || '---'}</td>
+                      <td style={{ ...td, color: health < 20 ? '#ef4444' : '#10b981', fontWeight: 'bold' }}>{health.toFixed(0)}%</td>
+                      <td style={td}><Link href={`https://wa.me/919600038089`} style={miniActionBtn}>QUOTE</Link></td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>
@@ -185,9 +212,12 @@ export default function MasterIntelligence() {
 }
 
 // STYLES
-const headerFlex: any = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '1px solid #1e293b', paddingBottom: '20px' };
+const headerFlex: any = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #1e293b', paddingBottom: '20px' };
+const searchBarContainer = { marginBottom: '30px' };
+const searchInputStyle = { width: '100%', padding: '15px 20px', borderRadius: '12px', border: '1px solid #1e293b', backgroundColor: '#0b0f1a', color: 'white', fontSize: '0.8rem', fontWeight: '700', letterSpacing: '1px', outline: 'none' };
 const reportBtn = { backgroundColor: '#06b6d4', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: '900', cursor: 'pointer' };
 const backBtn = { backgroundColor: 'transparent', color: '#ffb400', border: '1px solid #ffb400', padding: '10px 20px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: '900', cursor: 'pointer' };
+const directoryScroll = { display: 'flex', flexDirection: 'column' as const, gap: '12px', maxHeight: '600px', overflowY: 'auto' as const, paddingRight: '10px' };
 const schoolSelectCard = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px', borderRadius: '14px', cursor: 'pointer' };
 const miniActionBtn = { backgroundColor: 'rgba(255, 180, 0, 0.1)', color: '#ffb400', textDecoration: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '0.6rem', fontWeight: '900', border: '1px solid #ffb400' };
 const kpiGrid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '40px' };
